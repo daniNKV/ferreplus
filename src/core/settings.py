@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -26,22 +26,6 @@ SECRET_KEY = 'django-insecure-qgp0qy!1gtit*zwwq8#jt3t934ssnadh6&pr=r3#hvc)&p_9y0
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [ BASE_DIR / "templates" ],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                # Already defined Django-related contexts here
-
-                # `allauth` needs this from django
-                'django.template.context_processors.request',
-            ],
-        },
-    },
-]
 
 AUTHENTICATION_BACKENDS = [
     # Needed to login by username in Django admin, regardless of `allauth`
@@ -83,7 +67,7 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -146,6 +130,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# STATIC_ROOT = BASE_DIR.parent / "local-cdn" / "static"
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
