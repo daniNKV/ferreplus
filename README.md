@@ -99,7 +99,7 @@ TBD
   - [Django-tailwindcss](https://django-tailwind.readthedocs.io/en/latest/index.html) - 
   - [Wagtail](https://wagtail.org/) - CMS (Posiblemente?)
 - [SQLite3](https://www.sqlite.org/) - Database
-- [HTMX](httsp://htxm.org) - UI Framework
+- [HTMX](httsp://htmx.org) - UI Framework
 - [DaisyUI](https://daisyui.com) - Components Library
 - [Tailwind CSS](https://tailwindcss.com/) - CSS Utility Framework
 
@@ -108,9 +108,9 @@ TBD
 
 ## ✍️ Authors <a name = "authors"></a>
 
-- [@aritzblesa](https://github.com/daniNKV) 
-- [@augustoconti](https://github.com/daniNKV) 
-- [@sofiabongiorno](https://github.com/daniNKV) 
+- [@aritzblesa](https://github.com/) 
+- [@augustoconti](https://github.com/) 
+- [@sofiabongiorno](https://github.com/) 
 - [@danielnikiforov](https://github.com/daniNKV) 
 
 ## 🎉 Acknowledgements <a name = "acknowledgement"></a>
