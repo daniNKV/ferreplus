@@ -6,30 +6,31 @@ from django import forms
 class UsersSignupForm(SignupForm):
     first_name = forms.CharField(
         max_length=30,
-        label="First Name",
+        label="Nombre",
         widget=forms.TextInput(
             attrs={
-                "placeholder": ("First Name"),
+                "placeholder": ("Nombre"),
                 "autocomplete": "First Name",
             }
         ),
     )
     last_name = forms.CharField(
         max_length=30,
-        label="Last Name",
+        label="Apellido",
         widget=forms.TextInput(
             attrs={
-                "placeholder": ("Last Name"),
+                "placeholder": ("Apellido"),
                 "autocomplete": "Last Name",
             }
         ),
     )
     birth_date = forms.DateField(
         required=True,
+        label="Fecha de nacimiento",
         widget=forms.DateInput(
             attrs={
                 "type": "date",
-                "placeholder": ("Date of Birth"),
+                "placeholder": ("Fecha de nacimiento"),
                 "autocomplete": "Date of Birth",
             }
         ),
