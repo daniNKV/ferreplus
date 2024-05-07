@@ -10,6 +10,7 @@ class User(AbstractUserRole):
         "unpublish_product": True,
     }
 
+
 class Owner(AbstractUserRole):
     available_permissions = {
         "create_shop_product": True,
@@ -18,11 +19,10 @@ class Owner(AbstractUserRole):
         "create_employee": True,
         "delete_employee": True,
         "create_branch": True,
-        "delete_branch": True,                
+        "delete_branch": True,
         "modify_branch": True,
     }
 
 
 class Employee(AbstractUserRole):
-    available_permissions = {
-    }
+    available_permissions = {}
