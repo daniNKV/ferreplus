@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mostrar empleados</title>
+</head>
+<body>
+    <h1>Lista de empleados</h1>
+    <ul>
+        {% for objeto in objetos %}
+            <li>{{ objeto.name }} - {{ objeto.last_name }} - {{ objeto.email }} - {{ objeto.dni }} - {{ objeto.birth_date }}
+                <form id="deleteForm_{{ forloop.counter0 }}" method="post" action="{% url 'employee_delete' objeto.email %}">
+                    {% csrf_token %}
+                    <button type="button" onclick="confirmDelete('{{ forloop.counter0 }}')">Eliminar</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <script>
+        function confirmDelete(formIndex) {
+            if (confirm("¿Estás seguro de que quieres eliminar este empleado?")) {
+                var form = document.getElementById("deleteForm_" + formIndex);
+                form.submit();
+            }
+        }
+    </script>
+</body>
+</html>

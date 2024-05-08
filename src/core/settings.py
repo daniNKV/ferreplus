@@ -38,17 +38,20 @@ AUTHENTICATION_BACKENDS = [
 # Application definition
 
 INSTALLED_APPS = [
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'owners'
-
+    "django.contrib.admin",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.usersessions",
+    "rolepermissions",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "user",
+    "debug_toolbar",
+    "owners",
 ]
 
 MIDDLEWARE = [

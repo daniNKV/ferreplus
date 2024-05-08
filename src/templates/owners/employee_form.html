@@ -1,4 +1,36 @@
-<form method="post">{% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Save">
-</form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dar alta empleado</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <form method="post" class="custom-form" style="width: 50%; margin: 0 auto; background-color: #f9f9f9; padding: 20px; border-radius: 10px;">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="submit" value="Agregar empleado" class="submit-btn" style="background-color: #00008B; color: white; padding: 15px 20px; border: none; border-radius: 5px; cursor: pointer;">
+        </form>
+    </div>
+</body>
+</html>
+
+
+{% if employee_saved %}
+    <div class="notification">
+        Empleado creado exitosamente
+    </div>
+
+    <script>
+        // Mostrar la notificación y luego ocultarla después de un tiempo
+        window.onload = function() {
+            var notification = document.querySelector('.notification');
+            notification.style.display = "block";
+            setTimeout(function() {
+                notification.style.display = "none";
+            }, 3000); // Ocultar la notificación después de 3 segundos
+        };
+    </script>
+{% endif %}
