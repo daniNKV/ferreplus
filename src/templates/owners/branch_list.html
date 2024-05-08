@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mostrar las sucursales</title>
+</head>
+<body>
+    <h1>Lista de sucursales</h1>
+    <ul>
+        {% for objeto in objetos %}
+            <li>{{ objeto.name }} - {{ objeto.opening_hour }} - {{ closing_hour.adress }}</li>
+
+        {% endfor %}
+    </ul>
+</body>
+</html>

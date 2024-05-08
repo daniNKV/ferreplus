@@ -12,4 +12,4 @@ class Employee(models.Model):
     birth_date = models.DateField()
     last_name = models.CharField(max_length=100)
     dni = models.CharField(max_length=8)
-    branch_name = models.CharField(max_length=100)
+    

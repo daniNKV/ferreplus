@@ -2,3 +2,20 @@
     {{ form.as_p }}
     <input type="submit" value="Save">
 </form>
+
+{% if employee_saved %}
+    <div class="notification">
+        ¡Empleado creado exitosamente!
+    </div>
+
+    <script>
+        // Mostrar la notificación y luego ocultarla después de un tiempo
+        window.onload = function() {
+            var notification = document.querySelector('.notification');
+            notification.style.display = "block";
+            setTimeout(function() {
+                notification.style.display = "none";
+            }, 3000); // Ocultar la notificación después de 3 segundos
+        };
+    </script>
+{% endif %}
