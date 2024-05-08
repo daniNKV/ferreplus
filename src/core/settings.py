@@ -9,7 +9,6 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
-
 import os
 from pathlib import Path
 
@@ -49,8 +48,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "user",
-    'debug_toolbar',
-
+    "debug_toolbar",
 ]
 
 MIDDLEWARE = [
@@ -146,7 +144,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "user.User"
 
 INTERNAL_IPS = [
-    '127.0.0.1',
+    "127.0.0.1",
     # Add your IP address if different
 ]
 
@@ -160,3 +158,4 @@ ACCOUNT_FORMS = {
     "signup": "user.forms.UsersSignupForm",
 }
 
+ACCOUNT_ADAPTER = "user.adapter.UsersAdapter"
