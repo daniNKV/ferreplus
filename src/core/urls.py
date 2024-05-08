@@ -24,6 +24,8 @@ urlpatterns = [
     path("", views.home_view, name="home"),
     path("admin/", admin.site.urls),
     path("accounts/", include("user.urls")),
+    path("items/", include("item.urls")),
+
 ]
 
 if settings.DEBUG:
