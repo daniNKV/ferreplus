@@ -19,8 +19,12 @@
         <p class="mb-5 text-dark">Conseguí las herramientas y artículos que necesitás, mientras que
           le das una segunda vida a los que tenés.</p>
         <div class="flex justify-center gap-5">
-          <button class="btn btn-lg btn-outline text-dark hover:bg-main hover:text-neutral">Registrarme</button>
-          <button class="btn btn-lg bg-main text-neutral hover:bg-neutral hover:text-dark">Iniciar Sesión</button>
+          <a href="{% url 'account_signup' %}">
+            <button class="btn btn-lg btn-outline text-dark hover:bg-main hover:text-neutral">Registrarme</button>
+          </a>
+          <a href="{% url 'account_login' %}">
+            <button class="btn btn-lg bg-main text-neutral hover:bg-neutral hover:text-dark">Iniciar Sesión</button>
+          </a>
         </div>
       </div>
     </div>

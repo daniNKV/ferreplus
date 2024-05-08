@@ -5,6 +5,7 @@ from django import forms
 
 class UsersSignupForm(SignupForm):
     first_name = forms.CharField(
+        required=True,
         max_length=30,
         label="Nombre",
         widget=forms.TextInput(
@@ -15,6 +16,7 @@ class UsersSignupForm(SignupForm):
         ),
     )
     last_name = forms.CharField(
+        required=True,
         max_length=30,
         label="Apellido",
         widget=forms.TextInput(
@@ -36,7 +38,8 @@ class UsersSignupForm(SignupForm):
         ),
     )
 
-    def signup(self, request, user):
+    def save(self, request):
+        user = super(UsersSignupForm, self).save(request)
         user.first_name = self.cleaned_data["first_name"]
         user.last_name = self.cleaned_data["last_name"]
         user.birth_date = self.cleaned_data["birth_date"]
