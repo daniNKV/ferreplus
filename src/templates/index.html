@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="relative">
+  {% include 'navbar.html' %}
+</div>
+
+<div class="hero min-h-screen" style="background-image: url({% static 'img/background.png' %})">
+  <div class="hero-content flex-col lg:flex-row gap-0 text-center bg-neutral">
+    <figure
+      class="max-w-xl h-auto">
+      <img src="{% static 'logo.webp' %}" alt="logo" />
+    </figure>
+    <div class="bg-neutral">
+      <h1 class="mb-5 text-4xl font-bold text-dark">Empezá a intercambiar ya mismo!</h1>
+      <p class="mb-5 text-dark">Conseguí las herramientas y artículos que necesitás, mientras que
+        le das una segunda vida a los que tenés.</p>
+      <div class="flex justify-center gap-5">
+        <button class="btn btn-lg btn-outline text-dark hover:bg-main hover:text-neutral">Registrarme</button>
+        <button class="btn btn-lg bg-main text-neutral hover:bg-neutral hover:text-dark">Iniciar Sesión</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}
