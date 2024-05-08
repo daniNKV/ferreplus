@@ -2,3 +2,4 @@ Django<5.0.4
 Django-allauth
 Django-role-permissions
 Django-template-partials
+Django-debug-toolbar
