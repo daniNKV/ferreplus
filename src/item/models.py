@@ -1,10 +1,10 @@
 from django.db import models
 from django.forms import ModelForm
 
-class Category(abstractCategory):
+class Category(models.Model):
     name = models.CharField(max_length=30)
 
-class Item(AbstractItem):
+class Item(models.Model):
     name = models.CharField(max_length=30)
     description = models.CharField(max_length=200)
     creation_date = models.DateField()
