@@ -12,4 +12,7 @@ class Employee(models.Model):
     birth_date = models.DateField()
     last_name = models.CharField(max_length=100)
     dni = models.CharField(max_length=8)
+    password = models.CharField(max_length=10)
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
+
     

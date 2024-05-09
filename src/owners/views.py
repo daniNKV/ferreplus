@@ -8,11 +8,17 @@ from django.shortcuts import redirect
 class BranchCreateView(CreateView):
     model = Branch
     fields = ['name', 'address', 'opening_hour', 'closing_hour']
+    def form_valid(self, form):
+        messages.success(self.request, '¡Sucursal creada exitosamente!')
+        return super().form_valid(form) 
+
+    def get_success_url(self):
+        return '/' #Redirige a la pagina principal
 
 class EmployeeCreateView(CreateView):
     model = Employee
-    fields = ['name', 'email', 'birth_date', 'last_name', 'dni']
-    success_url = '/'  # Redirige a la misma página para crear otro empleado
+    fields = ['name', 'email', 'birth_date', 'last_name', 'dni', 'password', 'branch']
+    success_url = '/'  # Redirige a la misma página principal
 
     def form_valid(self, form):
         dni = form.cleaned_data['dni']
@@ -29,16 +35,25 @@ class EmployeeCreateView(CreateView):
         context = super().get_context_data(**kwargs)
         context['employee_saved'] = self.request.GET.get('employee_saved', False)
         return context
-
+    
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['branch'].queryset = Branch.objects.all()
+        return form
+    
 
 def employeeList(request):
     objetos = Employee.objects.all()
-    return render(request, 'C:/Users/nicol/OneDrive/Desktop/Informatica/IS2/ferreplus/src/templates/owners/employee_list.html', {'objetos': objetos})
+    return render(request, 'owners/employee_list.html', {'objetos': objetos})
 
 def branchList(request):
-    objetos = Employee.objects.all()
-    return render(request, 'C:/Users/nicol/OneDrive/Desktop/Informatica/IS2/ferreplus/src/templates/owners/branch_list.html', {'objetos': objetos})
+    objetos = Branch.objects.all()
+    return render(request, 'owners/branch_list.html', {'objetos': objetos})
 
 def employeeDelete(request, employee_email):
     Employee.objects.filter(email=employee_email).delete()
     return redirect('employee_list')
+
+def branchDelete(request, branch_id):
+    Branch.objects.filter(id=branch_id).delete()
+    return redirect('branch_list')

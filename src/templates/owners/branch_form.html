@@ -1,4 +1,18 @@
-<form method="post">{% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Save">
-</form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar sucursal</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <form method="post" class="custom-form" style="width: 50%; margin: 0 auto; background-color: #f9f9f9; padding: 20px; border-radius: 10px;">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="submit" value="Agregar sucursal" class="submit-btn" style="background-color: #00008B; color: white; padding: 15px 20px; border: none; border-radius: 5px; cursor: pointer;">
+        </form>
+    </div>
+</body>
+</html>

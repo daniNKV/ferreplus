@@ -8,8 +8,20 @@
     <ul>
         {% for objeto in objetos %}
             <li>{{ objeto.name }} - {{ objeto.opening_hour }} - {{ closing_hour.adress }}</li>
+            <form id="deleteForm_{{ forloop.counter0 }}" method="post" action="{% url 'branch_delete' objeto.id %}">
+                {% csrf_token %}
+                <button type="button" onclick="confirmDelete('{{ forloop.counter0 }}')">Eliminar</button>
+            </form>
+        </li>
+    {% endfor %}
+</ul>
 
-        {% endfor %}
-    </ul>
+<script>
+    function confirmDelete(formIndex) {
+        if (confirm("¿Estás seguro de que quieres eliminar esta sucursal?")) {
+            var form = document.getElementById("deleteForm_" + formIndex);
+            form.submit();
+        }
+    }
 </body>
 </html>
