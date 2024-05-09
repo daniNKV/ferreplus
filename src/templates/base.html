@@ -10,16 +10,34 @@
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
     <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
     <link rel="manifest" href="{% static 'site.webmanifest' %}">
+    <!-- TODO: Implementar instalando Django-tailwindcss y daisy-ui en esa app -->
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.2/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+    <!-- TODO: Implementar instalando Django-htmx -->
     <script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
-</head>
-<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+    <script src="https://kit.fontawesome.com/bfda2c7b17.js" crossorigin="anonymous"></script>
+    <script>
+        tailwind.config = {
+          theme: {
+            extend: {
+              colors: {
+                dark: '#202359',
+                main: '#30478C',
+                neutral: '#EBF1F8',
+                gray: '#B7BBD2',
+                accent: '#439AC8',
 
+              }
+            }
+          }
+        }
+      </script>
+</head>
+
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="min-h-screen font-sans">
     <div class="">
         {% block content %}
         {% endblock %}
     </div>
-    
 </body>
 </html>
