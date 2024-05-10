@@ -1,5 +1,8 @@
 from django.urls import path, include
+from . import views
+from item.views import itemList
 
 urlpatterns = [
-    path("add/", ),
+    path("", include("allauth.urls")),
+    path("", itemList, name="itemList"),
 ]
