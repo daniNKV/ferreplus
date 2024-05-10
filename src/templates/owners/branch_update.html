@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Modificar Sucursal - {{ objeto.name }}</title>
+</head>
+<body>
+    <h2>Modificar Sucursal: {{ objeto.name }}</h2>
+    <form method="post">
+        {% csrf_token %}
+        <label for="name">Nombre:</label>
+        <input type="text" id="name" name="name" value="{{ objeto.name }}"><br><br>
+
+        <label for="address">Dirección:</label>
+        <input type="text" id="address" name="address" value="{{ objeto.address }}"><br><br>
+
+        <label for="opening_hour">Hora de apertura:</label>
+        <input type="time" id="opening_hour" name="opening_hour" value="{{ objeto.opening_hour }}"><br><br>
+
+        <label for="closing_hour">Hora de cierre:</label>
+        <input type="time" id="closing_hour" name="closing_hour" value="{{ objeto.closing_hour }}"><br><br>
+
+        <button type="submit">Guardar Cambios</button>
+    </form>
+</body>
+</html>
+

@@ -1,19 +1,20 @@
-from django.shortcuts import render
-from django.views.generic import CreateView
+from django.shortcuts import render, redirect
+from django.views.generic import CreateView, ListView
 from owners.models import Branch, Employee
 from django.contrib import messages
-from django.shortcuts import redirect
-
+from django.urls import reverse_lazy
+from django.views.generic import UpdateView
 
 class BranchCreateView(CreateView):
     model = Branch
     fields = ['name', 'address', 'opening_hour', 'closing_hour']
+
     def form_valid(self, form):
         messages.success(self.request, '¡Sucursal creada exitosamente!')
         return super().form_valid(form) 
 
     def get_success_url(self):
-        return '/' #Redirige a la pagina principal
+        return reverse_lazy('branch_list') # Redirige a la lista de sucursales después de crear una sucursal
 
 class EmployeeCreateView(CreateView):
     model = Employee
@@ -57,3 +58,36 @@ def employeeDelete(request, employee_email):
 def branchDelete(request, branch_id):
     Branch.objects.filter(id=branch_id).delete()
     return redirect('branch_list')
+
+class BranchUpdateView(UpdateView):
+    model = Branch
+    fields = ['name', 'address', 'opening_hour', 'closing_hour']
+    template_name = 'owners/branch_update.html'
+
+    def get_success_url(self):
+        return reverse_lazy('branch_update', kwargs={'pk': self.object.pk})
+
+def branchList(request):
+    objetos = Branch.objects.all()
+    return render(request, 'owners/branch_list.html', {'objetos': objetos})
+
+def branchUpdate(request, branch_id):
+    branch = Branch.objects.get(id=branch_id)
+    if request.method == 'POST':
+        # Obtener los datos del formulario enviado
+        name = request.POST.get('name')
+        address = request.POST.get('address')
+        opening_hour = request.POST.get('opening_hour')
+        closing_hour = request.POST.get('closing_hour')
+
+        # Actualizar los campos de la sucursal
+        branch.name = name
+        branch.address = address
+        branch.opening_hour = opening_hour
+        branch.closing_hour = closing_hour
+        branch.save()
+
+        # Redirigir a la lista de sucursales o a una página de confirmación
+        return redirect('branch_list')
+    else:
+        return render(request, 'owners/branch_update.html', {'objeto': branch})

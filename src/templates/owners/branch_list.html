@@ -1,27 +1,30 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Mostrar las sucursales</title>
+    <meta charset="UTF-8">
+    <title>Lista de Sucursales</title>
 </head>
 <body>
-    <h1>Lista de sucursales</h1>
+    <h2>Lista de Sucursales</h2>
     <ul>
-        {% for objeto in objetos %}
-            <li>{{ objeto.name }} - {{ objeto.opening_hour }} - {{ closing_hour.adress }}</li>
-            <form id="deleteForm_{{ forloop.counter0 }}" method="post" action="{% url 'branch_delete' objeto.id %}">
-                {% csrf_token %}
-                <button type="button" onclick="confirmDelete('{{ forloop.counter0 }}')">Eliminar</button>
-            </form>
-        </li>
-    {% endfor %}
-</ul>
+        {% for branch in objetos %}
+            <li>{{ branch.name }} - {{ branch.opening_hour }} - {{ branch.closing_hour }} - {{ branch.address }}
+                <form id="deleteForm_{{ forloop.counter0 }}" method="post" action="{% url 'branch_delete' branch.id %}">
+                    {% csrf_token %}
+                    <button type="button" onclick="confirmDelete('{{ forloop.counter0 }}')">Eliminar</button>
+                </form>
+                <a href="{% url 'branch_update' branch.id %}">Editar</a>
+            </li>
+        {% endfor %}
+    </ul>
 
-<script>
-    function confirmDelete(formIndex) {
-        if (confirm("¿Estás seguro de que quieres eliminar esta sucursal?")) {
-            var form = document.getElementById("deleteForm_" + formIndex);
-            form.submit();
+    <script>
+        function confirmDelete(formIndex) {
+            if (confirm("¿Estás seguro de que quieres eliminar esta sucursal?")) {
+                var form = document.getElementById("deleteForm_" + formIndex);
+                form.submit();
+            }
         }
-    }
+    </script>
 </body>
 </html>
