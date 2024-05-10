@@ -27,7 +27,7 @@ urlpatterns = [
     path("accounts/", include("user.urls")),
     path("__debug__/", include("debug_toolbar.urls")),
     path('owners/', include('owners.urls')),
-    path("items/", include("item.urls")),
+    path("item/", include("item.urls")),
 
 ]
 
