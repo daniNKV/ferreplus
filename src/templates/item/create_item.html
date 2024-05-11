@@ -1,0 +1,13 @@
+<h1>Crear un item</h1>
+
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{form.as_p}}
+    <select class="form-control" id="make" name='selected_category'>
+        {% for category in categories %}
+            <option value='{{category.id}}'>{{ category.name }}</option>
+        {% endfor %}
+    </select>
+
+    <button>Guardar</button>
+</form>

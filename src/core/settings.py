@@ -174,3 +174,6 @@ ACCOUNT_FORMS = {
 }
 
 ACCOUNT_ADAPTER = "user.adapter.UsersAdapter"
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT=os.path.join(BASE_DIR,"media/")

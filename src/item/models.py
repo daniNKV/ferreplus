@@ -1,5 +1,6 @@
 from django.db import models
 from django.forms import ModelForm
+import os
 
 class Category(models.Model):
     name = models.CharField(max_length=30)
@@ -14,6 +15,7 @@ class Item(models.Model):
         blank=True,
         null=True
     )
+    image = models.ImageField(upload_to='item/images/', null=False, blank=False)
     #user = models.ForeignKey(
     #    User,
     #    on_delete=models.PROTECT,
@@ -22,4 +24,3 @@ class Item(models.Model):
     #)
     # TODO: Instalar Pillow para manejo de imagenes. Implementar con el perfil del usuario.
     # image = models.ImageField(upload_to='items/', null=False, blank=Flase)
-

@@ -1,10 +1,14 @@
 <h1> hola </h1>
 
+<h3> <button> <a href=" {% url 'createItem' %} "> subir artículo </a> </button> </h3>
+
 <table>
     <tr>
       <th>Nombre</th>
-      <th>Descripcion</th>
+      <th>Descripción</th>
+      <th>Categoría</th>
       <th>Fecha de creación</th>
+      <th>Imagen</th>
     </tr>
 
 {% for item in items %}
@@ -12,7 +16,9 @@
     <tr>
       <td>{{ item.name }}</td>
       <td>{{ item.description }}</td>
+      <td>{{ item.category.name }}</td>
       <td>{{ item.creation_date }}</td>
+      <td><img src=" {{ item.image.url }} "></td>
     </tr>
 
 {% endfor %}
