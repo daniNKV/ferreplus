@@ -23,17 +23,29 @@
         <img src="{% static 'logo.webp' %}" alt="logo" />
       </figure>
       <div class="bg-neutral">
-        <h1 class="mb-5 text-4xl font-bold text-dark">Empezá a intercambiar ya mismo!</h1>
-        <p class="mb-5 text-dark">Conseguí las herramientas y artículos que necesitás, mientras que
-          le das una segunda vida a los que tenés.</p>
-        <div class="flex justify-center gap-5">
-          <a href="{% url 'account_signup' %}">
-            <button class="btn btn-lg btn-outline text-dark hover:bg-main hover:text-neutral">Registrarme</button>
-          </a>
-          <a href="{% url 'account_login' %}">
-            <button class="btn btn-lg bg-main text-neutral hover:bg-neutral hover:text-dark">Iniciar Sesión</button>
-          </a>
-        </div>
+        {% if user.is_authenticated %}
+          <h1 class="mb-5 text-4xl font-bold text-dark">Bienvenido de nuevo, {{ user.first_name }}! </h1>
+          <p class="mb-5 text-dark">Conseguí las herramientas y artículos que necesitás, mientras que
+            le das una segunda vida a los que tenés.</p>
+          <div class="flex justify-center gap-5">
+            <a href=""> <!-- "{% url 'account_signup' %}" -->>
+              <button class="btn btn-lg bg-main text-neutral hover:bg-neutral hover:text-dark">Publicar artículo</button>
+            </a>
+
+          </div>
+        {% else %}
+          <h1 class="mb-5 text-4xl font-bold text-dark">Empezá a intercambiar ya mismo!</h1>
+          <p class="mb-5 text-dark">Conseguí las herramientas y artículos que necesitás, mientras que
+            le das una segunda vida a los que tenés.</p>
+          <div class="flex justify-center gap-5">
+            <a href="{% url 'account_signup' %}">
+              <button class="btn btn-lg btn-outline text-dark hover:bg-main hover:text-neutral">Registrarme</button>
+            </a>
+            <a href="{% url 'account_login' %}">
+              <button class="btn btn-lg bg-main text-neutral hover:bg-neutral hover:text-dark">Iniciar Sesión</button>
+            </a>
+          </div>
+        {% endif %}
       </div>
     </div>
   </div>
