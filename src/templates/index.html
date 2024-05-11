@@ -12,11 +12,9 @@
 
 {% block body %}
 
-<div class="relative">
-  {% include 'navbar.html' %}
-</div>
+<div class="z-20">{% include 'navbar.html' %}</div>
 
-<section id="hero">
+<section id="hero" class="z-10">
   <div class="hero min-h-screen" style="background-image: url({% static 'img/background.png' %})">
     <div class="hero-content flex-col lg:flex-row gap-0 text-center bg-neutral">
       <figure class="max-w-xl h-auto">
