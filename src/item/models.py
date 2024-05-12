@@ -3,11 +3,11 @@ from django.forms import ModelForm
 import os
 
 class Category(models.Model):
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=50)
 
 class Item(models.Model):
-    name = models.CharField(max_length=30)
-    description = models.CharField(max_length=200)
+    name = models.CharField(max_length=50)
+    description = models.CharField(max_length=500)
     creation_date = models.DateField()
     category = models.ForeignKey(
         Category,
@@ -16,11 +16,18 @@ class Item(models.Model):
         null=True
     )
     image = models.ImageField(upload_to='item/images/', null=False, blank=False)
+    wasTraded = models.BooleanField(default=False)
     #user = models.ForeignKey(
     #    User,
     #    on_delete=models.PROTECT,
     #    blank=True,
     #    null=True
     #)
-    # TODO: Instalar Pillow para manejo de imagenes. Implementar con el perfil del usuario.
-    # image = models.ImageField(upload_to='items/', null=False, blank=Flase)
+
+    #branch = models.ForeignKey(
+    #    Branch,
+    #    on_delete=models.PROTECT,
+    #    blank=True,
+    #    null=True
+    #)
+
