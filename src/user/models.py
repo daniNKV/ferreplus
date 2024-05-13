@@ -41,14 +41,42 @@ class UserManager(BaseUserManager):
         return user
 
 
+class EmployeeManager(UserManager):
+    def create_employee(
+        self, email, first_name, last_name, birth_date, dni, branch, password=None
+    ):
+        if not dni:
+            raise ValueError("Employee must have a DNI")
+        if not branch:
+            raise ValueError("Employee must have a branch")
+
+        user = super().create_user(
+            email=email,
+            first_name=first_name,
+            last_name=last_name,
+            birth_date=birth_date,
+            password=password,
+        )
+
+        employee = self.model(user=user, dni=dni, branch=branch)
+        employee.user.is_staff = True
+        employee.save()
+        return employee
+
+
 class User(AbstractBaseUser):
-    first_name = models.CharField(verbose_name="First name", max_length=20)
-    last_name = models.CharField(max_length=20, verbose_name="Last name")
-    birth_date = models.DateField(verbose_name="Date of birth")
+    class Meta:
+        verbose_name = "Usuario"
+
+    first_name = models.CharField(verbose_name="Nombre", max_length=20)
+    last_name = models.CharField(max_length=20, verbose_name="Apellido")
+    birth_date = models.DateField(verbose_name="Fecha de nacimiento")
     email = models.EmailField(verbose_name="Email", max_length=60, unique=True)
     password = models.CharField(verbose_name="Password", max_length=100)
-    date_joined = models.DateTimeField(verbose_name="Joined on date", auto_now_add=True)
-    last_login = models.DateTimeField(verbose_name="Last login", auto_now=True)
+    date_joined = models.DateTimeField(
+        verbose_name="Fecha de registro", auto_now_add=True
+    )
+    last_login = models.DateTimeField(verbose_name="Ultima vez activo", auto_now=True)
     is_admin = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -71,12 +99,12 @@ class User(AbstractBaseUser):
     )
     USERNAME_FIELD = "email"
     EMAIL_FIELD = "email"
-    REQUIRED_FIELDS = ["first_name", "last_name", "birth_date"]
+    REQUIRED_FIELDS = ["first_name", "last_name", "birth_date", "password"]
 
     objects = UserManager()
 
     def get_absolute_url(self):
-        return "/users/%i/" % (self.pk)
+        return f"/users/{self.pk}/"
 
     def __int__(self):
         return self.pk
@@ -92,3 +120,17 @@ class User(AbstractBaseUser):
 
     # TODO: Instalar Pillow para manejo de imagenes. Implementar con el perfil del usuario.
     # avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
+
+
+class Employee(models.Model):
+    class Meta:
+        verbose_name = "Empleado"
+
+    user = models.OneToOneField(User, verbose_name="Usuario", on_delete=models.CASCADE)
+    dni = models.CharField(
+        verbose_name="Documento nacional de identidad", max_length=8, unique=True
+    )
+    branch = models.ForeignKey(
+        "owners.Branch", verbose_name="Sucursal", on_delete=models.CASCADE
+    )
+    objects = EmployeeManager()

@@ -5,13 +5,17 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ferreplus</title>
+      <title>
+        {% block head_title %}
+        {% endblock head_title %}
+    </title>
+    {% block extra_head %}
+    {% endblock extra_head %}
     <link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
     <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
     <link rel="manifest" href="{% static 'site.webmanifest' %}">
     <!-- TODO: Implementar instalando Django-tailwindcss y daisy-ui en esa app -->
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.2/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
     <!-- TODO: Implementar instalando Django-htmx -->
     <script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
@@ -35,9 +39,10 @@
 </head>
 
 <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="min-h-screen font-sans">
-    <div class="">
-        {% block content %}
-        {% endblock %}
-    </div>
+  {% block body %}
+  {% endblock %}
+
+  {% block extra_body %}
+  {% endblock extra_body %}
 </body>
 </html>
