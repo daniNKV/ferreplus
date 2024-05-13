@@ -18,8 +18,6 @@ class UserAdminForm(ModelForm):
             "birth_date",
             "email",
             "password",
-            "is_admin",
-            "is_staff",
         ]
 
 
@@ -41,9 +39,9 @@ class EmployeeAdminForm(ModelForm):
 
     def clean_dni(self):
         dni = self.cleaned_data.get("dni")
-        if len(dni) >= 7 and len(dni) <= 8:
-            raise ValidationError("El DNI debe tener 7 o 8 caracteres")
-        return dni
+        if len(dni) >= 7:
+            return dni
+        raise ValidationError("El DNI debe tener 7 o 8 caracteres")
 
 
 class EmployeeAdmin(admin.ModelAdmin):
