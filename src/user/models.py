@@ -57,7 +57,6 @@ class EmployeeManager(UserManager):
             birth_date=birth_date,
             password=password,
         )
-
         employee = self.model(user=user, dni=dni, branch=branch)
         employee.user.is_staff = True
         employee.save()
@@ -117,6 +116,9 @@ class User(AbstractBaseUser):
 
     def has_module_perms(self, app_label):
         return True
+    
+    def __str__(self):
+        return self.first_name + " " + self.last_name
 
     # TODO: Instalar Pillow para manejo de imagenes. Implementar con el perfil del usuario.
     # avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
@@ -134,3 +136,6 @@ class Employee(models.Model):
         "owners.Branch", verbose_name="Sucursal", on_delete=models.CASCADE
     )
     objects = EmployeeManager()
+
+    def __str__(self):
+        return self.user.first_name + " " + self.user.last_name

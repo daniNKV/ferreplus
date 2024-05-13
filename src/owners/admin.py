@@ -10,7 +10,7 @@ admin.site.index_title = "Ferreplus"
 class BranchAdminForm(forms.ModelForm):
     class Meta:
         model = Branch
-        fields = ["name", "address", "opening_hour", "closing_hour", "employees"]
+        fields = ["name", "address", "opening_hour", "closing_hour"]
 
     def clean_(self):
         cleaned_data = super().clean()
