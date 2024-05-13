@@ -9,6 +9,6 @@ class Branch(models.Model):
     address = models.CharField(verbose_name="direccion", max_length=100)
     opening_hour = models.TimeField(verbose_name="hora de apertura")
     closing_hour = models.TimeField(verbose_name="hora de cierre")
-    
+
     def __str__(self):
-        return self.name
+        return str(self.name)
