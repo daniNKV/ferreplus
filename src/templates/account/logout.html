@@ -9,12 +9,9 @@
     {% endelement %}
     <p class="py-2">{% trans 'Are you sure you want to sign out?' %}</p>
     <div class="flex gap-2 mt-2">
-        {% url 'home' as redirect_url %}
-        <a href="{{ redirect_url }}">
-            <button class="btn btn-secondary">
-                Volver
-            </button>
-        </a>
+        <button class="btn btn-secondary" onclick=goBack()>
+            Volver
+        </button>
         {% url 'account_logout' as action_url %}
         {% element form method="post" action=action_url no_visible_fields=True %}
             {% slot body %}
@@ -33,3 +30,13 @@
         {% endelement %}
     </div>
 {% endblock content %}
+
+{% block extra_body %}
+
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+
+{% endblock extra_body %}
