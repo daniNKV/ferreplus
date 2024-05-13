@@ -29,10 +29,14 @@
       <td>{{ item.category.name }}</td>
       <td>{{ item.creation_date }}</td>
       <td><img src=" {{ item.image.url }} "></td>
-      <td><button> Modificar </button></td>
+      <form action= "{% url 'item_detail' item.id %}" method="GET">
+        {% csrf_token %}
+        <td><button> Modificar </button></td>
+      </form>
+
       <form action= "{% url 'deleteItem' item.id %}" method="POST">
         {% csrf_token %}
-        <td><button> Elminar </button></td>
+        <td><button> Eliminar </button></td>
       </form>
     </tr>
 

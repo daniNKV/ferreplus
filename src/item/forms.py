@@ -1,7 +1,7 @@
 from django import forms
 from item.models import Item
 
-class createItemForm(forms.Form):
+class createItemForm(forms.ModelForm):
     class Meta:
         model = Item
         fields = ['name', 'description', 'image']

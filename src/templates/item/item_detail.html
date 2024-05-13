@@ -1,11 +1,21 @@
-<h1>Crear un artículo</h1>
+<h1>Modificar un artículo</h1>
 
 <form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     {{form.as_p}}
+    <p>Imagen ya cargada (no es necesario poner imagen si no se va a modificar):
+    </p>
+    <p>
+    <img src=" {{ item.image.url }} ">
+    </p>
+
     <select class="form-control" id="make" name='selected_category'>
         {% for category in categories %}
-            <option value='{{category.id}}'>{{ category.name }}</option>
+            {% if category.id == item.category_id %}
+                <option value='{{category.id}}' selected>{{ category.name }}</option>
+            {% else %}
+                <option value='{{category.id}}'>{{ category.name }}</option>
+            {% endif %}
         {% endfor %}
     </select>
 

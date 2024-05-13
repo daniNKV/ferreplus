@@ -6,8 +6,6 @@ import datetime
 
 def itemList(request):
     items = Item.objects.all()
-    for item in items:
-        print(item.creation_date)
     return render(request, 'item/item_list.html', {'items': items})
 
 def validFileExtension(value):
@@ -39,4 +37,20 @@ def deleteItem(request, item_id):
         item.delete()
         messages.success(request, '¡Artículo eliminado exitosamente!')
     return redirect('itemList')
+
+def item_detail(request, item_id):
+    if request.method == 'POST':
+        item = get_object_or_404(Item, pk=item_id)#agregar desp como param user = request.user (solo acá)
+        form = createItemForm(request.POST, instance=item)
+        if form.is_valid():
+            form.save()
+            item.category_id = request.POST['selected_category']
+            item.save()
+            messages.success(request, '¡Artículo modificado exitosamente!')
+        return redirect('itemList')
+    else:
+        item = get_object_or_404(Item, pk=item_id)#agregar desp como param user = request.user (solo acá)
+        form = createItemForm(instance=item)
+        cats = Category.objects.all()
+        return render(request, 'item/item_detail.html', {'form': form, 'item':item, 'categories': cats})
 
