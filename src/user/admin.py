@@ -1,7 +1,9 @@
 from django.contrib import admin
-from django.forms import ModelForm, ValidationError
 from django.contrib.auth.models import Group
+from django.forms import ModelForm, ValidationError
 from allauth.socialaccount.models import SocialApp, SocialAccount, SocialToken
+from allauth.usersessions.models import UserSession
+from allauth.account.models import EmailAddress
 from .models import Employee, User
 
 admin.site.site_header = "Panel de Administración de Ferreplus"
@@ -53,3 +55,5 @@ admin.site.unregister(SocialApp)
 admin.site.unregister(SocialAccount)
 admin.site.unregister(SocialToken)
 admin.site.unregister(Group)
+admin.site.unregister(EmailAddress)
+admin.site.unregister(UserSession)
