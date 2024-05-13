@@ -2,6 +2,7 @@ import re
 from django.db import models
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from rolepermissions.roles import assign_role
 
 
 class UserManager(BaseUserManager):
@@ -23,6 +24,7 @@ class UserManager(BaseUserManager):
             birth_date=birth_date,
             password=password,
         )
+        assign_role(user, 'user')
         user.password = make_password(user.password)
         user.save()
         return user
@@ -35,7 +37,7 @@ class UserManager(BaseUserManager):
             birth_date=birth_date,
             password=password,
         )
-        user.is_admin = True
+        assign_role(user, 'owner')
         user.is_staff = True
         user.is_superuser = True
         user.save()
@@ -58,6 +60,7 @@ class EmployeeManager(UserManager):
             birth_date=birth_date,
             password=password,
         )
+        assign_role(user, 'employee')
         employee = self.model(user=user, dni=dni, branch=branch)
         employee.user.is_staff = True
         employee.save()
@@ -77,7 +80,6 @@ class User(AbstractBaseUser):
         verbose_name="Fecha de registro", auto_now_add=True
     )
     last_login = models.DateTimeField(verbose_name="Ultima vez activo", auto_now=True)
-    is_admin = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
@@ -113,7 +115,7 @@ class User(AbstractBaseUser):
         return self.pk
 
     def has_perm(self, perm, obj=None):
-        return self.is_admin
+        return self.is_staff
 
     def has_module_perms(self, app_label):
         return True

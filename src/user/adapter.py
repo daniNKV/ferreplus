@@ -1,5 +1,6 @@
 from allauth.account.adapter import DefaultAccountAdapter
-
+from rolepermissions.checkers import has_role
+from .roles import Owner
 
 class UsersAdapter(DefaultAccountAdapter):
     def save_user(self, request, user, form, commit=True):
@@ -16,11 +17,17 @@ class UsersAdapter(DefaultAccountAdapter):
         user.save()
         return user
 
-    # TODO: Agregar logica de redireccion segun el usuario
     def get_signup_redirect_url(self, request):
         path = "/"
         return path
 
-    def get_login_redirect_url(self, request):
+    def get_password_change_redirect_url(self, request):
         path = "/"
+        return path
+    
+    def get_login_redirect_url(self, request):
+        if has_role(request.user, Owner) or request.user.is_superuser:  # Replace with your condition for checking the user's role
+            path = "/admin"  # Replace with your admin panel URL
+        else:
+            path = "/"  # Replace with your user panel URL
         return path
