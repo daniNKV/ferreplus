@@ -18,6 +18,7 @@ class UserAdmin(admin.ModelAdmin):
             obj.set_password(password)
         obj.save()
 
+
 class EmployeeAdminForm(ModelForm):
     class Meta:
         model = Employee
@@ -41,10 +42,10 @@ class EmployeeAdminForm(ModelForm):
         raise ValidationError("El DNI debe tener 7 o 8 caracteres")
 
 
-
 class EmployeeAdmin(admin.ModelAdmin):
     form = EmployeeAdminForm
     fields = ("user", "dni", "branch")
+
 
 admin.site.register(User, UserAdmin)
 admin.site.register(Employee, EmployeeAdmin)
