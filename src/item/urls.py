@@ -1,10 +1,10 @@
 from django.urls import path, include
 from . import views
-from item.views import itemList
-from item.views import createItem
+from item import views
 
 urlpatterns = [
     path("", include("allauth.urls")),
-    path("", itemList, name="itemList"),
-    path("subirArticulo/", createItem, name="createItem"),
+    path("", views.itemList, name="itemList"),
+    path("subirArticulo/", views.createItem, name="createItem"),
+    path("<int:item_id>/delete", views.deleteItem, name="deleteItem"),
 ]

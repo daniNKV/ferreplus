@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from item.models import Item, Category
 from .forms import createItemForm
 from django.contrib import messages
@@ -32,3 +32,11 @@ def createItem(request):
             messages.error(request, 'Extensión del archivo no soportada')
             cats = Category.objects.all()
             return render(request, 'item/create_item.html', {'form': createItemForm(), 'categories': cats})
+
+def deleteItem(request, item_id):
+    if request.method == 'POST':
+        item = get_object_or_404(Item, pk=item_id)#agregar desp como param user = request.user (solo acá)
+        item.delete()
+        messages.success(request, '¡Artículo eliminado exitosamente!')
+    return redirect('itemList')
+

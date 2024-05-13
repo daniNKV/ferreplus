@@ -17,6 +17,8 @@
       <th>Categoría</th>
       <th>Fecha de creación</th>
       <th>Imagen</th>
+      <th>Modificar</th>
+      <th>Eliminar</th>
     </tr>
 
 {% for item in items %}
@@ -27,6 +29,11 @@
       <td>{{ item.category.name }}</td>
       <td>{{ item.creation_date }}</td>
       <td><img src=" {{ item.image.url }} "></td>
+      <td><button> Modificar </button></td>
+      <form action= "{% url 'deleteItem' item.id %}" method="POST">
+        {% csrf_token %}
+        <td><button> Elminar </button></td>
+      </form>
     </tr>
 
 {% endfor %}
