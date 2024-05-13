@@ -1,3 +1,4 @@
+import re
 from django.db import models
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
@@ -45,8 +46,8 @@ class EmployeeManager(UserManager):
     def create_employee(
         self, email, first_name, last_name, birth_date, dni, branch, password=None
     ):
-        if not dni:
-            raise ValueError("Employee must have a DNI")
+        if not dni or not re.match(r"^\d{7,8}$", dni):
+            raise ValueError("Employee DNI must be 7 or 8 digits")
         if not branch:
             raise ValueError("Employee must have a branch")
 
@@ -116,7 +117,7 @@ class User(AbstractBaseUser):
 
     def has_module_perms(self, app_label):
         return True
-    
+
     def __str__(self):
         return self.first_name + " " + self.last_name
 
@@ -138,4 +139,4 @@ class Employee(models.Model):
     objects = EmployeeManager()
 
     def __str__(self):
-        return self.user.first_name + " " + self.user.last_name
+        return self.user.__str__()

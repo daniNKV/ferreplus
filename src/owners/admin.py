@@ -20,7 +20,7 @@ class BranchAdminForm(forms.ModelForm):
 
 class BranchAdmin(admin.ModelAdmin):
     form = BranchAdminForm
-
+    list_display = ["name", "address", "opening_hour", "closing_hour"]
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.model._meta.verbose_name = "Ferreteria"
