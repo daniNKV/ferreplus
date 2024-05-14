@@ -173,3 +173,5 @@ ACCOUNT_FORMS = {
 }
 
 ACCOUNT_ADAPTER = "user.adapter.UsersAdapter"
+
+ROLEPERMISSIONS_MODULE = 'user.roles'

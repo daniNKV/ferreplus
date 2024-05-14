@@ -24,9 +24,9 @@ class UserManager(BaseUserManager):
             birth_date=birth_date,
             password=password,
         )
-        assign_role(user, 'user')
         user.password = make_password(user.password)
         user.save()
+        assign_role(user, 'user')
         return user
 
     def create_superuser(self, email, first_name, last_name, birth_date, password):
@@ -37,10 +37,11 @@ class UserManager(BaseUserManager):
             birth_date=birth_date,
             password=password,
         )
-        assign_role(user, 'owner')
+        user.is_admin = True
         user.is_staff = True
         user.is_superuser = True
         user.save()
+        assign_role(user, 'owner')
         return user
 
 
@@ -60,10 +61,10 @@ class EmployeeManager(UserManager):
             birth_date=birth_date,
             password=password,
         )
-        assign_role(user, 'employee')
         employee = self.model(user=user, dni=dni, branch=branch)
         employee.user.is_staff = True
         employee.save()
+        assign_role(user, 'employee')
         return employee
 
 
@@ -80,6 +81,7 @@ class User(AbstractBaseUser):
         verbose_name="Fecha de registro", auto_now_add=True
     )
     last_login = models.DateTimeField(verbose_name="Ultima vez activo", auto_now=True)
+    is_admin = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
