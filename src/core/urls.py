@@ -20,11 +20,8 @@ from django.conf import settings
 from django.contrib import admin
 from django.views.generic import RedirectView
 
-from . import views
-
-
 urlpatterns = [
-    path("", views.home_view, name="home"),
+    path('', include("index.urls")),
     path('admin/login/', RedirectView.as_view(url='/accounts/login/'), name='admin_login'),
     path('admin/logout/', RedirectView.as_view(url='/accounts/logout/'), name='admin_logout'),
     path("admin/", admin.site.urls),
