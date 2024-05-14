@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "user",
     "debug_toolbar",
     "owners",
+    "item",
 ]
 
 MIDDLEWARE = [
