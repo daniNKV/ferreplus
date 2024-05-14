@@ -14,15 +14,19 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-
+from django.conf.urls.static import static
+from django.urls import path, include
 from django.conf import settings
 from django.contrib import admin
-from django.urls import path, include
+from django.views.generic import RedirectView
+
 from . import views
 
 
 urlpatterns = [
     path("", views.home_view, name="home"),
+    path('admin/login/', RedirectView.as_view(url='/accounts/login/'), name='admin_login'),
+    path('admin/logout/', RedirectView.as_view(url='/accounts/logout/'), name='admin_logout'),
     path("admin/", admin.site.urls),
     path("accounts/", include("user.urls")),
     path("__debug__/", include("debug_toolbar.urls")),
@@ -32,9 +36,5 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
-    # do not do this in prod
-    from django.conf.urls.static import static
-
-    # Try Django
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

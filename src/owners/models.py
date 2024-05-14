@@ -1,18 +1,14 @@
 from django.db import models
 
+
 class Branch(models.Model):
-    name = models.CharField(max_length=100)
-    address = models.CharField(max_length=100)
-    opening_hour = models.TimeField()
-    closing_hour = models.TimeField()
+    class Meta:
+        verbose_name = "Sucursal"
 
-class Employee(models.Model):
-    name = models.CharField(max_length=100)
-    email = models.EmailField(max_length=100)
-    birth_date = models.DateField()
-    last_name = models.CharField(max_length=100)
-    dni = models.CharField(max_length=8)
-    password = models.CharField(max_length=10)
-    branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
+    name = models.CharField(verbose_name="nombre", max_length=100)
+    address = models.CharField(verbose_name="direccion", max_length=100)
+    opening_hour = models.TimeField(verbose_name="hora de apertura")
+    closing_hour = models.TimeField(verbose_name="hora de cierre")
 
-    
+    def __str__(self):
+        return str(self.name)
