@@ -1,6 +1,8 @@
+import re
 from django.db import models
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from rolepermissions.roles import assign_role
 
 
 class UserManager(BaseUserManager):
@@ -24,6 +26,7 @@ class UserManager(BaseUserManager):
         )
         user.password = make_password(user.password)
         user.save()
+        assign_role(user, 'user')
         return user
 
     def create_superuser(self, email, first_name, last_name, birth_date, password):
@@ -38,6 +41,7 @@ class UserManager(BaseUserManager):
         user.is_staff = True
         user.is_superuser = True
         user.save()
+        assign_role(user, 'owner')
         return user
 
 
@@ -45,8 +49,8 @@ class EmployeeManager(UserManager):
     def create_employee(
         self, email, first_name, last_name, birth_date, dni, branch, password=None
     ):
-        if not dni:
-            raise ValueError("Employee must have a DNI")
+        if not dni or not re.match(r"^\d{7,8}$", dni):
+            raise ValueError("Employee DNI must be 7 or 8 digits")
         if not branch:
             raise ValueError("Employee must have a branch")
 
@@ -60,6 +64,7 @@ class EmployeeManager(UserManager):
         employee = self.model(user=user, dni=dni, branch=branch)
         employee.user.is_staff = True
         employee.save()
+        assign_role(user, 'employee')
         return employee
 
 
@@ -112,11 +117,11 @@ class User(AbstractBaseUser):
         return self.pk
 
     def has_perm(self, perm, obj=None):
-        return self.is_admin
+        return self.is_staff
 
     def has_module_perms(self, app_label):
         return True
-    
+
     def __str__(self):
         return self.first_name + " " + self.last_name
 
@@ -138,4 +143,4 @@ class Employee(models.Model):
     objects = EmployeeManager()
 
     def __str__(self):
-        return self.user.first_name + " " + self.user.last_name
+        return self.user.__str__()

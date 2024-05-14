@@ -1,7 +1,9 @@
-from django.forms import ModelForm, ValidationError
 from django.contrib import admin
 from django.contrib.auth.models import Group
+from django.forms import ModelForm, ValidationError
 from allauth.socialaccount.models import SocialApp, SocialAccount, SocialToken
+from allauth.usersessions.models import UserSession
+from allauth.account.models import EmailAddress
 from .models import Employee, User
 
 admin.site.site_header = "Panel de Administración de Ferreplus"
@@ -9,16 +11,14 @@ admin.site.site_title = "Admin"
 admin.site.index_title = "Ferreplus"
 
 
-class UserAdminForm(ModelForm):
-    class Meta:
-        model = User
-        fields = [
-            "first_name",
-            "last_name",
-            "birth_date",
-            "email",
-            "password",
-        ]
+class UserAdmin(admin.ModelAdmin):
+    fields = ("first_name", "last_name", "email", "birth_date", "password")
+
+    def save_model(self, request, obj, form, change):
+        if not change:  # only for new objects
+            password = form.cleaned_data.get("password")
+            obj.set_password(password)
+        obj.save()
 
 
 class EmployeeAdminForm(ModelForm):
@@ -46,16 +46,14 @@ class EmployeeAdminForm(ModelForm):
 
 class EmployeeAdmin(admin.ModelAdmin):
     form = EmployeeAdminForm
-
-
-class UserAdmin(admin.ModelAdmin):
-    form = UserAdminForm
+    fields = ("user", "dni", "branch")
 
 
 admin.site.register(User, UserAdmin)
 admin.site.register(Employee, EmployeeAdmin)
-
 admin.site.unregister(SocialApp)
 admin.site.unregister(SocialAccount)
 admin.site.unregister(SocialToken)
 admin.site.unregister(Group)
+admin.site.unregister(EmailAddress)
+admin.site.unregister(UserSession)
