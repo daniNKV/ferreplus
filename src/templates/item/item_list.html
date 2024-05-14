@@ -34,12 +34,21 @@
         <td><button> Modificar </button></td>
       </form>
 
-      <form action= "{% url 'deleteItem' item.id %}" method="POST">
+      <form id="formEliminar" action= "{% url 'deleteItem' item.id %}" method="POST">
         {% csrf_token %}
-        <td><button> Eliminar </button></td>
+        <td><button onclick="confirmarEliminacion()"> Eliminar </button></td>
       </form>
     </tr>
 
 {% endfor %}
 
 </table> 
+
+<script>
+  function confirmarEliminacion() {
+      if (confirm('¿Estás seguro de que deseas eliminar este artículo?')) {
+          // Si el usuario confirma, enviar la solicitud de eliminación al servidor
+          Document.getElementById("formEliminar").submit();
+      }
+  }
+</script>

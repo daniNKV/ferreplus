@@ -1,3 +1,2 @@
 agregar sucursal
 agregar usuario
-agregar confirmación para borrar tarea
