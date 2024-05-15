@@ -1,20 +1,19 @@
-<h1>Crear un artículo</h1>
+{% extends 'base_form.html' %}
 
-<form method="POST" enctype="multipart/form-data">
+{% block title %}
+Crear un artículo
+{% endblock %}
+
+{% block form %}
+
+<form method="POST" class="form-control gap-5" enctype="multipart/form-data">
     {% csrf_token %}
     {{form.as_p}}
-    <select class="form-control" id="make" name='selected_category'>
-        {% for category in categories %}
-            <option value='{{category.id}}'>{{ category.name }}</option>
-        {% endfor %}
-    </select>
-
-    <button>Guardar</button>
+    <button type="submit" class="btn btn-lg btn-outline bg-main text-neutral">Publicar</button>
 </form>
-{% if messages %}
-    <ul class="messages">
-        {% for message in messages %}
-            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-        {% endfor %}
-    </ul>
-{% endif %}
+
+{% endblock %}
+
+
+
+
