@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "index",
     "user",
+    "profiles",
     "debug_toolbar",
     "owners",
     "item",
