@@ -12,6 +12,18 @@
 
 {% block body %}
 
+{% if messages %}
+    <ul id="messages" class="messages">
+      {% for message in messages %}
+        <div class="toast">
+          <div class="alert alert-info">
+            <span>{{ message }}</span>
+          </div>
+        </div>
+      {% endfor %}
+  </ul>
+{% endif %}
+
 <div class="z-20">{% include 'navbar.html' %}</div>
 
 <section id="hero" class="z-10">
@@ -26,7 +38,7 @@
           <p class="mb-5 text-dark">Conseguí las herramientas y artículos que necesitás, mientras que
             le das una segunda vida a los que tenés.</p>
           <div class="flex justify-center gap-5">
-            <a href=""> <!-- "{% url 'account_signup' %}" -->
+            <a href=""> 
               <button class="btn btn-lg bg-main text-neutral hover:bg-neutral hover:text-dark">Publicar artículo</button>
             </a>
 
@@ -213,4 +225,13 @@
 
 {% include 'footer.html' %}
 
+{% block extra_body %}
+
+<script>
+  window.setTimeout(function() {
+    document.querySelector('.alert').remove()
+}, 4000);
+
+</script>
+{% endblock extra_body %}
 {% endblock %}

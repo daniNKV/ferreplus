@@ -51,7 +51,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "index",
     "user",
+    "profiles",
     "debug_toolbar",
     "owners",
     "item",
@@ -180,3 +182,6 @@ ACCOUNT_FORMS = {
 ACCOUNT_ADAPTER = "user.adapter.UsersAdapter"
 
 ROLEPERMISSIONS_MODULE = 'user.roles'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")

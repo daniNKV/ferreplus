@@ -1,6 +1,7 @@
 from datetime import datetime
 from allauth.account.forms import SignupForm
 from django import forms
+from . import models
 
 
 class UsersSignupForm(SignupForm):
@@ -59,3 +60,13 @@ class UsersSignupForm(SignupForm):
                 "Hay que ser mayor de 18 años para registrarse en la plataforma."
             )
         return birth_date
+
+
+class UserEditForm(forms.ModelForm):
+    class Meta:
+        model = models.User
+        fields = ("first_name", "last_name")
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'input input-bordered w-full'}),
+            'last_name': forms.TextInput(attrs={'class': 'input input-bordered w-full'}),
+        }
