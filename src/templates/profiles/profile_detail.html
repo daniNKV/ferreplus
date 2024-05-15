@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block extra_head %}
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+{% endblock extra_head %}
+{% block body %}
+
+{% include 'navbar.html' %}
+
+<section id="hero" class="hero min-h-screen text-dark bg-cover" style="background-image: url({% static 'img/background.png' %})">
+  <div class="hero-content w-screen bg-neutral flex-col lg:gap-2">
+    <h2 class="text-7xl text-center font-bold">{{ profile.user.first_name }} {{ profile.user.last_name }}</h1>
+
+    <img src="{% static 'img/avatar-default.jpg' %}" class="max-w-72 rounded-lg shadow-2xl" />
+
+    <div class="join join-horizontal pt-2">
+      <a href="#items" class="btn btn-lg bg-main join-item text-neutral">Ver articulos</a>
+      {% if user.is_authenticated and user.pk == profile.user.pk %}
+        <a class="btn btn-lg bg-main join-item text-neutral">Modificar perfil</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<section id="items" class="hero min-h-screen bg-neutral">
+  <div class="hero-content">
+    <h1 class="text-3xl">Ooops. No hay nada todavía!</h1>
+  </div>
+</section>
+{% endblock %}
