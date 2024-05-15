@@ -16,7 +16,6 @@ class Profile(models.Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         path = self.avatar.path  # pylint: disable=no-member
-        path = self.avatar.path  # pylint: disable=no-member
         img = Image.open(path)
         if img.height != 700 or img.width != 700:
             output_size = (700, 700)
