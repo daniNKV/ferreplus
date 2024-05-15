@@ -15,7 +15,12 @@
 {% include 'navbar.html' %}
 
 <section class="hero min-h-screen bg-cover bg-neutral" style="background-image: url({% static 'img/background.png' %})">
-    <div class="hero-content w-11/12 max-w-3xl p-5 md:px-20 md:py-10 card mt-10 text-dark bg-neutral shadow-xl">
+ 
+    <div class="relative hero-content w-11/12 max-w-3xl p-5 md:px-20 md:py-10 card mt-10 text-dark bg-neutral shadow-xl">
+        <a href="{% url 'profile_view' user_id=user.pk %}" class="absolute top-0 text-dark left-0 p-5 inline-flex items-center text-gray-500 hover:text-gray-700">
+          <i class="fas fa-arrow-left text-3xl mr-2"></i>
+          Volver
+        </a>  
         <h1 class="text-5xl font-bold text-center">¡Actualiza tus datos!</h1>
         <form class="card-body p-5 gap-5" method="post" enctype="multipart/form-data">
             {% csrf_token %}
