@@ -28,7 +28,7 @@
       <td>{{ item.description }}</td>
       <td>{{ item.category.name }}</td>
       <td>{{ item.creation_date }}</td>
-      <td><img src=" {{ item.image.url }} "></td>
+      <td><img src="{{ item.image.url }}"></td>
       <form action= "{% url 'item_detail' item.id %}" method="GET">
         {% csrf_token %}
         <td><button> Modificar </button></td>
