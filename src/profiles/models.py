@@ -9,12 +9,16 @@ class Profile(models.Model):
     avatar = models.ImageField(
         default="avatars/avatar-default.jpg", upload_to=UploadToPathAndRename("avatars")
     )
+    avatar = models.ImageField(
+        default="avatars/avatar-default.jpg", upload_to=UploadToPathAndRename("avatars")
+    )
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         path = self.avatar.path  # pylint: disable=no-member
+        path = self.avatar.path  # pylint: disable=no-member
         img = Image.open(path)
-        if img.height != 500 or img.width != 500:
-            output_size = (500, 500)
+        if img.height != 700 or img.width != 700:
+            output_size = (700, 700)
             img = img.resize(output_size)
             img.save(path)

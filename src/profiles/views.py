@@ -1,5 +1,6 @@
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
+from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from user.forms import UserEditForm
@@ -33,7 +34,8 @@ def profile_edit(request, user_id):
         if user_form.is_valid() and profile_formset.is_valid():
             user_form.save()
             profile_formset.save()
-            # return redirect("profile_view", user_id=request.user.pk)
+            messages.success(request, '¡Tu perfil fue actualizado correctamente!')
+            return redirect("profile_view", user_id=request.user.pk)
     else:
         user_form = UserEditForm(instance=user)
         profile_formset = ProfileFormSet(instance=user)
