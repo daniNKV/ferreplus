@@ -1,3 +1,3 @@
 -- SQLite
 insert into item_category(name)
-values("martillo")
+values("hacha")

@@ -21,7 +21,6 @@ def createItem(request):
         cats = Category.objects.all()
         return render(request, 'item/create_item.html', {'form': createItemForm(), 'categories': cats})
     else:
-        print(request.FILES['image'].name)
         if validFileExtension(request.FILES['image'].name):
             Item.objects.create(name=request.POST['name'], description=request.POST['description'], creation_date=datetime.datetime.now(), category_id = request.POST['selected_category'], image = request.FILES['image'])
             messages.success(request, '¡Artículo cargado exitosamente!')
@@ -45,6 +44,7 @@ def item_detail(request, item_id):
         if form.is_valid():
             form.save()
             item.category_id = request.POST['selected_category']
+            item.image = request.FILES['image']
             item.save()
             messages.success(request, '¡Artículo modificado exitosamente!')
         return redirect('itemList')
