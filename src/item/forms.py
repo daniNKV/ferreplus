@@ -3,7 +3,7 @@ from item.models import Item, Category
 from owners.models import Branch
 
 
-class ItemCreateForm(forms.ModelForm):
+class ItemForm(forms.ModelForm):
     class Meta:
         model = Item
         fields = ["name", "description", "image", "category", "branch"]
