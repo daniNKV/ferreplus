@@ -13,7 +13,7 @@
 {% block body %}
 
 {% if messages %}
-    <ul id="messages" class="messages">
+    <ul id="messages" class="messages flex flex-col">
       {% for message in messages %}
         <div class="toast">
           <div class="alert alert-info">
@@ -35,14 +35,27 @@
       <div class="bg-neutral">
         {% if user.is_authenticated %}
           <h1 class="mb-5 text-4xl font-bold text-dark">Bienvenido de nuevo, {{ user.first_name }}! </h1>
-          <p class="mb-5 text-dark">Conseguí las herramientas y artículos que necesitás, mientras que
-            le das una segunda vida a los que tenés.</p>
-          <div class="flex justify-center gap-5">
-            <a href=""> 
-              <button class="btn btn-lg bg-main text-neutral hover:bg-neutral hover:text-dark">Publicar artículo</button>
-            </a>
 
-          </div>
+          {% if user.is_staff %}
+            <p class="mb-5 text-dark">Validá los trueques de los usuarios, dándoles seguridad y confianza.</p>
+            <div class="flex justify-center gap-2">
+              <a href="{% url 'employee_panel' %}">
+                <button class="btn btn-lg bg-main text-neutral hover:bg-neutral hover:text-dark">Ir al panel de empleados</button>
+              </a>
+            </div>
+          {% else %}
+            <p class="mb-5 text-dark">Conseguí las herramientas y artículos que necesitás, mientras que
+            le das una segunda vida a los que tenés.</p>
+            <div class="flex justify-center gap-2">
+              <a href="{% url 'profile_view' user_id=user.pk %}"> 
+                <button class="btn btn-lg bg-main text-neutral hover:bg-neutral hover:text-dark">Ver mi perfil</button>
+              </a>
+              <a href="{% url 'item_create' %}"> 
+                <button class="btn btn-lg bg-main text-neutral hover:bg-neutral hover:text-dark">Publicar artículo</button>
+              </a>
+            </div>
+          {% endif %}
+
         {% else %}
           <h1 class="mb-5 text-4xl font-bold text-dark">Empezá a intercambiar ya mismo!</h1>
           <p class="mb-5 text-dark">Conseguí las herramientas y artículos que necesitás, mientras que
@@ -64,162 +77,48 @@
 <section id="user-products" class="min-w-screen bg-neutral text-dark">
   <div class="flex justify-between items-center p-5 bg-main">
     <h2 class="text-xl md:text-4xl text-neutral">Articulos ofrecidos por otros usuarios</h2>
-    <a href="" class="btn btn-lg btn-outline text-neutral">Ver todo</a>
+    <!-- <a href="" class="btn btn-lg btn-outline text-neutral">Ver todo</a> -->
   </div>
-  <div class="carousel w-full carousel-center p-4 px-10 space-x-4 bg-neutral">
-
-    <div class="carousel-item w-96 bg-base-100 shadow-xl">
-      <div class="card">
-        <figure class="rounded-none">
-          <img src="https://img.freepik.com/free-photo/construction-worker-using-hammer-job-site_23-2150530697.jpg?t=st=1715136270~exp=1715139870~hmac=40f054e8cd00eceecdbb4d2ff820587297e84cb2f72923d1af52bd0ec22d8250&w=1480" alt="Martillo" />
-        </figure>
-        <div class="card-body items-center text-center bg-main text-neutral">
-          <h2 class="card-title">
-            Martillo Braco  
-            <div class="badge badge-secondary"></div>
-          </h2>
-          <p>Martillo marca nacional en excelente estado</p>
-          <div class="card-actions justify-end">
-            <div class="badge badge-outline">Herramientas manuales</div>
+  <div class="carousel w-full carousel-center py-20 px-10 space-x-10 bg-neutral">
+    {% if items %}
+      {% for item in items %}
+        <div class="carousel-item w-96 bg-base-100 shadow-xl">
+          <div class="card">
+            <figure class="rounded-none">
+              <img src="{{ item.image.url }}" alt="{{ item.name }}" />
+            </figure>
+            <div class="card-body gap-5 items-center text-center bg-main text-neutral">
+              <!-- <div class="avatar">
+                <div class="w-12 rounded-full">
+                  <img src="{{ item.user.avatar.url }}" class="" alt="">
+                </div>
+              </div> -->
+              <h2 class="card-title">
+                {{ item.name }}  
+              </h2>
+              <p>{{ item.description }}</p>
+              <div class="card-actions justify-end">
+                <div class="badge badge-outline">{{ item.category }}</div>
+              </div>
+            </div>
           </div>
         </div>
+      {% endfor %}
+    {% else  %}
+      <div class="flex justify-center items-center w-full h-96">
+        <h2 class="text-2xl text-dark">No hay artículos disponibles aún</h2>
       </div>
-    </div>
-
-    <div class="carousel-item w-96 bg-base-100 shadow-xl">
-      <div class="card">
-        <figure class="h-64 rounded-none">
-          <img src="https://img.freepik.com/free-photo/red-gas-burner-wooden-table_23-2148180603.jpg?t=st=1715136343~exp=1715139943~hmac=45a6cf180e822f2f88164c9966010668bb4c19774153d64af6dd737c7d0abcf7&w=1380" alt="Llave inglesa" />
-        </figure>
-        <div class="card-body items-center text-center bg-main text-neutral">
-          <h2 class="card-title">
-            Pistola de calor
-          </h2>
-          <p>En impecable estado</p>
-          <div class="card-actions justify-end">
-            <div class="badge badge-outline">Herramientas Eléctricas</div>
-          </div>
-        </div>
-      </div> 
-    </div>
-
-    <div class="carousel-item w-96 bg-base-100 shadow-xl">
-      <div class="card">
-        <figure class="rounded-none">
-          <img src="https://img.freepik.com/free-photo/flat-lay-gardening-tools-with-copy-space_23-2148224038.jpg?t=st=1715134565~exp=1715138165~hmac=c7c9c743ab3cdb1875d3a4e9a077a03a245127701a98a7d3f58e5ca98fed9608&w=1480" alt="Martillo" />
-        </figure>
-        <div class="card-body items-center text-center bg-main text-neutral">
-          <h2 class="card-title">
-            Juego de jardinería
-          </h2>
-          <p>Pala y rastrillo de jardinería</p>
-          <div class="card-actions justify-end">
-            <div class="badge badge-outline">Herramientas manuales</div>
-            <div class="badge badge-outline">Jardineria</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="carousel-item w-96 bg-base-100 shadow-xl">
-      <div class="card">
-        <figure class="rounded-none">
-          <img src="https://img.freepik.com/free-photo/horizontal-construction-work-bolt-white_1323-86.jpg?t=st=1715129859~exp=1715133459~hmac=be18b774d8ab52acda51c782ba8892f6cff8634120b94e594905d3a4f274e403&w=1480" alt="Llave inglesa" />
-        </figure>
-        <div class="card-body items-center text-center bg-main text-neutral">
-          <h2 class="card-title">
-            Llave inglesa
-          </h2>
-          <p>Llave inglesa, estado como se ve en las fotos.</p>
-          <div class="card-actions justify-end">
-            <div class="badge badge-outline">Herramientas manuales</div>
-          </div>
-        </div>
-      </div> 
-    </div>
-  </div>
+    {% endif %}
 </section>
+
 
 <section id="shop-products" class="min-w-screen bg-neutral text-dark">
   <div class="flex justify-between items-center p-5 bg-main">
     <h2 class="text-xl md:text-4xl text-neutral">Articulos ofrecidos por nosotros</h2>
-    <a href="" class="btn btn-lg btn-outline text-neutral">Ver todo</a>
+    <!-- <a href="" class="btn btn-lg btn-outline text-neutral">Ver todo</a> -->
   </div>
-  <div class="carousel w-full carousel-center p-4 px-10 space-x-4 bg-neutral">
-
-    <div class="carousel-item w-96 bg-base-100 shadow-xl">
-      <div class="card">
-        <figure class="rounded-none">
-          <img src="https://img.freepik.com/free-photo/top-view-different-types-tools_23-2148428245.jpg?t=st=1715138274~exp=1715141874~hmac=3e3e6000ebac9108719efaf07ae8f416085d84d860414edf4f58129f705944f1&w=1480" alt="Kit de Herramientas" />
-        </figure>
-        <div class="card-body items-center text-center bg-main text-neutral">
-          <h2 class="card-title">
-            Kit de Herramientas  
-            <div class="badge badge-secondary"></div>
-          </h2>
-          <p>Conjunto completo de herramientas para trabajos de construcción. Incluye...</p>
-          <div class="card-actions justify-end">
-            <div class="badge badge-outline">Kits</div>
-            <div class="badge badge-outline">Herramientas manuales</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="carousel-item w-96 bg-base-100 shadow-xl">
-      <div class="card">
-        <figure class="rounded-none h-64">
-          <img src="https://img.freepik.com/free-photo/jigsaw-design_1048-1992.jpg?t=st=1715138332~exp=1715141932~hmac=afed937ef922257bb13c2e11da8eb0ead94f4a90cb6746e37b57271e1105bbf3&w=1380" alt="Caladora" />
-        </figure>
-        <div class="card-body items-center text-center bg-main text-neutral">
-          <h2 class="card-title">
-            Caladora  
-            <div class="badge badge-secondary"></div>
-          </h2>
-          <p>Herramienta eléctrica para cortes precisos en madera y otros materiales</p>
-          <div class="card-actions justify-end">
-            <div class="badge badge-outline">Herramientas eléctricas</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="carousel-item w-96 bg-base-100 shadow-xl">
-      <div class="card">
-        <figure class="rounded-none">
-          <img src="https://img.freepik.com/free-photo/close-up-two-screwdrivers_23-2147615902.jpg?t=st=1715138406~exp=1715142006~hmac=5c8c52e6e693202b088e09bd3b1e9b4a5d2187bfb44bf593ef48321f6b849a1c&w=1480" alt="Destornillador" />
-        </figure>
-        <div class="card-body items-center text-center bg-main text-neutral">
-          <h2 class="card-title">
-            Destornillador  
-            <div class="badge badge-secondary"></div>
-          </h2>
-          <p>Herramienta manual utilizada para apretar o aflojar tornillos</p>
-          <div class="card-actions justify-end">
-            <div class="badge badge-outline">Herramientas manuales</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="carousel-item w-96 bg-base-100 shadow-xl">
-      <div class="card">
-          <figure class="rounded-none">
-              <img src="https://img.freepik.com/free-photo/top-view-letcon-with-copy-space_23-2148428286.jpg?t=st=1715138589~exp=1715142189~hmac=0a3a0a19622bdee6856e922f34c2b337999aab4ab2723eb392b7907c1885ad5c&w=1480" alt="Soldadora de Estaño" />
-          </figure>
-          <div class="card-body items-center text-center bg-main text-neutral">
-              <h2 class="card-title">
-                  Soldadora de Estaño  
-                  <div class="badge badge-secondary"></div>
-              </h2>
-              <p>Herramienta utilizada para soldar componentes electrónicos y cables.</p>
-              <div class="card-actions justify-end">
-                  <div class="badge badge-outline">Herramientas eléctricas</div>
-              </div>
-          </div>
-      </div>
-  </div>
-  
+  <div class="flex justify-center items-center w-full h-96">
+    <h2 class="text-2xl text-dark">Oops. No hay artículos disponibles aún.</h2>
   </div>
 </section>
 
@@ -227,11 +126,12 @@
 
 {% block extra_body %}
 
-<script>
-  window.setTimeout(function() {
-    document.querySelector('.alert').remove()
-}, 4000);
+  <script>
+    window.setTimeout(function() {
+      document.querySelector('.alert').remove()
+  }, 4000);
 
-</script>
+  </script>
 {% endblock extra_body %}
+
 {% endblock %}

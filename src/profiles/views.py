@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from user.forms import UserEditForm
+from item.models import Item
 from .forms import ProfileEditForm
 from django.forms import inlineformset_factory
 
@@ -14,8 +15,9 @@ from .models import Profile
 def profile_view(request, user_id):
     user_model = get_user_model()
     user = get_object_or_404(user_model, pk=user_id)
+    items = Item.objects.filter(user=user)  
     profile, created = Profile.objects.get_or_create(user=user)
-    return render(request, "profiles/profile_detail.html", {"profile": profile})
+    return render(request, "profiles/profile_detail.html", {"profile": profile, "items": items})
 
 
 @login_required
@@ -26,7 +28,9 @@ def profile_edit(request, user_id):
     if request.user.id != user.id:
         return HttpResponseForbidden()
 
-    ProfileFormSet = inlineformset_factory(user_model, Profile, form=ProfileEditForm, extra=0, can_delete=False)
+    ProfileFormSet = inlineformset_factory(
+        user_model, Profile, form=ProfileEditForm, extra=0, can_delete=False
+    )
 
     if request.method == "POST":
         user_form = UserEditForm(request.POST, instance=user)
@@ -34,7 +38,7 @@ def profile_edit(request, user_id):
         if user_form.is_valid() and profile_formset.is_valid():
             user_form.save()
             profile_formset.save()
-            messages.success(request, '¡Tu perfil fue actualizado correctamente!')
+            messages.success(request, "¡Tu perfil fue actualizado correctamente!")
             return redirect("profile_view", user_id=request.user.pk)
     else:
         user_form = UserEditForm(instance=user)
@@ -43,4 +47,5 @@ def profile_edit(request, user_id):
     return render(
         request,
         "profiles/profile_edit.html",
-        {"user_form": user_form, "profile_formset": profile_formset},)  
+        {"user_form": user_form, "profile_formset": profile_formset},
+    )

@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 from PIL import Image
-from .jobs import UploadToPathAndRename
+from core.jobs import UploadToPathAndRename
 
 
 class Profile(models.Model):
