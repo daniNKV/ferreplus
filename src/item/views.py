@@ -1,8 +1,7 @@
-from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST, require_http_methods
+from django.views.decorators.http import require_POST
 from item.models import Item
 from .forms import ItemForm
 
@@ -55,6 +54,7 @@ def delete_item(request, item_id):
     item.delete()
     messages.success(request, "¡Artículo eliminado exitosamente!")
     return redirect("profile_view", user_id=request.user.id)
+
 
 # def detail_item(request, item_id):
 #     if request.method == "POST":
