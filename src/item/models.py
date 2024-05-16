@@ -31,5 +31,5 @@ class Item(models.Model):
             self.creation_date = timezone.now()
         super().save(*args, **kwargs)
 
-    def __str(self):
+    def __str__(self):
         return str(self.name)

@@ -54,29 +54,3 @@ def delete_item(request, item_id):
     item.delete()
     messages.success(request, "¡Artículo eliminado exitosamente!")
     return redirect("profile_view", user_id=request.user.id)
-
-
-# def detail_item(request, item_id):
-#     if request.method == "POST":
-#         item = get_object_or_404(
-#             Item, pk=item_id
-#         )  # agregar desp como param user = request.user (solo acá)
-#         form = ItemForm(request.POST, instance=item)
-#         if form.is_valid():
-#             form.save()
-#             item.category_id = request.POST["selected_category"]
-#             item.image = request.FILES["image"]
-#             item.save()
-#             messages.success(request, "¡Artículo modificado exitosamente!")
-#         return redirect("itemList")
-#     else:
-#         item = get_object_or_404(
-#             Item, pk=item_id
-#         )  # agregar desp como param user = request.user (solo acá)
-#         form = ItemForm(instance=item)
-#         cats = Category.objects.all()
-#         return render(
-#             request,
-#             "item/item_detail.html",
-#             {"form": form, "item": item, "categories": cats},
-#         )
