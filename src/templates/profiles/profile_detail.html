@@ -37,9 +37,10 @@
         <img alt="Default avatar" class="avatar max-w-72 w-h-72 rounded-lg shadow-2xl" src="{% static 'img/avatar-default.jpg' %}"/>
     {% endif %}
     <div class="join join-horizontal pt-2">
-      <a href="#items" class="btn btn-lg bg-main join-item text-neutral">Ver articulos</a>
+      <a href="#items" class="btn btn-lg btn-outline join-item text-dark">Ver articulos</a>
       {% if user.is_authenticated and user.pk == profile.user.pk %}
-        <a href="{% url 'profile_edit' user_id=profile.user.pk %}" class="btn btn-lg bg-main join-item text-neutral">Modificar perfil</a>
+        <a href="{% url 'item_create' %}" class="btn btn-lg btn-outline join-item text-dark">Publicar Artículo</a>
+        <a href="{% url 'profile_edit' user_id=profile.user.pk %}" class="btn btn-lg btn-outline join-item text-dark">Modificar perfil</a>
       {% endif %}
     </div>
   </div>

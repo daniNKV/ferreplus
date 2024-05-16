@@ -1,56 +1,62 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from item.models import Item, Category
-from .forms import createItemForm
 from django.contrib import messages
-import datetime
+from django.contrib.auth.decorators import login_required
+from rolepermissions.decorators import has_role_decorator
+from item.models import Item, Category
+from .forms import ItemCreateForm
+
 
 def itemList(request):
     items = Item.objects.all()
-    return render(request, 'item/item_list.html', {'items': items})
+    return render(request, "item/item_list.html", {"items": items})
 
-def validFileExtension(value):
-    value.lower()
-    fileTypes = ['.png', '.jpg', '.jpeg', '.webp', '.avif']
-    for typ in fileTypes:
-        if value.endswith(typ):
-            return True
-    return False
 
-def createItem(request):
-    if request.method == 'GET':
-        cats = Category.objects.all()
-        return render(request, 'item/create_item.html', {'form': createItemForm(), 'categories': cats})
+@login_required
+def create_item(request):
+    if request.method == "POST":
+        form = ItemCreateForm(request.POST, request.FILES)
+        if form.is_valid():
+            item = form.save(commit=False)
+            item.user = request.user
+            messages.success(request, "¡Artículo cargado exitosamente!")
+            item.save()
+            return redirect("profile_view", user_id=request.user.pk)
     else:
-        if validFileExtension(request.FILES['image'].name):
-            Item.objects.create(name=request.POST['name'], description=request.POST['description'], creation_date=datetime.datetime.now(), category_id = request.POST['selected_category'], image = request.FILES['image'])
-            messages.success(request, '¡Artículo cargado exitosamente!')
-            return redirect('itemList')
-        else:
-            messages.error(request, 'Extensión del archivo no soportada')
-            cats = Category.objects.all()
-            return render(request, 'item/create_item.html', {'form': createItemForm(), 'categories': cats})
+        form = ItemCreateForm()
+    return render(request, "item/create_item.html", {"form": form})
 
-def deleteItem(request, item_id):
-    if request.method == 'POST':
-        item = get_object_or_404(Item, pk=item_id)#agregar desp como param user = request.user (solo acá)
+
+def delete_item(request, item_id):
+    if request.method == "POST":
+        item = get_object_or_404(
+            Item, pk=item_id
+        )  # agregar desp como param user = request.user (solo acá)
         item.delete()
-        messages.success(request, '¡Artículo eliminado exitosamente!')
-    return redirect('itemList')
+        messages.success(request, "¡Artículo eliminado exitosamente!")
+    return redirect("itemList")
 
-def item_detail(request, item_id):
-    if request.method == 'POST':
-        item = get_object_or_404(Item, pk=item_id)#agregar desp como param user = request.user (solo acá)
-        form = createItemForm(request.POST, instance=item)
+
+def detail_item(request, item_id):
+    if request.method == "POST":
+        item = get_object_or_404(
+            Item, pk=item_id
+        )  # agregar desp como param user = request.user (solo acá)
+        form = ItemCreateForm(request.POST, instance=item)
         if form.is_valid():
             form.save()
-            item.category_id = request.POST['selected_category']
-            item.image = request.FILES['image']
+            item.category_id = request.POST["selected_category"]
+            item.image = request.FILES["image"]
             item.save()
-            messages.success(request, '¡Artículo modificado exitosamente!')
-        return redirect('itemList')
+            messages.success(request, "¡Artículo modificado exitosamente!")
+        return redirect("itemList")
     else:
-        item = get_object_or_404(Item, pk=item_id)#agregar desp como param user = request.user (solo acá)
-        form = createItemForm(instance=item)
+        item = get_object_or_404(
+            Item, pk=item_id
+        )  # agregar desp como param user = request.user (solo acá)
+        form = ItemCreateForm(instance=item)
         cats = Category.objects.all()
-        return render(request, 'item/item_detail.html', {'form': form, 'item':item, 'categories': cats})
-
+        return render(
+            request,
+            "item/item_detail.html",
+            {"form": form, "item": item, "categories": cats},
+        )

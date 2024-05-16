@@ -26,7 +26,9 @@ def profile_edit(request, user_id):
     if request.user.id != user.id:
         return HttpResponseForbidden()
 
-    ProfileFormSet = inlineformset_factory(user_model, Profile, form=ProfileEditForm, extra=0, can_delete=False)
+    ProfileFormSet = inlineformset_factory(
+        user_model, Profile, form=ProfileEditForm, extra=0, can_delete=False
+    )
 
     if request.method == "POST":
         user_form = UserEditForm(request.POST, instance=user)
@@ -34,7 +36,7 @@ def profile_edit(request, user_id):
         if user_form.is_valid() and profile_formset.is_valid():
             user_form.save()
             profile_formset.save()
-            messages.success(request, '¡Tu perfil fue actualizado correctamente!')
+            messages.success(request, "¡Tu perfil fue actualizado correctamente!")
             return redirect("profile_view", user_id=request.user.pk)
     else:
         user_form = UserEditForm(instance=user)
@@ -43,4 +45,5 @@ def profile_edit(request, user_id):
     return render(
         request,
         "profiles/profile_edit.html",
-        {"user_form": user_form, "profile_formset": profile_formset},)  
+        {"user_form": user_form, "profile_formset": profile_formset},
+    )
