@@ -13,6 +13,7 @@ admin.site.index_title = "Ferreplus"
 
 class UserAdmin(admin.ModelAdmin):
     fields = ("first_name", "last_name", "email", "birth_date", "password")
+    list_display = ("first_name", "last_name", "email", "birth_date")
 
     def save_model(self, request, obj, form, change):
         if not change:  # only for new objects
@@ -24,11 +25,7 @@ class UserAdmin(admin.ModelAdmin):
 class EmployeeAdminForm(ModelForm):
     class Meta:
         model = Employee
-        fields = [
-            "user",
-            "dni",
-            "branch",
-        ]
+        fields = ("user", "dni", "branch")
 
     def clean_(self):
         cleaned_data = super().clean()
@@ -47,6 +44,8 @@ class EmployeeAdminForm(ModelForm):
 class EmployeeAdmin(admin.ModelAdmin):
     form = EmployeeAdminForm
     fields = ("user", "dni", "branch")
+    list_display = ("user", "dni", "branch")
+
 
 
 admin.site.register(User, UserAdmin)
