@@ -30,3 +30,6 @@ class Item(models.Model):
         if not self.id:  # if the object is being created
             self.creation_date = timezone.now()
         super().save(*args, **kwargs)
+
+    def __str(self):
+        return str(self.name)

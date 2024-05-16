@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from user.forms import UserEditForm
+from item.models import Item
 from .forms import ProfileEditForm
 from django.forms import inlineformset_factory
 
@@ -14,8 +15,9 @@ from .models import Profile
 def profile_view(request, user_id):
     user_model = get_user_model()
     user = get_object_or_404(user_model, pk=user_id)
+    items = Item.objects.filter(user=user)  
     profile, created = Profile.objects.get_or_create(user=user)
-    return render(request, "profiles/profile_detail.html", {"profile": profile})
+    return render(request, "profiles/profile_detail.html", {"profile": profile, "items": items})
 
 
 @login_required

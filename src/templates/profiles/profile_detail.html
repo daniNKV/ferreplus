@@ -46,9 +46,38 @@
   </div>
 </section>
 
+<div class="divider divider-neutral text-3xl p-10 bg-neutral text-dark">Productos ofrecidos por {{ profile.user.first_name }} {{ profile.user.last_name }}</div>
+
 <section id="items" class="hero min-h-screen bg-neutral">
   <div class="hero-content">
-    <h1 class="text-3xl">Ooops. No hay nada todavía!</h1>
+    {% if items %}
+      <ul class="flex max-w-11/12 flex-wrap pt-20 gap-10">
+        {% for item in items %}
+          <div class="card w-11/12 max-w-96 relative">
+            <figure class="rounded-none z-10">
+              <img src="{{ item.image.url }}" class="w-full max-h-72" alt="Martillo" />
+            </figure>
+            <div class="card-body items-center gap-5 text-center bg-main text-neutral">
+              <div class="badge badge-secondary">{{ item.category.name }}</div>
+              <h2 class="card-title">
+                {{ item.name }}
+              </h2>
+              <p>{{ item.description|truncatechars:100 }}</p>
+              <div class="join join-horizontal ">
+                {% if user.is_authenticated and user.pk == profile.user.pk %}
+                  <a href="" class="btn join-item btn-outline text-neutral"><i class="fas fa-edit text-2xl text-center"></i>Editar</a>
+                  <a href="" class="btn join-item btn-outline text-error "><i class="fa-solid fa-trash text-2xl text-error text-center"></i></i>Eliminar</a>
+
+                {% endif %}
+                <!-- <a href="" class="btn w-full btn-outline text-neutral">Ver más</a> -->
+              </div>
+            </div>
+          </div>
+        {% empty %}
+          <h2 class="text-3xl">Ooops. No hay nada todavía!</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
   </div>
 </section>
 {% endblock %}
