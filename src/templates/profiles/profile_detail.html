@@ -51,43 +51,71 @@
 <section id="items" class="hero min-h-screen bg-neutral">
   <div class="hero-content">
     {% if items %}
-      <ul class="flex max-w-11/12 flex-wrap pt-20 gap-10">
-        {% for item in items %}
-          <div class="card w-11/12 max-w-96 relative">
-            <figure class="rounded-none z-10">
-              <img src="{{ item.image.url }}" class="w-full max-h-72" alt="Martillo" />
-            </figure>
-            <div class="card-body items-center gap-5 text-center bg-main text-neutral">
-              <div class="badge badge-secondary">{{ item.category.name }}</div>
-              <h2 class="card-title">
-                {{ item.name }}
-              </h2>
-              <p>{{ item.description|truncatechars:100 }}</p>
-              <div class="join join-horizontal ">
-                {% if user.is_authenticated and user.pk == profile.user.pk %}
-                  <a href="{% url 'item_edit' item_id=item.pk %}" class="btn join-item btn-outline text-neutral"><i class="fas fa-edit text-2xl text-center"></i>Editar</a>
-                  <a href="" class="btn join-item btn-outline text-error "><i class="fa-solid fa-trash text-2xl text-error text-center"></i></i>Eliminar</a>
-
-                {% endif %}
-                <!-- <a href="" class="btn w-full btn-outline text-neutral">Ver más</a> -->
-              </div>
+      {% for item in items %}
+        <div id="item-{{ item.pk }}" class="card w-11/12 max-w-96 relative">
+          <figure class="rounded-none z-10">
+            <img src="{{ item.image.url }}" class="w-full max-h-72" alt="Martillo" />
+          </figure>
+          <div class="card-body items-center gap-5 text-center bg-main text-neutral">
+            <div class="badge badge-secondary">{{ item.category.name }}</div>
+            <h2 class="card-title">
+              {{ item.name }}
+            </h2>
+            <p>{{ item.description|truncatechars:100 }}</p>
+            <div class="join join-horizontal ">
+              {% if user.is_authenticated and user.pk == profile.user.pk %}
+                <a href="{% url 'item_edit' item_id=item.pk %}" class="btn join-item btn-outline text-neutral"><i class="fas fa-edit text-2xl text-center"></i>Editar</a>
+                <button id="openModalButton-{{item.pk}}" class="modal-btn btn join-item btn-outline text-error" onclick="modal.showModal()>
+                  <i class="fa-solid fa-trash text-2xl text-error text-center"></i>
+                  Eliminar
+                </button>
+              {% endif %}
+              <!-- <a href="" class="btn w-full btn-outline text-neutral">Ver más</a> -->
             </div>
           </div>
-        {% empty %}
-          <h2 class="text-3xl">Ooops. No hay nada todavía!</li>
-        {% endfor %}
-      </ul>
+        </div>
+
+        <dialog id="modal-{{ item.pk }}" class="modal z-20 bg-slate-800 backdrop-blur-lg">
+          <div class="modal-box bg-neutral text-dark">
+            <h3 class="font-bold text-lg">¿Está seguro que desea eliminar el item {{ item.name }}?</h3>
+            <div class="modal-action">
+              <form method="dialog">
+                <button class="btn btn-outline text-dark">Cancelar</button>
+              </form>
+              <form method="post" action="{% url 'item_delete' item_id=item.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn bg-error text-neutral">Eliminar</button>
+              </form>
+            </div>
+          </div>
+        </dialog>
+
+      {% empty %}
+        <h2 class="text-3xl">Ooops. No hay nada todavía!</li>
+      {% endfor %}
     {% endif %}
   </div>
 </section>
-{% endblock %}
 
+{% endblock %}
 
 {% block extra_body %}
 <script>
+let buttons = document.querySelectorAll('.modal-btn');
+
   window.setTimeout(function() {
     document.querySelector('.alert').remove()
 }, 4000);
+
+buttons.forEach(function(button) {
+  button.addEventListener('click', function() {
+    // Get the item's primary key from the button's ID
+    let pk = this.id.split('-')[1];
+    // Get the corresponding modal and show it
+    let modal = document.getElementById('modal-' + pk);
+    modal.showModal();
+  });
+});
 
 </script>
 {% endblock extra_body %}
