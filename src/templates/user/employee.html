@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block head_title %}
+    Empleados Ferreplus
+{% endblock head_title %}
+
+{% block extra_head %}
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+{% endblock extra_head %}
+
+{% block body %}
+   {% include 'navbar.html' %} 
+
+    <section class="min-h-screen flex items-center justify-center bg-neutral">
+        <div class="card max-w-96 bg-base-100 shadow-xl">
+            <figure><img class="w-96" src="{% static 'img/construction.jpg' %}" alt="Construction warning"/></figure>
+            <div class="card-body bg-slate-800 text-neutral">
+                <h2 class="card-title">¡Estamos trabajando en las funcionalidades para empleados!</h2>
+                <p>Vuelva prontos</p>
+                <div class="card-actions justify-end">
+                <a href="{% url 'home' %}" class="btn btn-primary">Ir al inicio</a>
+                </div>
+            </div>
+        </div>
+
+   </section>
+
+{% endblock %}  

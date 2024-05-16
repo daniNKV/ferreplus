@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
+# from rolepermissions.decorators import has_role_decorator
 from item.models import Item
 from .forms import ItemForm
 
@@ -12,6 +13,7 @@ def itemList(request):
 
 
 @login_required
+# @has_role_decorator('user')
 def create_item(request):
     if request.method == "POST":
         form = ItemForm(request.POST, request.FILES)

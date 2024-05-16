@@ -26,7 +26,7 @@ class UserManager(BaseUserManager):
         )
         user.password = make_password(user.password)
         user.save()
-        assign_role(user, 'user')
+        assign_role(user, "user")
         return user
 
     def create_superuser(self, email, first_name, last_name, birth_date, password):
@@ -41,7 +41,7 @@ class UserManager(BaseUserManager):
         user.is_staff = True
         user.is_superuser = True
         user.save()
-        assign_role(user, 'owner')
+        assign_role(user, "owner")
         return user
 
 
@@ -63,8 +63,9 @@ class EmployeeManager(UserManager):
         )
         employee = self.model(user=user, dni=dni, branch=branch)
         employee.user.is_staff = True
+        employee.user.save()
         employee.save()
-        assign_role(user, 'employee')
+        assign_role(user, "employee")
         return employee
 
 

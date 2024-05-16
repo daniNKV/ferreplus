@@ -13,7 +13,7 @@
 {% block body %}
 
 {% if messages %}
-    <ul id="messages" class="messages">
+    <ul id="messages" class="messages flex flex-col">
       {% for message in messages %}
         <div class="toast">
           <div class="alert alert-info">
@@ -35,16 +35,27 @@
       <div class="bg-neutral">
         {% if user.is_authenticated %}
           <h1 class="mb-5 text-4xl font-bold text-dark">Bienvenido de nuevo, {{ user.first_name }}! </h1>
-          <p class="mb-5 text-dark">Conseguí las herramientas y artículos que necesitás, mientras que
+
+          {% if user.is_staff %}
+            <p class="mb-5 text-dark">Validá los trueques de los usuarios, dándoles seguridad y confianza.</p>
+            <div class="flex justify-center gap-2">
+              <a href="{% url 'employee_panel' %}">
+                <button class="btn btn-lg bg-main text-neutral hover:bg-neutral hover:text-dark">Ir al panel de empleados</button>
+              </a>
+            </div>
+          {% else %}
+            <p class="mb-5 text-dark">Conseguí las herramientas y artículos que necesitás, mientras que
             le das una segunda vida a los que tenés.</p>
-          <div class="flex justify-center gap-2">
-            <a href="{% url 'profile_view' user_id=user.pk %}"> 
-              <button class="btn btn-lg bg-main text-neutral hover:bg-neutral hover:text-dark">Ver mi perfil</button>
-            </a>
-            <a href="{% url 'item_create' %}"> 
-              <button class="btn btn-lg bg-main text-neutral hover:bg-neutral hover:text-dark">Publicar artículo</button>
-            </a>
-          </div>
+            <div class="flex justify-center gap-2">
+              <a href="{% url 'profile_view' user_id=user.pk %}"> 
+                <button class="btn btn-lg bg-main text-neutral hover:bg-neutral hover:text-dark">Ver mi perfil</button>
+              </a>
+              <a href="{% url 'item_create' %}"> 
+                <button class="btn btn-lg bg-main text-neutral hover:bg-neutral hover:text-dark">Publicar artículo</button>
+              </a>
+            </div>
+          {% endif %}
+
         {% else %}
           <h1 class="mb-5 text-4xl font-bold text-dark">Empezá a intercambiar ya mismo!</h1>
           <p class="mb-5 text-dark">Conseguí las herramientas y artículos que necesitás, mientras que
