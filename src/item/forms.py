@@ -9,37 +9,39 @@ class ItemForm(forms.ModelForm):
         fields = ["name", "description", "image", "category", "branch"]
 
     name = forms.CharField(
+        label="Nombre",
+        max_length=50,
         widget=forms.TextInput(
             attrs={"class": "input input-bordered w-full bg-neutral border-dark"}
         ),
-        label="Nombre",
     )
     description = forms.CharField(
+        label="Descripción",
+        max_length=500,
         widget=forms.Textarea(
             attrs={"class": "textarea textarea-bordered w-full bg-neutral border-dark"}
         ),
-        label="Descripción",
     )
     image = forms.ImageField(
+        label="Imagen",
         widget=forms.ClearableFileInput(
             attrs={"class": "file-input file-input-bordered w-full border-1"}
         ),
-        label="Imagen",
     )
     category = forms.ModelChoiceField(
+        label="Categoría",
         queryset=Category.objects.all(),
         widget=forms.Select(
             attrs={"class": "select select-bordered w-full bg-neutral border-dark"}
         ),
-        label="Categoría",
     )
     branch = forms.ModelChoiceField(
+        label="Sucursal",
         queryset=Branch.objects.all(),
         # help_text="Selecciona la sucursal en la que desea realizar el trueque.",
         widget=forms.Select(
             attrs={"class": "select select-bordered w-full bg-neutral border-dark"}
         ),
-        label="Sucursal",
     )
 
     def clean_image(self):
@@ -64,3 +66,9 @@ class ItemForm(forms.ModelForm):
             raise forms.ValidationError(f"Imagen invalida: {e}")
 
         return image
+
+    def clean_description(self):
+        description = self.cleaned_data.get('description')
+        if len(description) > 500:
+            raise forms.ValidationError('La descripcion debe ser de 500 caracteres o menos')
+        return description
