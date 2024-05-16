@@ -89,10 +89,16 @@
             </div>
           </div>
         </dialog>
-
-      {% empty %}
-        <h2 class="text-3xl">Ooops. No hay nada todavía!</li>
       {% endfor %}
+    {% else %}
+      {% if user.pk == profile.user.pk %}
+        <div class="flex flex-col gap-5 text-dark">
+          <h2 class="text-3xl text-center">Ooops. No has publicado todavía. <br> ¿Por qué no publicas algo?</h2>
+          <a href="{% url 'item_create' %}" class="btn btn-lg btn-outline bg-main text-neutral">Publicar</a>
+        </div>
+      {% else %}
+        <h2 class="text-3xl text-dark">Ooops. {{profile.user.first_name}} no ha publicado todavía! </h2>
+      {% endif %}
     {% endif %}
   </div>
 </section>
