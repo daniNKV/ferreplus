@@ -1,0 +1,54 @@
+<h1> hola </h1>
+
+<h3> <button> <a href=" {% url 'createItem' %} "> subir artículo </a> </button> </h3>
+
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+<table>
+    <tr>
+      <th>Nombre</th>
+      <th>Descripción</th>
+      <th>Categoría</th>
+      <th>Fecha de creación</th>
+      <th>Imagen</th>
+      <th>Modificar</th>
+      <th>Eliminar</th>
+    </tr>
+
+{% for item in items %}
+
+    <tr>
+      <td>{{ item.name }}</td>
+      <td>{{ item.description }}</td>
+      <td>{{ item.category.name }}</td>
+      <td>{{ item.creation_date }}</td>
+      <td><img src="{{ item.image.url }}"></td>
+      <form action= "{% url 'item_detail' item.id %}" method="GET">
+        {% csrf_token %}
+        <td><button> Modificar </button></td>
+      </form>
+
+      <form id="formEliminar" action= "{% url 'deleteItem' item.id %}" method="POST">
+        {% csrf_token %}
+        <td><button onclick="confirmarEliminacion()"> Eliminar </button></td>
+      </form>
+    </tr>
+
+{% endfor %}
+
+</table> 
+
+<script>
+  function confirmarEliminacion() {
+      if (confirm('¿Estás seguro de que deseas eliminar este artículo?')) {
+          // Si el usuario confirma, enviar la solicitud de eliminación al servidor
+          Document.getElementById("formEliminar").submit();
+      }
+  }
+</script>

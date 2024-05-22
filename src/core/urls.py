@@ -20,18 +20,19 @@ from django.conf import settings
 from django.contrib import admin
 from django.views.generic import RedirectView
 
-from . import views
-
-
 urlpatterns = [
-    path("", views.home_view, name="home"),
+    path('', include("index.urls")),
     path('admin/login/', RedirectView.as_view(url='/accounts/login/'), name='admin_login'),
     path('admin/logout/', RedirectView.as_view(url='/accounts/logout/'), name='admin_logout'),
     path("admin/", admin.site.urls),
     path("accounts/", include("user.urls")),
     path("__debug__/", include("debug_toolbar.urls")),
     path('owners/', include('owners.urls')),
+    path("item/", include("item.urls")),
+    path("profile/", include("profiles.urls"))
 ]
 
 if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

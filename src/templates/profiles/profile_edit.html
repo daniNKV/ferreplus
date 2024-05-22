@@ -1,0 +1,21 @@
+{% extends 'base_form.html' %}
+
+{% block title %}
+  ¡Actualiza tus datos!
+{% endblock %}
+
+{% block form %}
+  <form class="card-body p-5 gap-5" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ user_form.as_p }}
+    {% for form in profile_formset %}
+      {{ form.as_p }}
+    {% endfor %}
+    {{ profile_formset.management_form }}
+    <input class="btn btn-lg bg-main text-neutral" type="submit" value="Actualizar">
+  </form>
+{% endblock %}
+
+
+
+

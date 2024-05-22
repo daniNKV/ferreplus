@@ -36,13 +36,14 @@
           }
         }
       </script>
-</head>
+  </head>
 
-<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="min-h-screen font-sans">
-  {% block body %}
-  {% endblock %}
+  <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="min-h-screen bg-neutral dark:bg-slate-800 font-sans">
+    {% block body %}
+    {% endblock %}
 
-  {% block extra_body %}
-  {% endblock extra_body %}
-</body>
+    {% block extra_body %}
+    {% endblock extra_body %}
+    <script src="{% static 'js/base.js' %}"></script>
+  </body>
 </html>

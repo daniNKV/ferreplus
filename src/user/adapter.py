@@ -1,6 +1,7 @@
 from allauth.account.adapter import DefaultAccountAdapter
 from rolepermissions.checkers import has_role
-from .roles import Owner
+from .roles import Owner, Employee
+
 
 class UsersAdapter(DefaultAccountAdapter):
     def save_user(self, request, user, form, commit=True):
@@ -13,7 +14,6 @@ class UsersAdapter(DefaultAccountAdapter):
             user.set_password(data["password1"])
         else:
             user.set_unusable_password()
-        self.populate_username(request, user)
         user.save()
         return user
 
@@ -24,10 +24,12 @@ class UsersAdapter(DefaultAccountAdapter):
     def get_password_change_redirect_url(self, request):
         path = "/"
         return path
-    
+
     def get_login_redirect_url(self, request):
-        if has_role(request.user, Owner) or request.user.is_superuser:  # Replace with your condition for checking the user's role
-            path = "/admin"  # Replace with your admin panel URL
+        if has_role(request.user, Owner) or request.user.is_superuser:
+            path = "/admin"
+        elif has_role(request.user, Employee) or request.user.is_staff:
+            path = "/accounts/employee"
         else:
-            path = "/"  # Replace with your user panel URL
+            path = "/"
         return path
