@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block head_title %}
+    Viendo {{ item.name }}
+{% endblock %}
+
+{% block extra_head %}
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+{% endblock extra_head %}
+
+{% block body %}
+
+{% if messages %}
+    <ul id="messages" class="messages">
+      {% for message in messages %}
+        <div class="toast">
+          <div class="alert alert-success">
+            <span>{{ message }}</span>
+          </div>
+        </div>
+      {% endfor %}
+  </ul>
+{% endif %}
+
+<section class="flex flex-col bg-neutral items-center place-content-center h-screen w-screen">
+    <div class="card md:card-side bg-main gap-2 items-center bg-base-100 shadow-xl max-w-5xl p-5">
+        <figure class=""><img src={{item.image.url}}/></figure>
+        <div class="card-body h-full gap-2 max-w-lg">
+          <h2 class="text-6xl text-white">{{ item.name }}</h2>
+          <p class="h-fit">{{ item.description }}.</p>
+          <div class="flex flex-col gap-2">
+              <p class="badge p-4 badge-accent max-w-xs">{{ item.branch }}.</p>
+              <p class="badge p-4 badge-accent">{{ item.category.name }}.</p>
+          </div>
+          <div class="card-actions justify-end">
+            <button class="btn btn-outline w-full bg-neutral text-dark">Solicitar trueque</button>
+          </div>
+        </div>
+      </div>
+</section>
+
+{% include 'navbar.html' %}
+{% endblock %}

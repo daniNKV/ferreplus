@@ -56,3 +56,7 @@ def delete_item(request, item_id):
     item.delete()
     messages.success(request, "¡Artículo eliminado exitosamente!")
     return redirect("profile_view", user_id=request.user.id)
+
+def detail_item(request, item_id):
+    item = get_object_or_404(Item, pk=item_id)
+    return render(request, "item/detail_item.html", { "item": item })

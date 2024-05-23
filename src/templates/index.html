@@ -100,6 +100,7 @@
               <div class="card-actions justify-end">
                 <div class="badge badge-outline">{{ item.category }}</div>
               </div>
+              <a href="{% url 'item_detail' item_id=item.pk %}" class="btn btn-outline w-full bg-neutral text-dark">Ver en detalle</a>
             </div>
           </div>
         </div>
@@ -125,12 +126,10 @@
 {% include 'footer.html' %}
 
 {% block extra_body %}
-
   <script>
     window.setTimeout(function() {
       document.querySelector('.alert').remove()
   }, 4000);
-
   </script>
 {% endblock extra_body %}
 
