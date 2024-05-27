@@ -41,12 +41,16 @@
           <p>Publicado en<span class="badge p-5 badge-accent text-center ml-2">{{ item.category.name }}.</span></p>
       </div>
       <div class="card-actions justify-end">
-        <button class="btn btn-outline w-full bg-neutral text-dark">Solicitar trueque</button>
+        {% if user.pk == item.user.pk %}
+          <a href="{% url 'item_edit' item_id=item.pk %}" class="btn btn-outline w-full bg-neutral text-dark">Editar</a>      
+        {% else %}
+          <a href="{% url 'propose_trade' %}" class="btn btn-outline w-full bg-neutral text-dark">Solicitar trueque</a>
+        {% endif %}
       </div>
 
-      <a href="{% url 'profile_view' user_id=item.user.pk%}" class="avatar absolute md:-top-0 md:-right-6">
+      <a href="{% url 'profile_view' user_id=item.user.pk %}" class="avatar absolute md:-top-0 md:-right-6">
         <div class="w-16 md:w-20 rounded-full ring ring-main ring-offset-main ring-offset-2">
-          <img src="{{ profile.avatar.url }}" />
+          <img src="{{ item.user.profile.avatar.url }}" />
         </div>
       </a>
     </div>

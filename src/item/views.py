@@ -62,5 +62,4 @@ def delete_item(request, item_id):
 
 def detail_item(request, item_id):
     item = get_object_or_404(Item, pk=item_id)
-    profile = get_object_or_404(Profile, user=item.user)
-    return render(request, "item/detail_item.html", {"item": item, "profile": profile})
+    return render(request, "item/detail_item.html", {"item": item})
