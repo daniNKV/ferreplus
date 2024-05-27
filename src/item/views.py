@@ -2,8 +2,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
+
 # from rolepermissions.decorators import has_role_decorator
 from item.models import Item
+from profiles.models import Profile
 from .forms import ItemForm
 
 
@@ -57,6 +59,8 @@ def delete_item(request, item_id):
     messages.success(request, "¡Artículo eliminado exitosamente!")
     return redirect("profile_view", user_id=request.user.id)
 
+
 def detail_item(request, item_id):
     item = get_object_or_404(Item, pk=item_id)
-    return render(request, "item/detail_item.html", { "item": item })
+    profile = get_object_or_404(Profile, user=item.user)
+    return render(request, "item/detail_item.html", {"item": item, "profile": profile})
