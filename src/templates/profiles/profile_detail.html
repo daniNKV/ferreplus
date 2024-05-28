@@ -51,12 +51,12 @@
 <section id="items" class="flex items-center place-content-center min-h-screen bg-neutral">
   <div class="hero-content">
     {% if items %}
-      <ul class="flex flex-col md:flex-row  items-start max-w-screen-xl gap-4 ">
+      <ul class="flex flex-col sm:flex-row flex-wrap md:justify-center max-w-screen-xl gap-4 ">
         {% for item in items %}
-          <li id="item-{{ item.pk }}" class="card w-11/12 h-full max-w-96 relative shadow-xl hover:-translate-y-2 hover:shadow-2xl transition-transform">
-            <a href="{% url 'item_detail' item_id=item.pk %}">
-              <figure class="rounded-none z-10">
-                <img src="{{ item.image.url }}" class="w-full max-h-72" alt="Martillo" />
+          <li id="item-{{ item.pk }}" class="card w-[95%] mx-auto sm:max-w-64 lg:max-w-72 relative shadow-xl hover:-translate-y-2 hover:shadow-2xl transition-transform">
+            <a href="{% url 'item_detail' item_id=item.pk %}" class="sm:h-2/4">
+              <figure class="rounded-none z-10 max-h-64">
+                <img src="{{ item.image.url }}"  alt="Martillo" />
               </figure>
             </a>
             <div class="card-body items-center gap-5 text-center bg-main text-neutral">
