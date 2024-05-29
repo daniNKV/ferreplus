@@ -1,0 +1,14 @@
+<!-- date_snippet.html -->
+<form method="post" hx-replace-url="/" hx-post="{% url 'proposal_creation' requested_item_id=requested_item.id offered_item_id=offered_item.id %}" hx-target="body">
+  {% csrf_token %}
+  <h1 class="text-2xl text-wrap font-semibold text-center text-dark">
+    Seleccioná 3 (tres) fechas posibles para el trueque
+  </h1>
+  <h2 class="text-lg opacity-80 text-dark text-center">Estas intercambiando: <span class="badge badge-md bg-dark text-white my-auto">{{offered_item.name}}</span> </h2>
+
+  <div class="flex flex-col mx-auto text-dark max-w-screen-sm gap-4">
+    {{form.as_p}}
+    <button type="submit" class="btn btn-outline border-2 btn-lg max-w-md mx-auto text-dark bg-[#F8F8F8] hover:text-white hover:bg-dark hover:border-white mt-4">Enviar solicitud</button>
+  </div>
+  
+</form>

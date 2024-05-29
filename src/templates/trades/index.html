@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block head_title %}
+  Ferreplus
+{% endblock %}
+
+{% block extra_head %}
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+{% endblock extra_head %}
+
+{% block body %}
+  {% include 'navbar.html' %}
+    <div class="hero min-h-screen bg-neutral">
+      <div class="hero-content text-center text-dark">
+        <div class="max-w-md">
+          <h1 class="text-5xl font-bold">Buscá tu intercambio</h1>
+          <p class="py-6">Provident cupiditate voluptatem et in. Quaerat fugiat ut assumenda excepturi exercitationem quasi. In deleniti eaque aut repudiandae et a id nisi.</p>
+          <button class="btn btn-primary">Ver trueques disponibles</button>
+        </div>
+      </div>
+    </div>
+{% endblock %}
