@@ -18,9 +18,9 @@
 
     {% if items_to_offer|length == 0 %}
 
-      <div class="flex flex-col gap-5 text-dark">
+      <div class="flex flex-col mx-auto my-auto gap-5 max-w-screen-md text-dark">
         <h2 class="text-2xl text-center flex items-center leading-loose">
-          Ooops. No has publicado todavía en la categoría 
+          Ooops. No has publicado todavía en la categoría <br>
             <span class="badge p-5 badge-accent text-xl font-bold text-center max-w-xs ml-2">
               {{requested_item.category.name}}
             </span>
@@ -72,24 +72,24 @@
           <table class="table text-dark max-w-screen-md mx-auto">
             <thead class="text-dark">
               <tr>
-                <th></th>
+                <th class="hidden sm:block"></th>
                 <th>Articulo</th>
-                <th>Sucursal</th>
+                <th class="hidden sm:block">Sucursal</th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
               {% for item in items_to_offer %}
                 <tr>
-                  <th>
+                  <th class="hidden sm:block">
                     <a href="{% url 'item_detail' item_id=item.pk %}" class="btn btn-ghost btn-xs">Ver</a>
                   </th>
                   <td>
                     <div class="flex items-center gap-3">
                       <div class="avatar">
-                        <div class="mask mask-squircle w-12 h-12">
-                          <img src="{{item.image.url}}" alt="Avatar Tailwind CSS Component" />
-                        </div>
+                        <a href="{% url 'item_detail' item_id=item.pk %}" class="mask mask-squircle w-12 h-12">
+                          <img src="{{item.image.url}}" />
+                        </a>
                       </div>
                       <div>
                         <div class="font-bold">{{item.name}} {{i}}</div>
@@ -97,11 +97,11 @@
                       </div>
                     </div>
                   </td>
-                  <td>
-                    <span class="badge badge-ghost badge-sm p-3 bg-dark text-white">{{item.branch}}</span>
+                  <td class="hidden sm:block">
+                    <span class="badge badge-ghost badge-sm p-5 sm:p-2 bg-dark text-white">{{item.branch}}</span>
                   </td>
                   <th>
-                    <label class="form-control btn-ghost btn border-2 btn-md text-dark hover:text-white hover:bg-dark hover:border-white">
+                    <label class="flex gap-2 text-dark focus:bg-transparent">
                       <span class="">Elegir</span>
                       <input type="radio" name="offered_item" class="radio radio-md" value="{{item.id}}" required>
                     </label>
@@ -117,7 +117,6 @@
         </form>
       </div>
     {% endif %}
-    </form>
   {% comment %} hx-get="{% url 'date_selection' product.id %}" {% endcomment %}
 {% endblock %}
 

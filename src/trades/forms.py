@@ -15,15 +15,14 @@ def generate_date_choices():
     dates = [
         (
             datetime.now() + timedelta(days=i),
-            (datetime.now() + timedelta(days=i)).strftime("%Y-%m-%d"),
+            (datetime.now() + timedelta(days=i)).strftime("%A %d"),
         )
         for i in range(1, 15)
-        if (datetime.now() + timedelta(days=i)).weekday() < 5
+        if (datetime.now() + timedelta(days=i)).weekday() < 6
     ]
     return dates
 
-
-class TradeForm(forms.Form):
+class DatesForm(forms.Form):
     date1 = forms.ChoiceField(
         required=True,
         label="Dia 1",
@@ -72,7 +71,7 @@ class TradeForm(forms.Form):
     )
 
     def __init__(self, *args, **kwargs):
-        super(TradeForm, self).__init__(*args, **kwargs)
+        super(DatesForm, self).__init__(*args, **kwargs)
         self.fields["date1"].choices = generate_date_choices()
         self.fields["time1"].choices = generate_time_choices()
         self.fields["date2"].choices = generate_date_choices()

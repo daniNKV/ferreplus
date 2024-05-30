@@ -4,11 +4,22 @@
   <h1 class="text-2xl text-wrap font-semibold text-center text-dark">
     Seleccioná 3 (tres) fechas posibles para el trueque
   </h1>
-  <h2 class="text-lg opacity-80 text-dark text-center">Estas intercambiando: <span class="badge badge-md bg-dark text-white my-auto">{{offered_item.name}}</span> </h2>
+  <h2 class="text-lg opacity-80 text-dark text-center">Estas ofreciendo: <span class="badge badge-md bg-dark text-white my-auto">{{offered_item.name}}</span> </h2>
 
-  <div class="flex flex-col mx-auto text-dark max-w-screen-sm gap-4">
-    {{form.as_p}}
-    <button type="submit" class="btn btn-outline border-2 btn-lg max-w-md mx-auto text-dark bg-[#F8F8F8] hover:text-white hover:bg-dark hover:border-white mt-4">Enviar solicitud</button>
+  <div class="flex flex-col gap-2 mx-auto bg-[#F8F8F8] rounded-3xl border-2 border-dark mt-4 p-5 text-dark max-w-screen-sm ">
+    <div class="">
+      <p class="p-1 text-dark">Opción 1</p>
+      <div class="flex gap-2">{{ form.date1 }} {{ form.time1 }}</div>
+    </div>
+    <div class="">
+      <p class="p-1 text-dark">Opción 2</p>
+      <div class="flex gap-2">{{ form.date2 }} {{ form.time2 }}</div>
+    </div>
+    <div class="">
+      <p class="p-1 text-dark">Opción 3</p>
+      <div class="flex gap-2">{{ form.date3 }} {{ form.time3 }}</div>
+    </div>
+    <button type="submit" class="btn btn-outline border-2 btn-lg mx-auto text-dark bg-[#F8F8F8] hover:text-white hover:bg-dark hover:border-white mt-4">Enviar solicitud</button>
   </div>
   
 </form>
