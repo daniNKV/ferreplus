@@ -9,10 +9,20 @@ from owners.models import Branch
 
 class State(models.Model):
     name = models.CharField(max_length=20, verbose_name="Estado")
+    
 
 
 class CanceledTrade(State):
-    pass
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super(CanceledTrade, self).save(*args, **kwargs)
+
+    @classmethod
+    def load(cls):
+        obj, created = cls.objects.get_or_create(pk=1)
+        return obj
+
+
 
 
 class PendingTrade(State):
@@ -25,6 +35,18 @@ class PendingTrade(State):
     def counteroffer(self):
         pass
 
+    def expire(self):
+        pass
+    
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super(PendingTrade, self).save(*args, **kwargs)
+
+    @classmethod
+    def load(cls):
+        obj, created = cls.objects.get_or_create(pk=1)
+        return obj
+
 
 class AcceptedTrade(State):
     def confirm(self):
@@ -36,19 +58,24 @@ class AcceptedTrade(State):
     def expire(self):
         pass
 
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super(AcceptedTrade, self).save(*args, **kwargs)
 
-class DateTuple(models.Model):
+    @classmethod
+    def load(cls):
+        obj, created = cls.objects.get_or_create(pk=1)
+        return obj
+       
+    
+
+
+class Appointment(models.Model):
     date = models.DateField()
-    start_time = models.DateTimeField()
-    end_time = models.DateTimeField()
+    time = models.TimeField()
 
     def __str__(self):
-        return str(self.start_time) + str(self.end_time)
-
-
-class TradeDateTuple(models.Model):
-    trade = models.ForeignKey("trades.Trade", on_delete=models.CASCADE)
-    date_tuple = models.ForeignKey(DateTuple, on_delete=models.CASCADE)
+        return str(self.date) + str(self.time)
 
 
 class Trade(models.Model):
@@ -80,11 +107,12 @@ class Trade(models.Model):
         Branch, verbose_name="Sucursal elegida", on_delete=models.PROTECT
     )
     selected_dates = models.ManyToManyField(
-        DateTuple,
-        through=TradeDateTuple,
+        Appointment,
         verbose_name="Fechas seleccionadas",
+        related_name="agreed_date",
     )
+    agreed_date = models.DateTimeField(verbose_name="Cita consensuada", null=True)
     state = models.ForeignKey(State, on_delete=models.DO_NOTHING)
-    employee = models.ForeignKey(Employee, on_delete=models.PROTECT)
-    created_at = models.DateField(auto_now_add=True)
-    replied_at = models.DateField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    employee = models.ForeignKey(Employee, null=True, on_delete=models.PROTECT)
+    replied_at = models.DateTimeField(null=True)
