@@ -3,7 +3,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 # from rolepermissions.decorators import has_role_decorator
-from item.models import Item
+from item.models import Item, Category
+from profiles.models import Profile
 from .forms import ItemForm
 
 
@@ -14,7 +15,7 @@ def itemList(request):
 
 @login_required
 # @has_role_decorator('user')
-def create_item(request):
+def create_item(request, category_id=None):
     if request.method == "POST":
         form = ItemForm(request.POST, request.FILES)
         if form.is_valid():
@@ -24,7 +25,11 @@ def create_item(request):
             item.save()
             return redirect("profile_view", user_id=request.user.pk)
     else:
-        form = ItemForm()
+        category = None
+        if (category_id):
+            category = Category.objects.get(id=category_id) 
+            
+        form = ItemForm(initial={'category': category})
     return render(request, "item/create_item.html", {"form": form})
 
 
@@ -56,3 +61,8 @@ def delete_item(request, item_id):
     item.delete()
     messages.success(request, "¡Artículo eliminado exitosamente!")
     return redirect("profile_view", user_id=request.user.id)
+
+
+def detail_item(request, item_id):
+    item = get_object_or_404(Item, pk=item_id)
+    return render(request, "item/detail_item.html", {"item": item})

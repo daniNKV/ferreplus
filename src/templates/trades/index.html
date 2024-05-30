@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block head_title %}
+  Ferreplus | Mis Trueques
+{% endblock %}
+
+{% block extra_head %}
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+{% endblock extra_head %}
+
+{% block body %}
+
+  {% if messages %}
+      <ul id="messages" class="messages flex flex-col">
+        {% for message in messages %}
+          <div class="toast">
+            <div class="alert alert-info">
+              <span>{{ message }}</span>
+            </div>
+          </div>
+        {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% include 'navbar.html' %}
+
+
+
+    <div class="hero min-h-screen bg-neutral">
+      <div class="hero-content text-center text-dark">
+        <div class="max-w-md">
+          <h1 class="text-5xl font-bold">Buscá tu intercambio</h1>
+          <p class="py-6">Provident cupiditate voluptatem et in. Quaerat fugiat ut assumenda excepturi exercitationem quasi. In deleniti eaque aut repudiandae et a id nisi.</p>
+          <button class="btn btn-primary">Ver trueques disponibles</button>
+        </div>
+      </div>
+    </div>
+
+  {% block extra_body %}
+    <script>
+      window.setTimeout(function() {
+        document.querySelector('.alert').remove()
+    }, 4000);
+    
+    </script>
+  {% endblock %}
+
+{% endblock %}

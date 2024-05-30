@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block head_title %}
+    Viendo {{ item.name }}
+{% endblock %}
+
+{% block extra_head %}
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+{% endblock extra_head %}
+
+{% block body %}
+
+{% if messages %}
+    <ul id="messages" class="messages">
+      {% for message in messages %}
+        <div class="toast">
+          <div class="alert alert-success">
+            <span>{{ message }}</span>
+          </div>
+        </div>
+      {% endfor %}
+  </ul>
+{% endif %}
+
+{% include 'navbar.html' %}
+
+<section 
+    class="flex flex-col bg-neutral text-dark items-center place-content-center min-h-screen bg-cover" 
+    style="background-image: url({% static 'img/background.png' %})">
+    <div class="card relative indicator lg:card-side bg-neutral gap-5 items-center max-w-screen-xl p-5 mt-16">
+      <div class="lg:w-6/12 p-2 md:p-0">
+        <figure class="object-center max-h-[500px] max-w-[500px]"><img src={{item.image.url}}/></figure>
+      </div>
+      <div class="flex flex-col gap-4 lg:w-6/12 p-4">
+        <h2 class="card-title text-dark text-6xl place-self-center ">{{ item.name }}</h2>
+        <p class="max-w-xl">{{ item.description }}.</p>
+        <div class="flex flex-col gap-2">
+          <p>Disponible en<span class="badge p-5 badge-accent text-center max-w-xs ml-2">{{ item.branch }}.</span></p>
+          <p>Publicado en<span class="badge p-5 badge-accent text-center ml-2">{{ item.category.name }}.</span></p>
+      </div>
+      <div class="card-actions justify-end">
+        {% if user.pk == item.user.pk %}
+          <a href="{% url 'item_edit' item_id=item.pk %}" class="btn btn-outline w-full bg-neutral text-dark">Editar</a>      
+        {% else %}
+          <a href="{% url 'propose_trade' requested_item_id=item.pk %}" class="btn btn-outline w-full bg-neutral text-dark">Solicitar trueque</a>
+        {% endif %}
+      </div>
+
+      <a href="{% url 'profile_view' user_id=item.user.pk %}" class="avatar indicator-item top-10 indicator-right absolute">
+        <div class="w-16 md:w-20 rounded-full ring ring-main ring-offset-main ring-offset-2">
+          <img src="{{ item.user.profile.avatar.url }}" />
+        </div>
+      </a>
+    </div>
+</section>
+
+{% endblock %}
