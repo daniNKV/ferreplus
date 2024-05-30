@@ -74,10 +74,15 @@
 </section>
 
 <section id="user-products" class="min-w-screen bg-neutral text-dark">
-  <div class="flex justify-between items-center p-5 bg-main">
+  <!--<div class="flex justify-between items-center p-5 bg-main">
     <h2 class="text-xl md:text-4xl text-neutral">Articulos ofrecidos por otros usuarios</h2>
-    <!-- <a href="" class="btn btn-lg btn-outline text-neutral">Ver todo</a> -->
-  </div>
+    <a href="" class="btn btn-lg btn-outline text-neutral">Ver todo</a> 
+  </div>-->
+  <div class="navbar flex justify-between items-center p-5 bg-main">
+      <h2 class="text-xl md:text-4xl text-neutral">Artículos publicados</h2>
+      <a href="{% url 'all_items' %}" class="btn btn-outline bg-neutral text-dark">Ver todos los artículos</a>
+    </div>
+
   <div class="carousel w-full carousel-center py-20 px-10 space-x-10 bg-neutral">
     {% if items %}
       {% for item in items %}
