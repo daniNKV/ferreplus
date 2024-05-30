@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block extra_head %}
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+{% endblock extra_head %}
+
+{% block body %}
+{% include "navbar.html" %}
+<div class="bg-neutral text-dark min-h-screen w-screen mt-16">
+  <h1 class="text-xl md:text-4xl text-dark text-center p-4">Todos los artículos publicados </h1>
+  <form action="{% url 'all_items' %}" method="get" class="mx-auto w-full flex flex-col gap-2 max-w-screen-sm">
+    <input id="searchInput" type="text" name="text" placeholder="Buscar artículo" class="input input-bordered w-24 md:w-auto" />
+    <select name="category" class="form-select p-2 bg-white border border-gray-300 rounded">
+      <option disabled selected>Filtrar por categoría</option>
+      <option value="" >Cualquiera</option>
+          {% for category in categories %}
+            <option value="{{ category.name }}">{{ category.name }}</option>
+          {% endfor %}
+      </select>
+      <select name="branch" class="form-select p-2 bg-white border border-gray-300 rounded">
+          <option disabled selected>Filtrar por sucursal</option>
+          <option value="" >Cualquiera</option>
+              {% for branch in branches %}
+                <option value="{{ branch.id }}">{{ branch.name }}</option>
+              {% endfor %}
+      </select>
+      <button type="submit" class="btn btn-outline bg-neutral text-dark">Buscar artículos</button>
+  </form>
+    
+    {% block content %}
+
+    {% endblock %}
+  </div>
+</div>
+
+{% endblock %}

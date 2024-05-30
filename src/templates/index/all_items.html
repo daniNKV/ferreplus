@@ -1,0 +1,26 @@
+{% extends 'index/base.html' %}
+
+{% block content %}
+<div class="flex flex-wrap justify-center gap-4 bg-neutral p-5">
+    {% for item in resultados %}
+    <div class="rounded-xl card w-80 sm:w-72 shadow-xl hover:-translate-y-2 hover:shadow-2xl transition-transform bg-main">
+      <a href="{% url 'item_detail' item_id=item.pk %}" class="bg-main sm:h-2/4">
+        <figure class="h-48 overflow-hidden">
+          <img class="w-full h-full object-cover" src="{{ item.image.url }}" alt="{{ item.name }}" />
+        </figure>
+      </a>
+      <div class="card-body p-4 text-center bg-main text-neutral">
+        <h2 class="card-title text-xl mb-2">{{ item.name }}</h2>
+        <p class="text-sm mb-4">{{ item.description|truncatechars:100 }}</p>
+        <div class="card-actions justify-center mb-4">
+          <p class="label">Disponible en<span class="badge badge-outline ml-2 p-2 py-1">{{ item.branch }}</span></p>
+        </div>
+        <a href="{% url 'item_detail' item_id=item.pk %}" class="btn btn-outline w-full bg-neutral text-dark">Ver en detalle</a>
+      </div>
+    </div>
+    {% empty %}
+    <p class="text-center w-full">No se encontraron resultados.</p>
+    {% endfor %}
+</div>
+
+{% endblock %}
