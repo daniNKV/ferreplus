@@ -1,12 +1,12 @@
 <!-- date_snippet.html -->
 <form method="post" hx-replace-url="/trades" hx-post="{% url 'create_trade' requested_item_id=requested_item.id offered_item_id=offered_item.id %}" hx-target="body">
   {% csrf_token %}
-  <h1 class="text-2xl text-wrap font-semibold text-center text-dark">
-    Seleccioná 3 (tres) fechas posibles para el trueque
-  </h1>
   <h2 class="text-lg opacity-80 text-dark text-center">Estas ofreciendo: <span class="badge badge-md bg-dark text-white my-auto">{{offered_item.name}}</span> </h2>
-
+  
   <div class="flex flex-col gap-2 mx-auto bg-[#F8F8F8] rounded-3xl border-2 border-dark mt-4 p-5 text-dark max-w-screen-sm ">
+    <h1 class="text-2xl text-wrap font-semibold text-center text-dark">
+      Seleccioná 3 (tres) fechas posibles para el trueque
+    </h1>
     {% if form.errors %}
     <div class="alert alert-danger">
         <ul>
@@ -30,7 +30,7 @@
       <p class="p-1 text-dark">Opción 3</p>
       <div class="flex gap-2">{{ form.date3 }} {{ form.time3 }}</div>
     </div>
-    <button type="submit" class="btn btn-outline border-2 btn-lg mx-auto text-dark bg-[#F8F8F8] hover:text-white hover:bg-dark hover:border-white mt-4">Enviar solicitud</button>
+    <button type="submit" class="btn btn-outline text-neutral bg-main border-2 btn-lg mx-auto bg-[#F8F8F8] hover:text-white hover:bg-dark hover:border-white mt-4">Enviar solicitud</button>
   </div>
   
 </form>

@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', (event) => {
+document.addEventListener('load', (event) => {
     window.onscroll = () => {
         let navbar = document.getElementById('navbar');
         if (window.scrollY > 0) {

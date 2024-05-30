@@ -5,3 +5,4 @@ Django-template-partials
 python-dotenv==1.0.1
 Django-debug-toolbar
 Pillow~=10.3.0
+python-dateutil

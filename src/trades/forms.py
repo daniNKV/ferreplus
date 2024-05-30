@@ -32,7 +32,7 @@ class DatesForm(forms.Form):
         label="Dia 1",
         choices=[],
         widget=forms.widgets.Select(
-            attrs={"class": "select select-bordered bg-dark text-neutral w-full"}
+            attrs={"class": "select select-bordered bg-neutral text-dark font-semibold border-2 border-dark w-full"}
         ),
     )
     time1 = forms.ChoiceField(
@@ -40,7 +40,7 @@ class DatesForm(forms.Form):
         label="Horario 1",
         choices=[],
         widget=forms.widgets.Select(
-            attrs={"class": "select select-bordered bg-dark text-neutral w-full"}
+            attrs={"class": "select select-bordered bg-neutral text-dark font-semibold border-2 border-dark w-full"}
         ),
     )
     date2 = forms.ChoiceField(
@@ -48,7 +48,7 @@ class DatesForm(forms.Form):
         label="Dia 2",
         choices=[],
         widget=forms.widgets.Select(
-            attrs={"class": "select select-bordered bg-dark text-neutral w-full"}
+            attrs={"class": "select select-bordered bg-neutral text-dark font-semibold border-2 border-dark w-full"}
         ),
     )
     time2 = forms.ChoiceField(
@@ -56,21 +56,21 @@ class DatesForm(forms.Form):
         label="Horario 2",
         choices=[],
         widget=forms.widgets.Select(
-            attrs={"class": "select select-bordered bg-dark text-neutral w-full"}
+            attrs={"class": "select select-bordered bg-neutral text-dark font-semibold border-2 border-dark w-full"}
         ),
     )
     date3 = forms.ChoiceField(
         label="Dia 3",
         choices=[],
         widget=forms.widgets.Select(
-            attrs={"class": "select select-bordered bg-dark text-neutral w-full"}
+            attrs={"class": "select select-bordered bg-neutral text-dark font-semibold border-2 border-dark w-full"}
         ),
     )
     time3 = forms.ChoiceField(
         label="Horario 3",
         choices=[],
         widget=forms.widgets.Select(
-            attrs={"class": "select select-bordered bg-dark text-neutral w-full"}
+            attrs={"class": "select select-bordered bg-neutral text-dark font-semibold border-2 border-dark w-full"}
         ),
     )
 

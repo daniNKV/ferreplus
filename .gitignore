@@ -1,6 +1,6 @@
 .DS_Store
 local-cdn/
-
+src/media/
 # Logs
 logs
 *.log
