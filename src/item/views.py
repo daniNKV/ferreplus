@@ -25,7 +25,10 @@ def create_item(request, category_id=None):
             item.save()
             return redirect("profile_view", user_id=request.user.pk)
     else:
-        category = Category.objects.get(id=category_id) 
+        category = None
+        if (category_id):
+            category = Category.objects.get(id=category_id) 
+            
         form = ItemForm(initial={'category': category})
     return render(request, "item/create_item.html", {"form": form})
 
