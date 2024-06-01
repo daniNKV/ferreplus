@@ -13,8 +13,8 @@ urlpatterns = [
     ),
     path(
         "create/<int:requested_item_id>/<int:offered_item_id>/",
-        views.trade_creation,
-        name="create_trade",
+        views.proposal_creation,
+        name="create_proposal",
     ),
     #path("detail/<int:trade_id>", views.trade_detail, name="detail_trade"),
 ]

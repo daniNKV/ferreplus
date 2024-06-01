@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     "owners",
     "item",
     "trades",
+    "transitions"
 ]
 
 MIDDLEWARE = [

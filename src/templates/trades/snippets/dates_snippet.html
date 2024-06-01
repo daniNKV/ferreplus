@@ -1,5 +1,5 @@
 <!-- date_snippet.html -->
-<form method="post" hx-replace-url="/trades" hx-post="{% url 'create_trade' requested_item_id=requested_item.id offered_item_id=offered_item.id %}" hx-target="body">
+<form method="post" hx-replace-url="/trades" hx-post="{% url 'create_proposal' requested_item_id=requested_item.id offered_item_id=offered_item.id %}" hx-target="body">
   {% csrf_token %}
   <h2 class="text-lg opacity-80 text-dark text-center">Estas ofreciendo: <span class="badge badge-md bg-dark text-white my-auto">{{offered_item.name}}</span> </h2>
   
@@ -18,18 +18,12 @@
         </ul>
     </div>
     {% endif %}
-    <div class="">
-      <p class="p-1 text-dark">Opción 1</p>
-      <div class="flex gap-2">{{ form.date1 }} {{ form.time1 }}</div>
-    </div>
-    <div class="">
-      <p class="p-1 text-dark">Opción 2</p>
-      <div class="flex gap-2">{{ form.date2 }} {{ form.time2 }}</div>
-    </div>
-    <div class="">
-      <p class="p-1 text-dark">Opción 3</p>
-      <div class="flex gap-2">{{ form.date3 }} {{ form.time3 }}</div>
-    </div>
+
+    {{ formset.management_form }}
+    {% for form in formset %}
+        <div class="flex gap-2">{{ form.as_p }}</div>
+    {% endfor %}
+    
     <button type="submit" class="btn btn-outline text-neutral bg-main border-2 btn-lg mx-auto bg-[#F8F8F8] hover:text-white hover:bg-dark hover:border-white mt-4">Enviar solicitud</button>
   </div>
   

@@ -1,12 +1,17 @@
-from django.forms import formset_factory
-from django.shortcuts import render, HttpResponseRedirect
-from django.http import JsonResponse
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, HttpResponseRedirect, get_object_or_404
 from django.views.decorators.http import require_GET, require_POST
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse, HttpResponse
+from django.forms import formset_factory
+from django.contrib import messages
 from item.models import Item
-from .models import Proposal, DateSelection
 from .forms import DatesSelectionForm
+from .models import (
+    Proposal,
+    Trade,
+    ProposalStateMachine as ProposalState,
+    TradeStateMachine as TradeState,
+)
 
 
 def index_trade(request):
@@ -45,7 +50,7 @@ def dates_selection(request, requested_item_id):
 
 @login_required
 @require_POST
-def trade_creation(request, requested_item_id, offered_item_id):
+def proposal_creation(request, requested_item_id, offered_item_id):
     DateSelectionFormSet = formset_factory(DatesSelectionForm, extra=3)
     selected_dates = DateSelectionFormSet(request.POST)
 
@@ -65,7 +70,7 @@ def trade_creation(request, requested_item_id, offered_item_id):
         )
         for date in dates:
             proposal.possible_dates.add(date)
-
+        # TODO: Decidir si se envian notificaciones al crear la propuesta
         proposal.save()
 
         messages.warning(request, "Hasta aca llegué por ahora")
@@ -75,3 +80,25 @@ def trade_creation(request, requested_item_id, offered_item_id):
         return render(request, "trades/index.html", {})
     else:
         return JsonResponse(selected_dates.errors, safe=False)
+
+
+def accept_proposal(request, proposal_id, settled_date):
+    proposal = get_object_or_404(Proposal, id=proposal_id)
+    fsm = ProposalState(proposal)
+
+    if fsm.is_pending():
+        fsm.accept(settled_date=settled_date)
+        return HttpResponse(f"Proposal {proposal_id} accepted and trade created.")
+    return HttpResponse(f"Proposal {proposal_id} could not be accepted.")
+
+
+def counteroffer_proposal(request, proposal_id, selected_item_id):
+    proposal = get_object_or_404(Proposal, id=proposal_id)
+    counter_item = get_object_or_404(Item, id=selected_item_id)
+    fsm = ProposalState(proposal)
+
+    if fsm.is_pending():
+        # TODO: Definir si al contra ofertar se vuelve a seleccionar las fechas
+        fsm.counteroffer(item=counter_item)
+        return HttpResponse(f"Proposal {proposal_id} counteroffered.")
+    return HttpResponse(f"Proposal {proposal_id} could not be counteroffered.")

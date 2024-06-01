@@ -1,82 +1,148 @@
-from datetime import time
-from django.utils import timezone
+from datetime import datetime
 from django.db import models
-from django.core.exceptions import ValidationError
+from transitions import Machine
+from django.utils.translation import gettext_lazy as _
 from user.models import User, Employee
 from item.models import Item
 from owners.models import Branch
 
 
-class State(models.Model):
-    name = models.CharField(max_length=20, verbose_name="Estado")
-    
+class ProposalState(models.TextChoices):
+    PENDING = "PENDING", _("Pending")
+    ACCEPTED = "ACCEPTED", _("Acepted")
+    DECLINED = "DECLINED", _("Declined")
+    COUNTEROFFERED = "COUNTEROFFERED", _("Counteroffered")
+    EXPIRED = "EXPIRED", _("Expired")
 
 
-class CanceledTrade(State):
-    def save(self, *args, **kwargs):
-        self.pk = 1
-        super(CanceledTrade, self).save(*args, **kwargs)
+class ProposalStateMachine:
+    states = [state for state, _ in ProposalState.choices]
+    proposal_transitions = [
+        {
+            "trigger": "accept",
+            "source": [ProposalState.PENDING, ProposalState.COUNTEROFFERED],
+            "dest": ProposalState.ACCEPTED,
+            "before": "create_trade",
+            "after": "save_state",
+        },
+        {
+            "trigger": "decline",
+            "source": [ProposalState.PENDING, ProposalState.COUNTEROFFERED],
+            "dest": ProposalState.DECLINED,
+            "after": ["save_state"],
+        },
+        {
+            "trigger": "counteroffer",
+            "source": ProposalState.PENDING,
+            "dest": ProposalState.COUNTEROFFERED,
+            "before": "new_offer",
+            "after": "save_state",
+        },
+        {
+            "trigger": "expire",
+            "source": [ProposalState.PENDING, ProposalState.COUNTEROFFERED],
+            "dest": ProposalState.EXPIRED,
+            "after": "save_state",
+        },
+    ]
 
-    @classmethod
-    def load(cls):
-        obj, created = cls.objects.get_or_create(pk=1)
-        return obj
+    def __init__(self, proposal):
+        self.proposal = proposal
+        self.machine = Machine(
+            model=self,
+            states=ProposalStateMachine.states,
+            transitions=self.proposal_transitions,
+            initial=self.states.PENDING,
+            send_event=True,
+        )
+
+    def save_state(self, event):
+        self.proposal.state = event.model.state
+        self.proposal.save()
+
+    def create_trade(self, event):
+        trade = Trade(
+            proposal=self.proposal,
+            agreed_date=event.kwargs.get("settled_date"),
+            branch=self.proposal.branch,
+        )
+        trade.save()
+
+    def new_offer(self, event):
+        counter_item = event.kwargs.get("item")
+        last_offer = self.proposal
+        counteroffer = Proposal(
+            replied_at=datetime.now,
+            counteroffer_to=last_offer,
+            requested_item=counter_item,
+            requested_user=last_offer.offering_user,
+            offering_user=last_offer.requested_user,
+            offered_item=last_offer.requested_item,
+            possible_branch=last_offer.possible_branch,
+            possible_dates=last_offer.possible_dates,
+        )
+        counteroffer.save()
 
 
-class PendingTrade(State):
-    def accept(self):
-        pass
-
-    def decline(self):
-        pass
-
-    def counteroffer(self):
-        pass
-
-    def expire(self):
-        pass
-    
-    def save(self, *args, **kwargs):
-        self.pk = 1
-        super(PendingTrade, self).save(*args, **kwargs)
-
-    @classmethod
-    def load(cls):
-        obj, created = cls.objects.get_or_create(pk=1)
-        return obj
+class TradeState(models.TextChoices):
+    PENDING = "PENDING", _("Pending")
+    CONFIRMED = "ACCEPTED", _("Acepted")
+    CANCELED = "CANCELED", _("Canceled")
+    EXPIRED = "EXPIRED", _("Expired")
 
 
-class AcceptedTrade(State):
-    def confirm(self):
-        pass
+class TradeStateMachine:
+    state = [state for state, _ in TradeState.choices]
+    trade_transitions = [
+        {
+            "trigger": "confirm",
+            "source": TradeState.PENDING,
+            "dest": TradeState.CONFIRMED,
+            "after": "save_state",
+        },
+        {
+            "trigger": "cancel",
+            "source": TradeState.PENDING,
+            "dest": TradeState.CANCELED,
+            "after": "save_state",
+        },
+        {
+            "trigger": "expire",
+            "source": TradeState.PENDING,
+            "dest": TradeState.EXPIRED,
+            "after": "save_state",
+        },
+    ]
 
-    def cancel(self):
-        pass
+    def __init__(self, trade):
+        self.trade = trade
+        self.machine = Machine(
+            model=self,
+            states=TradeStateMachine.states,
+            transitions=self.trade_transitions,
+            initial="pending",
+            send_event=True,
+        )
 
-    def expire(self):
-        pass
-
-    def save(self, *args, **kwargs):
-        self.pk = 1
-        super(AcceptedTrade, self).save(*args, **kwargs)
-
-    @classmethod
-    def load(cls):
-        obj, created = cls.objects.get_or_create(pk=1)
-        return obj
-       
-    
+    def save_state(self, event):
+        self.proposal.state = event.model.state
+        self.proposal.save()
 
 
-class Appointment(models.Model):
+class DateSelection(models.Model):
     date = models.DateField()
-    time = models.TimeField()
+    from_time = models.TimeField()
+    to_time = models.TimeField()
 
     def __str__(self):
-        return str(self.date) + str(self.time)
+        return str(self.date) + str(self.from_time)
 
 
-class Trade(models.Model):
+class Proposal(models.Model):
+    state = models.CharField(
+        max_length=20, choices=ProposalState.choices, default=ProposalState.PENDING
+    )
+
     requested_user = models.ForeignKey(
         User,
         verbose_name="Usuario solicitado",
@@ -101,16 +167,35 @@ class Trade(models.Model):
         related_name="offered_item",
         on_delete=models.PROTECT,
     )
-    branch = models.ForeignKey(
+    possible_dates = models.ManyToManyField(
+        DateSelection,
+        verbose_name="Fechas posibles para el encuentro",
+    )
+    possible_branch = models.ForeignKey(
         Branch, verbose_name="Sucursal elegida", on_delete=models.PROTECT
     )
-    selected_dates = models.ManyToManyField(
-        Appointment,
-        verbose_name="Fechas seleccionadas",
-        related_name="agreed_date",
+    counteroffer_to = models.OneToOneField(
+        "self",
+        verbose_name="Propuesta previa",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
     )
-    agreed_date = models.DateTimeField(verbose_name="Cita consensuada", null=True)
-    state = models.ForeignKey(State, on_delete=models.DO_NOTHING)
+    replied_at = models.DateTimeField(default=None, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class Trade(models.Model):
+    state = models.CharField(
+        max_length=20, choices=TradeState.choices, default=TradeState.PENDING
+    )
+    proposal = models.OneToOneField(
+        Proposal,
+        verbose_name="Propuesta",
+        on_delete=models.PROTECT,
+    )
+    agreed_date = models.DateTimeField(verbose_name="Fecha acordada")
+    branch = models.ForeignKey(Branch, on_delete=models.PROTECT)
     employee = models.ForeignKey(Employee, null=True, on_delete=models.PROTECT)
-    replied_at = models.DateTimeField(null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    confirmed_at = models.DateTimeField()
