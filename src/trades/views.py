@@ -5,6 +5,7 @@ from django.http import JsonResponse, HttpResponse
 from django.forms import formset_factory
 from django.contrib import messages
 from item.models import Item
+from user.models import Employee
 from .forms import DatesSelectionForm
 from .models import (
     Proposal,
@@ -85,7 +86,8 @@ def proposal_creation(request, requested_item_id, offered_item_id):
 def accept_proposal(request, proposal_id, settled_date):
     proposal = get_object_or_404(Proposal, id=proposal_id)
     fsm = ProposalState(proposal)
-
+    # TODO: Validar que el usuario que acepta la propuesta es el que la recibio
+    # TODO: Validar que la propuesta no expiró
     if fsm.is_pending():
         fsm.accept(settled_date=settled_date)
         return HttpResponse(f"Proposal {proposal_id} accepted and trade created.")
@@ -97,8 +99,62 @@ def counteroffer_proposal(request, proposal_id, selected_item_id):
     counter_item = get_object_or_404(Item, id=selected_item_id)
     fsm = ProposalState(proposal)
 
+    # TODO: Validar que el usuario haciendo la contraoferta sea el usuario que la recibio inicialmente
     if fsm.is_pending():
         # TODO: Definir si al contra ofertar se vuelve a seleccionar las fechas
         fsm.counteroffer(item=counter_item)
         return HttpResponse(f"Proposal {proposal_id} counteroffered.")
     return HttpResponse(f"Proposal {proposal_id} could not be counteroffered.")
+
+# def decline_proposal(request, proposal_id):
+#     proposal = get_object_or_404(Proposal, id=proposal_id)
+#     fsm = ProposalState(proposal)
+
+#     if proposal.state in [ProposalState.states.PENDING, ProposalState.states.COUNTEROFFERED]:
+#         fsm.decline()
+#         return HttpResponse(f"Proposal {proposal_id} declined.")
+#     return HttpResponse(f"Proposal {proposal_id} could not be declined.")
+
+
+# def expire_proposal(request, proposal_id):
+#     proposal = get_object_or_404(Proposal, id=proposal_id)
+
+#     fsm = ProposalState(proposal)
+
+#     if proposal.state in [ProposalState.states.PENDING, ProposalState.states.COUNTEROFFERED]:
+#         fsm.expire()
+#         return HttpResponse(f"Proposal {proposal_id} expired.")
+#     return HttpResponse(f"Proposal {proposal_id} could not be expired.")
+
+
+
+
+def confirm_trade(self, request, trade_id, employee_id):
+    trade = get_object_or_404(Trade, id=trade_id)
+    employee = get_object_or_404(Employee, id=employee_id)
+    fsm = TradeState(trade)
+
+    if trade.state == TradeState.PENDING:
+        fsm.confirm(employee=employee)
+        return HttpResponse(f"Trade {trade_id} confirmed.")
+    return HttpResponse(f"Trade {trade_id} could not be confirmed.", status=400)
+
+
+def cancel_trade(self, request, trade_id):
+    trade = get_object_or_404(Trade, id=trade_id)
+    fsm = TradeState(trade)
+
+    if trade.state == TradeState.PENDING:
+        fsm.cancel()
+        return HttpResponse(f"Trade {trade_id} canceled.")
+    return HttpResponse(f"Trade {trade_id} could not be canceled.", status=400)
+
+
+# def expire_trade(request, trade_id):
+#     trade = get_object_or_404(Trade, id=trade_id)
+#     fsm = TradeState(trade)
+
+#     if trade.state == TradeState.states.PENDING:
+#         fsm.expire()
+#         return HttpResponse(f"Trade {trade_id} expired.")
+#     return HttpResponse(f"Trade {trade_id} could not be expired.")
