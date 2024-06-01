@@ -1,19 +1,19 @@
+from django.forms import formset_factory
 from django.shortcuts import render, HttpResponseRedirect
 from django.http import JsonResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_GET, require_POST
 from item.models import Item
-from .models import Trade, Appointment, State, AcceptedTrade, CanceledTrade, PendingTrade
-from .forms import DatesForm
-
-# Create your views here.
+from .models import Proposal, DateSelection
+from .forms import DatesSelectionForm
 
 
 def index_trade(request):
     return render(request, "trades/index.html", {})
 
 
+# TODO:  Hay que verificar que el usuario no le haya hecho una propuesta aun
 @login_required
 @require_GET
 def item_selection(request, requested_item_id):
@@ -28,14 +28,15 @@ def item_selection(request, requested_item_id):
     return render(request, "trades/select_item.html", context)
 
 
+# TODO: Hay que validar que las selecciones de rango no se superpongan ni sean inversas
 @login_required
 @require_POST
 def dates_selection(request, requested_item_id):
     requested_item = Item.objects.filter(id=requested_item_id).first()
     offered_item = Item.objects.get(id=request.POST.get("offered_item"))
-    form = DatesForm()
+    DateSelectionFormSet = formset_factory(DatesSelectionForm, extra=3)
     context = {
-        "form": form,
+        "formset": DateSelectionFormSet,
         "requested_item": requested_item,
         "offered_item": offered_item,
     }
@@ -45,42 +46,32 @@ def dates_selection(request, requested_item_id):
 @login_required
 @require_POST
 def trade_creation(request, requested_item_id, offered_item_id):
-    form = DatesForm(request.POST)
-    if form.is_valid():
-        date1 = form.cleaned_data['date1']
-        time1 = form.cleaned_data['time1']
-        date2 = form.cleaned_data['date2']
-        time2 = form.cleaned_data['time2']
-        date3 = form.cleaned_data['date3']
-        time3 = form.cleaned_data['time3']
-        dates = [date1, date2, date3]
-        times = [time1, time2, time3]
-        appointments = [Appointment.objects.create(date=date, time=time) for date, time in zip(dates, times)]
-        
+    DateSelectionFormSet = formset_factory(DatesSelectionForm, extra=3)
+    selected_dates = DateSelectionFormSet(request.POST)
+
+    if selected_dates.is_valid():
+        dates = [selection.save() for selection in selected_dates]
         requested_item = Item.objects.get(id=requested_item_id)
         offered_item = Item.objects.get(id=offered_item_id)
         requested_user = requested_item.user
         offering_user = offered_item.user
         branch = requested_item.branch
-        state = PendingTrade.load()
-        trade = Trade.objects.create(
+        proposal = Proposal.objects.create(
             requested_user=requested_user,
             offering_user=offering_user,
             requested_item=requested_item,
             offered_item=offered_item,
             branch=branch,
-            state=state,
         )
-        for appointment in appointments:
-            trade.selected_dates.add(appointment)
-            
-        trade.save()
+        for date in dates:
+            proposal.possible_dates.add(date)
+
+        proposal.save()
+
         messages.warning(request, "Hasta aca llegué por ahora")
-        messages.warning(request, "Las fechas no estan siendo validadas")
         response = HttpResponseRedirect("/trades")
         response["HX-Redirect"] = "/trades"
-        
+
         return render(request, "trades/index.html", {})
     else:
-        # Handle the case where the form is not valid
-        return JsonResponse(form.errors, safe=False)
+        return JsonResponse(selected_dates.errors, safe=False)
