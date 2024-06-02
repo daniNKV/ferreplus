@@ -27,7 +27,7 @@
 <div class="z-20">{% include 'navbar.html' %}</div>
 
 <section id="hero" class="z-10">
-  <div class="hero min-h-screen" style="background-image: url({% static 'img/background.png' %})">
+  <div class="hero min-h-screen bg-cover" style="background-image: url({% static 'img/background.png' %})">
     <div class="hero-content flex-col lg:flex-row gap-0 text-center bg-neutral">
       <figure class="max-w-xl h-auto">
         <img src="{% static 'logo.webp' %}" alt="logo" />
@@ -78,9 +78,9 @@
     <h2 class="text-xl md:text-4xl text-neutral">Articulos ofrecidos por otros usuarios</h2>
     <a href="" class="btn btn-lg btn-outline text-neutral">Ver todo</a> 
   </div>-->
-  <div class="navbar flex justify-between items-center p-5 bg-main">
-      <h2 class="text-xl md:text-4xl text-neutral">Artículos publicados</h2>
-      <a href="{% url 'all_items' %}" class="btn btn-outline bg-neutral text-dark">Ver todos los artículos</a>
+  <div class="navbar flex justify-between items-center p-5 gap-2 bg-main">
+      <h2 class="sm:text-xl  lg:text-4xl text-neutral">Artículos publicados</h2>
+      <a href="{% url 'all_items' %}" class="btn btn-outline bg-neutral text-dark">Ver todos</a>
     </div>
 
   <div class="carousel w-full carousel-center py-20 px-10 space-x-10 bg-neutral">
@@ -121,20 +121,13 @@
     <!-- <a href="" class="btn btn-lg btn-outline text-neutral">Ver todo</a> -->
   </div>
   <div class="flex justify-center items-center w-full h-96">
-    <h2 class="text-2xl text-dark">Oops. No hay artículos disponibles aún.</h2>
+    <h2 class="text-2xl text-dark text-center">Oops. No hay artículos disponibles aún.</h2>
   </div>
 </section>
 
 {% include 'footer.html' %}
 
 {% block extra_body %}
-  <script>
-    window.setTimeout(function() {
-      document.querySelector('.alert').remove()
-  }, 4000);
-  
-  </script>
-  
 {% endblock extra_body %}
 
 {% endblock %}
