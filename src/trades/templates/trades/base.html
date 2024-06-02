@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block head_title %}
+  Ferreplus | Mis Trueques
+{% endblock %}
+
+{% block extra_head %}
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+{% endblock extra_head %}
+
+{% block body %}
+  {% if messages %}
+    <ul id="messages" class="messages flex flex-col">
+      {% for message in messages %}
+        <div class="toast">
+          <div class="alert alert-info">
+            <span>{{ message }}</span>
+          </div>
+        </div>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% include 'navbar.html' %}
+
+  {% block content %}
+  
+  {% endblock %}
+{% endblock %}
+
+
+{% block extra_body %}
+<script>
+  window.setTimeout(function() {
+    let messages = document.getElementById('messages');
+    if (messages) {
+      messages.remove();
+    }
+}, 4000);
+
+</script>
+{% block js %}
+{% endblock %}
+
+{% endblock %}
