@@ -1,10 +1,16 @@
-{% extends "trades/base.html" %}
+{% extends "base.html" %}
 
 {% block head_title %}
   Ferreplus | Intercambiar
 {% endblock %}
 
-{% block content %}
+{% block extra_head %}
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+{% endblock extra_head %}
+
+
+{% block body %}
+{% include 'navbar.html' with trade_manage=False %}
   <div class="min-h-screen flex flex-col bg-neutral">
 
     {% if items_to_offer|length == 0 %}

@@ -29,11 +29,11 @@
 <section 
     class="flex flex-col bg-neutral text-dark items-center place-content-center min-h-screen bg-cover" 
     style="background-image: url({% static 'img/background.png' %})">
-    <div class="card relative indicator lg:card-side bg-neutral gap-5 items-center w-11/12 max-w-screen-xl mt-16">
-      <div class="lg:w-6/12 p-10">
-        <figure class="object-center w-64 md sm:w-full"><img src={{item.image.url}}/></figure>
+    <div class="card relative indicator lg:card-side bg-neutral gap-5 items-center w-11/12 max-w-screen-xl mt-20">
+      <div class="lg:w-6/12 pt-10">
+        <figure class="max-w-[500px] max-h-[500px] h-auto"><img class="object-center object-cover" src={{item.image.url}}/></figure>
       </div>
-      <div class="flex flex-col place-self-start gap-4 lg:w-6/12 p-4 lg:py-20">
+      <div class="flex flex-col place-self-center gap-4 lg:w-6/12 p-4 lg:py-20">
         <h2 class="card-title text-dark text-3xl sm:text-6xl place-self-center ">{{ item.name }}</h2>
         <p class="max-w-xl">{{ item.description }}.</p>
         <div class="flex flex-col gap-2">
@@ -48,7 +48,7 @@
         {% endif %}
       </div>
 
-      <a href="{% url 'profile_view' user_id=item.user.pk %}" class="avatar indicator-item  sm:top-20 right-10 sm:indicator-right absolute">
+      <a href="{% url 'profile_view' user_id=item.user.pk %}" class="avatar indicator-item indicator-top top-10 md:top-12 right-2/4 translate-x-2/4 absolute">
         <div class="w-16 md:w-20 rounded-full ring ring-main ring-offset-main ring-offset-2">
           <img src="{{ item.user.profile.avatar.url }}" />
         </div>

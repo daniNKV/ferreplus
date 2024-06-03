@@ -37,10 +37,10 @@
         <img alt="Default avatar" class="avatar max-w-72 w-h-72 rounded-lg shadow-2xl" src="{% static 'img/avatar-default.jpg' %}"/>
     {% endif %}
     <div class="join pt-2">
-      <a href="#items" class="btn btn-lg btn-outline join-item text-dark">Ver articulos</a>
+      <a href="#items" class="btn btn-lg btn-outline join-item text-dark hover:bg-dark hover:text-neutral">Ver articulos</a>
       {% if user.is_authenticated and user.pk == profile.user.pk %}
-        <a href="{% url 'item_create' %}" class="btn btn-lg btn-outline join-item text-dark">Publicar Artículo</a>
-        <a href="{% url 'profile_edit' user_id=profile.user.pk %}" class="btn btn-lg btn-outline join-item text-dark">Modificar perfil</a>
+        <a href="{% url 'item_create' %}" class="btn btn-lg btn-outline join-item text-dark hover:bg-dark hover:text-neutral">Publicar Artículo</a>
+        <a href="{% url 'profile_edit' user_id=profile.user.pk %}" class="btn btn-lg btn-outline join-item text-dark hover:bg-dark hover:text-neutral">Modificar perfil</a>
       {% endif %}
     </div>
   </div>
@@ -60,15 +60,15 @@
               </figure>
             </a>
             <div class="card-body items-center gap-5 text-center bg-main text-neutral">
-              <div class="badge badge-secondary">{{ item.category.name }}</div>
-              <h2 class="card-title">
+              <div class="badge bg-accent border-none font-semibold tracking-wide p-4 text-neutral">{{ item.category.name }}</div>
+              <h2 class="card-title text-3xl">
                 {{ item.name }}
               </h2>
               <p>{{ item.description|truncatechars:100 }}</p>
               <div class="join join-horizontal ">
                 {% if user.is_authenticated and user.pk == profile.user.pk %}
                   <a href="{% url 'item_edit' item_id=item.pk %}" class="btn join-item btn-outline text-neutral"><i class="fas fa-edit text-2xl text-center"></i>Editar</a>
-                  <button id="openModalButton-{{item.pk}}" class="modal-btn btn join-item btn-outline text-error" onclick="modal.showModal()>
+                  <button id="openModalButton-{{item.pk}}" class="modal-btn btn join-item btn-outline text-neutral hover:bg-error hover:text-neutral"" onclick="modal.showModal()>
                     <i class="fa-solid fa-trash text-2xl text-error text-center"></i>
                     Eliminar
                   </button>
