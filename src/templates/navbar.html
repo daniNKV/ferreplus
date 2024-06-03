@@ -2,8 +2,11 @@
 <div 
     id="navbar" 
     class="navbar fixed inset-0 z-30 max-h-16 transition-all bg-slate-800 text-neutral">
-    <div class="flex-1">
+    <div class="flex-1 gap-1">
       <a href="{% url 'home' %}"class="btn btn-ghost text-xl">Ferreplus</a>
+        {% if trade_manage %}
+            <label for="menu" class="btn btn-ghost drawer-button"><i class="fas fa-hamburger text-3xl"></i>Menu</label>
+        {% endif %}
     </div>
     <div class="flex-none gap-2">
         <a href="{% url 'all_items' %}"><i class="fas fa-search text-2xl mr-2"></i></a>

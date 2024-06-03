@@ -1,13 +1,12 @@
 from django.shortcuts import render, HttpResponseRedirect, get_object_or_404
+from django.http import JsonResponse, HttpResponseForbidden, HttpResponse
 from django.views.decorators.http import require_GET, require_POST
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse, HttpResponse
 from django.forms import formset_factory
-from django.contrib import messages
-from unittest.mock import Mock
-from item.models import Item
-from user.models import Employee
 from .forms import DatesSelectionForm
+from django.contrib import messages
+from user.models import Employee
+from item.models import Item
 from .models import (
     Proposal,
     Trade,
@@ -15,15 +14,28 @@ from .models import (
     TradeStateMachine as TradeState,
 )
 
+
 @login_required
 @require_GET
 def index_trade(request):
-    pending_proposals = Proposal.objects.filter(requested_user=request.user.id, state='PENDING')
-    pending_trades = Trade.objects.filter(proposal__requested_user=request.user.id, state='PENDING')
-    non_expired_proposals = [proposal for proposal in pending_proposals if not proposal.is_expired()]
+    pending_proposals = Proposal.objects.filter(
+        requested_user=request.user.id, state=ProposalState.State.PENDING
+    )
+    sent_proposals = Proposal.objects.filter(
+        offering_user=request.user.id, state=ProposalState.State.PENDING
+    )
+    pending_trades = Trade.objects.filter(
+        proposal__requested_user=request.user.id, state=ProposalState.State.PENDING
+    )
+    non_expired_proposals = [
+        proposal for proposal in pending_proposals if not proposal.is_expired()
+    ]
     context = {
-        'proposals': non_expired_proposals,
-        'trades': pending_trades,
+        "proposals": {
+            "pending": pending_proposals,
+            "sent": sent_proposals,
+        },
+        "trades": pending_trades,
     }
     return render(request, "trades/index.html", context)
 
@@ -89,17 +101,19 @@ def proposal_creation(request, requested_item_id, offered_item_id):
 
         return render(request, "trades/index.html", {})
     else:
-        return JsonResponse(selected_dates.errors, safe=False)
+        return JsonResponse(selected_dates.errors, safe=True)
+
 
 def detail_proposal(request, proposal_id):
     proposal = get_object_or_404(Proposal, id=proposal_id)
-    if (proposal.requested_user.get_id() != request.user.id):
-        return HttpResponse(f"Proposal {proposal_id} it's not for you")
+    if proposal.requested_user.get_id() != request.user.id:
+        return HttpResponseForbidden(f"Proposal {proposal_id} it's not for you")
     if not (proposal.is_expired()):
-        return HttpResponse(f"Proposal {proposal_id} it's expired")
-    
-    context = {'proposal': proposal}
-    return render(request, 'trades/detail_proposal.html', context)
+        return HttpResponseForbidden(f"Proposal {proposal_id} it's expired")
+
+    context = {"proposal": proposal}
+    return render(request, "trades/detail_proposal.html", context)
+
 
 def confirm_date(request, proposal_id):
     pass
@@ -108,10 +122,10 @@ def confirm_date(request, proposal_id):
 def accept_proposal(request, proposal_id, settled_date):
     proposal = get_object_or_404(Proposal, id=proposal_id)
     fsm = ProposalState(proposal)
-    if (proposal.requested_user.get_id() == request.user.id):
-        return HttpResponse(f"Proposal {proposal_id} it's not for you")
-    if (proposal.is_expired()):
-        return HttpResponse(f"Proposal {proposal_id} it's expired")
+    if proposal.requested_user.get_id() == request.user.id:
+        return HttpResponseForbidden(f"Proposal {proposal_id} it's not for you")
+    if proposal.is_expired():
+        return HttpResponseForbidden(f"Proposal {proposal_id} it's expired")
     if fsm.is_pending():
         fsm.accept(settled_date=settled_date)
         return HttpResponse(f"Proposal {proposal_id} has been accepted")
@@ -129,6 +143,7 @@ def counteroffer_proposal(request, proposal_id, selected_item_id):
         fsm.counteroffer(item=counter_item)
         return HttpResponse(f"Proposal {proposal_id} counteroffered.")
     return HttpResponse(f"Proposal {proposal_id} could not be counteroffered.")
+
 
 # def decline_proposal(request, proposal_id):
 #     proposal = get_object_or_404(Proposal, id=proposal_id)
@@ -151,9 +166,8 @@ def counteroffer_proposal(request, proposal_id, selected_item_id):
 #     return HttpResponse(f"Proposal {proposal_id} could not be expired.")
 
 
-
-
 def confirm_trade(self, request, trade_id, employee_id):
+    # TODO: Validar que los usuarios involucrados no sean el empleado que confirma
     trade = get_object_or_404(Trade, id=trade_id)
     employee = get_object_or_404(Employee, id=employee_id)
     fsm = TradeState(trade)
