@@ -4,18 +4,24 @@
   <section id="pending-action" 
     class="flex flex-col bg-neutral text-dark w-screen pt-16 px-4">
     <h1 class="text-3xl font-bold text-center p-5">Esperando tu respuesta</h1>
-    <div class="join mx-auto max-w-screen-lg">
-      <div class="card join-item sm:w-72 bg-base-[#F8F8F8] shadow-xl image-full">
-        <figure><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRnMzcWuCUtr0KoJ9b0buMd3aGlhMJ7HXdFHQ&s" alt="" /></figure>
-        <div class="card-body gap-4">
-          <h2 class="card-title font-bold text-3xl text-neutral">Nombre del articulo!</h2>
-          <p class="text-neutral inline-flex items-center gap-3"><i class="fa-solid fa-map-pin text-3xl"></i>La Plata</p>
-          <p class="text-neutral inline-flex items-center gap-3"><i class="fa-regular fa-user text-3xl"></i>Rogelio</p>
-          <div class="card-actions justify-end text-neutral">
-            <a href="{% url 'detail_proposal' 1 %}" class="btn btn-outline border-2 btn-lg w-full mx-auto bg-[#F8F8F8] hover:bg-[#F8F8F8] text-dark hover:border-white"">Decidir</a>
+    <div class="flex flex-wrap gap-4 mx-auto max-w-screen-lg">
+      {% if proposals %}
+        {% for proposal in proposals %}
+          <div class="card sm:w-72 bg-base-[#F8F8F8] shadow-xl image-full">
+            <figure><img src="{{proposal.requested_item.image.url}}" alt="" /></figure>
+            <div class="card-body gap-4">
+              <h2 class="card-title font-bold text-3xl text-neutral">{{proposal.requested_item.name}}!</h2>
+              <p class="text-neutral inline-flex items-center gap-3"><i class="fa-solid fa-map-pin text-3xl"></i>{{proposal.possible_branch}}</p>
+              <p class="text-neutral inline-flex items-center gap-3"><i class="fa-regular fa-user text-3xl"></i>{{proposal.offering_user.first_name}}</p>
+              <div class="card-actions justify-end text-neutral">
+                <a href="{% url 'detail_proposal' 1 %}" class="btn btn-outline border-2 btn-lg w-full mx-auto bg-[#F8F8F8] hover:bg-[#F8F8F8] text-dark hover:border-white"">Decidir</a>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        {% endfor %}
+      {% else %}
+        <h1> No tenes propuestas!</h1>
+      {% endif %}
     </div>
   </section>
 
@@ -23,6 +29,48 @@
     <div class="max-w-screen-xl p-4 mx-auto">
       <h1 class="text-3xl grow font-bold text-center p-5 mt-16"">Trueques confirmados</h1>
       <div class="flex-col flex gap-6">
+        {% if trades %}
+          {% for trade in trades %}
+            <div class="stats stats-vertical sm:stats-horizontal p-3 items-center bg-[#F8F8F8] border-2 border-dark text-dark  shadow-lg">
+              <div class="stat">
+                <div class="stat-title">Con</div>
+                <div class="stat-value">{{trade.proposal.offering_user.first_name}} <br> {{trade.proposal.offering_user.last_name}}</div>
+                <div class="avatar mx-auto">
+                  <div class="w-24 mt-1 mask mask-squircle object-center">
+                    <img class="" src="https://cdn-icons-png.flaticon.com/512/219/219969.png" alt="">
+                  </div>
+                </div>
+              </div>
+              <div class="stat">
+                <div class="flex flex-row mx-auto sm:flex-col border-opacity-50">
+                  <div class="grid h-24 w-24 card rounded-box place-items-center">
+                    <div class="w-24 mask mask-squircle object-center">
+                      <img src="{{trade.proposal.offered_item.image.url}}" alt=""> 
+                    </div>
+                  </div>
+                  <div class="divider">por</div>
+                  <div class="grid h-24 w-24 card rounded-box place-items-center">
+                    <div class="avatar">
+                      <div class="w-24 mask mask-squircle object-center">
+                        <img src="{{trade.proposal.requested_item.image.url}}" alt="">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="stat">
+                <div class="stat-title">en</div>
+                <div class="stat-value">Sucursal <br> {{trade.branch.name}} </div>
+              </div>
+              <div class="stat">
+                <div class="stat-title">{{ date|date:"l" }}</div>
+                <div class="stat-value">{{ date|date:"j \d\e F" }} <br> {{ date|date:"H:i" }}</div>
+              </div>
+            </div>
+          {% endfor %}
+            
+        {% else %}
+        <h1> No tenes trueques confirmados!</h1>
         <div class="stats items-center sm:stats-horizontal stats-vertical bg-[#F8F8F8] border-2 border-dark text-dark shadow-lg">
           <div class="stat">
             <div class="stat-title">Con</div>
@@ -60,42 +108,7 @@
           </div>
         </div>
 
-        <div class="stats stats-vertical sm:stats-horizontal p-3 items-center bg-[#F8F8F8] border-2 border-dark text-dark  shadow-lg">
-          <div class="stat">
-            <div class="stat-title">Con</div>
-            <div class="stat-value">MARIA <br> DEL CARMEN</div>
-            <div class="avatar mx-auto">
-              <div class="w-24 mt-1 mask mask-squircle object-center">
-                <img class="" src="https://cdn-icons-png.flaticon.com/512/219/219969.png" alt="">
-              </div>
-            </div>
-          </div>
-          <div class="stat">
-            <div class="flex flex-row mx-auto sm:flex-col border-opacity-50">
-              <div class="grid h-24 w-24 card rounded-box place-items-center">
-                <div class="w-24 mask mask-squircle object-center">
-                  <img src="https://www.e-paimun.com.ar/wp-content/uploads/2021/03/Martillo-Galponero-1.jpg" alt=""> 
-                </div>
-              </div>
-              <div class="divider">por</div>
-              <div class="grid h-24 w-24 card rounded-box place-items-center">
-                <div class="avatar">
-                  <div class="w-24 mask mask-squircle object-center">
-                    <img src="https://cdn.ready-market.com.tw/788980ae/Templates/pic/01%20911%20%20wooden%20handle%20hand%20saw.jpg?v=1dce39d5" alt="">
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="stat">
-            <div class="stat-title">en</div>
-            <div class="stat-value">Sucursal <br> La Plata</div>
-          </div>
-          <div class="stat">
-            <div class="stat-title">el jueves</div>
-            <div class="stat-value">5 de Junio <br> 10:00</div>
-          </div>
-        </div>
+        {% endif %}
       </div>
     </div>
   </section>

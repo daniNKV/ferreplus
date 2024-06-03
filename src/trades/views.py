@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse
 from django.forms import formset_factory
 from django.contrib import messages
+from unittest.mock import Mock
 from item.models import Item
 from user.models import Employee
 from .forms import DatesSelectionForm
@@ -14,9 +15,17 @@ from .models import (
     TradeStateMachine as TradeState,
 )
 
-
+@login_required
+@require_GET
 def index_trade(request):
-    return render(request, "trades/index.html", {})
+    pending_proposals = Proposal.objects.filter(requested_user=request.user.id, state='PENDING')
+    pending_trades = Trade.objects.filter(proposal__requested_user=request.user.id, state='PENDING')
+    non_expired_proposals = [proposal for proposal in pending_proposals if not proposal.is_expired()]
+    context = {
+        'proposals': non_expired_proposals,
+        'trades': pending_trades,
+    }
+    return render(request, "trades/index.html", context)
 
 
 # TODO:  Hay que verificar que el usuario no le haya hecho una propuesta aun
@@ -67,14 +76,14 @@ def proposal_creation(request, requested_item_id, offered_item_id):
             offering_user=offering_user,
             requested_item=requested_item,
             offered_item=offered_item,
-            branch=branch,
+            possible_branch=branch,
         )
         for date in dates:
             proposal.possible_dates.add(date)
         # TODO: Decidir si se envian notificaciones al crear la propuesta
         proposal.save()
 
-        messages.warning(request, "Hasta aca llegué por ahora")
+        messages.success(request, "Solicitud enviada con exito!")
         response = HttpResponseRedirect("/trades")
         response["HX-Redirect"] = "/trades"
 
@@ -83,17 +92,29 @@ def proposal_creation(request, requested_item_id, offered_item_id):
         return JsonResponse(selected_dates.errors, safe=False)
 
 def detail_proposal(request, proposal_id):
-    context = {}
+    proposal = get_object_or_404(Proposal, id=proposal_id)
+    if (proposal.requested_user.get_id() != request.user.id):
+        return HttpResponse(f"Proposal {proposal_id} it's not for you")
+    if not (proposal.is_expired()):
+        return HttpResponse(f"Proposal {proposal_id} it's expired")
+    
+    context = {'proposal': proposal}
     return render(request, 'trades/detail_proposal.html', context)
+
+def confirm_date(request, proposal_id):
+    pass
+
 
 def accept_proposal(request, proposal_id, settled_date):
     proposal = get_object_or_404(Proposal, id=proposal_id)
     fsm = ProposalState(proposal)
-    # TODO: Validar que el usuario que acepta la propuesta es el que la recibio
-    # TODO: Validar que la propuesta no expiró
+    if (proposal.requested_user.get_id() == request.user.id):
+        return HttpResponse(f"Proposal {proposal_id} it's not for you")
+    if (proposal.is_expired()):
+        return HttpResponse(f"Proposal {proposal_id} it's expired")
     if fsm.is_pending():
         fsm.accept(settled_date=settled_date)
-        return HttpResponse(f"Proposal {proposal_id} accepted and trade created.")
+        return HttpResponse(f"Proposal {proposal_id} has been accepted")
     return HttpResponse(f"Proposal {proposal_id} could not be accepted.")
 
 

@@ -48,7 +48,7 @@
         {% endif %}
       </div>
 
-      <a href="{% url 'profile_view' user_id=item.user.pk %}" class="avatar indicator-item indicator-top indicator-center sm:top-10 sm:indicator-right absolute">
+      <a href="{% url 'profile_view' user_id=item.user.pk %}" class="avatar indicator-item indicator-top indicator-right sm:top-10 sm:indicator-right absolute">
         <div class="w-16 md:w-20 rounded-full ring ring-main ring-offset-main ring-offset-2">
           <img src="{{ item.user.profile.avatar.url }}" />
         </div>
