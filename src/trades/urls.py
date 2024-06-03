@@ -19,6 +19,10 @@ urlpatterns = [
         views.proposal_creation,
         name="create_proposal",
     ),
-
+    path(
+        "history",
+        views.show_history,
+        name="show_history"
+    )
     #path("detail/<int:trade_id>", views.trade_detail, name="detail_trade"),
 ]

@@ -40,6 +40,11 @@ def index_trade(request):
     return render(request, "trades/index.html", context)
 
 
+@login_required
+@require_GET
+def show_history(request):
+    return render(request, 'trades/event_history.html', {})
+
 # TODO:  Hay que verificar que el usuario no le haya hecho una propuesta aun
 @login_required
 @require_GET

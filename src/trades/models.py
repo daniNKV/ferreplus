@@ -7,41 +7,48 @@ from item.models import Item
 from owners.models import Branch
 
 
-class ProposalState(models.TextChoices):
-    PENDING = "PENDING", _("Pending")
-    ACCEPTED = "ACCEPTED", _("Acepted")
-    DECLINED = "DECLINED", _("Declined")
-    COUNTEROFFERED = "COUNTEROFFERED", _("Counteroffered")
-    EXPIRED = "EXPIRED", _("Expired")
-
-
 class ProposalStateMachine:
-    states = [state for state, _ in ProposalState.choices]
+    class State(models.TextChoices):
+        PENDING = "PENDING", _("Pending")
+        ACCEPTED = "ACCEPTED", _("Acepted")
+        DECLINED = "DECLINED", _("Declined")
+        COUNTEROFFERED = "COUNTEROFFERED", _("Counteroffered")
+        EXPIRED = "EXPIRED", _("Expired")
+        CANCELED = "CANCELED", _("Canceled")
+
+
+    states = [state for state, _ in State.choices]
     proposal_transitions = [
         {
             "trigger": "accept",
-            "source": [ProposalState.PENDING, ProposalState.COUNTEROFFERED],
-            "dest": ProposalState.ACCEPTED,
+            "source": [State.PENDING, State.COUNTEROFFERED],
+            "dest": State.ACCEPTED,
             "before": "create_trade",
             "after": "save_state",
         },
         {
             "trigger": "decline",
-            "source": [ProposalState.PENDING, ProposalState.COUNTEROFFERED],
-            "dest": ProposalState.DECLINED,
+            "source": [State.PENDING, State.COUNTEROFFERED],
+            "dest": State.DECLINED,
             "after": ["save_state"],
         },
         {
             "trigger": "counteroffer",
-            "source": ProposalState.PENDING,
-            "dest": ProposalState.COUNTEROFFERED,
+            "source": State.PENDING,
+            "dest": State.COUNTEROFFERED,
             "before": "new_offer",
             "after": "save_state",
         },
         {
             "trigger": "expire",
-            "source": [ProposalState.PENDING, ProposalState.COUNTEROFFERED],
-            "dest": ProposalState.EXPIRED,
+            "source": [State.PENDING, State.COUNTEROFFERED],
+            "dest": State.EXPIRED,
+            "after": "save_state",
+        },
+        {
+            "trigger": "cancel",
+            "source": [State.PENDING, State.COUNTEROFFERED],
+            "dest": State.CANCELED,
             "after": "save_state",
         },
     ]
@@ -84,32 +91,31 @@ class ProposalStateMachine:
         counteroffer.save()
 
 
-class TradeState(models.TextChoices):
-    PENDING = "PENDING", _("Pending")
-    CONFIRMED = "ACCEPTED", _("Acepted")
-    CANCELED = "CANCELED", _("Canceled")
-    EXPIRED = "EXPIRED", _("Expired")
-
-
 class TradeStateMachine:
-    state = [state for state, _ in TradeState.choices]
+    class State(models.TextChoices):
+        PENDING = "PENDING", _("Pending")
+        CONFIRMED = "ACCEPTED", _("Acepted")
+        CANCELED = "CANCELED", _("Canceled")
+        EXPIRED = "EXPIRED", _("Expired")
+
+    state = [state for state, _ in State.choices]
     trade_transitions = [
         {
             "trigger": "confirm",
-            "source": TradeState.PENDING,
-            "dest": TradeState.CONFIRMED,
+            "source": State.PENDING,
+            "dest": State.CONFIRMED,
             "after": "save_state",
         },
         {
             "trigger": "cancel",
-            "source": TradeState.PENDING,
-            "dest": TradeState.CANCELED,
+            "source": State.PENDING,
+            "dest": State.CANCELED,
             "after": "save_state",
         },
         {
             "trigger": "expire",
-            "source": TradeState.PENDING,
-            "dest": TradeState.EXPIRED,
+            "source": State.PENDING,
+            "dest": State.EXPIRED,
             "after": "save_state",
         },
     ]
@@ -140,7 +146,7 @@ class DateSelection(models.Model):
 
 class Proposal(models.Model):
     state = models.CharField(
-        max_length=20, choices=ProposalState.choices, default=ProposalState.PENDING
+        max_length=20, choices=ProposalStateMachine.State.choices, default=ProposalStateMachine.State.PENDING
     )
 
     requested_user = models.ForeignKey(
@@ -171,6 +177,7 @@ class Proposal(models.Model):
         DateSelection,
         verbose_name="Fechas posibles para el encuentro",
     )
+    confirmed_date = models.DateTimeField(null=True, blank=True)
     possible_branch = models.ForeignKey(
         Branch, verbose_name="Sucursal elegida", on_delete=models.PROTECT
     )
@@ -183,11 +190,21 @@ class Proposal(models.Model):
     )
     replied_at = models.DateTimeField(default=None, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
+    
+    def is_counteroffer(self):
+        return self.counteroffer_to != None
+        
+    def is_expired(self):
+        current_time = datetime.now()
+        for date_selection in self.possible_dates.all():
+            datetime_obj = datetime.combine(date_selection.date, date_selection.to_time)
+            if datetime_obj > current_time:
+                return False
+        return True
 
 class Trade(models.Model):
     state = models.CharField(
-        max_length=20, choices=TradeState.choices, default=TradeState.PENDING
+        max_length=20, choices=TradeStateMachine.State.choices, default=TradeStateMachine.State.PENDING
     )
     proposal = models.OneToOneField(
         Proposal,

@@ -5,7 +5,10 @@
     <div class="flex-1 gap-1">
       <a href="{% url 'home' %}"class="btn btn-ghost text-xl">Ferreplus</a>
         {% if trade_manage %}
-            <label for="menu" class="btn btn-ghost drawer-button"><i class="fas fa-hamburger text-3xl"></i>Menu</label>
+            <label for="menu" class="btn btn-ghost drawer-button">
+                <i class="fas fa-hamburger text-3xl"></i>
+                <span class="hidden sm:block">Menu</span>
+            </label>
         {% endif %}
     </div>
     <div class="flex-none gap-2">
