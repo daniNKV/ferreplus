@@ -7,6 +7,9 @@ urlpatterns = [
         "initiate/<int:requested_item_id>/", views.item_selection, name="propose_trade"
     ),
     path(
+        "detail/<int:proposal_id>/", views.detail_proposal, name="detail_proposal"
+    ),
+    path(
         "date-selection/<int:requested_item_id>/",
         views.dates_selection,
         name="dates_selection",
@@ -16,5 +19,6 @@ urlpatterns = [
         views.proposal_creation,
         name="create_proposal",
     ),
+
     #path("detail/<int:trade_id>", views.trade_detail, name="detail_trade"),
 ]

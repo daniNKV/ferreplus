@@ -31,7 +31,7 @@ def item_selection(request, requested_item_id):
         "requested_item": requested_item,
         "items_to_offer": items_to_offer,
     }
-    return render(request, "trades/select_item.html", context)
+    return render(request, "trades/initiate_proposal.html", context)
 
 
 # TODO: Hay que validar que las selecciones de rango no se superpongan ni sean inversas
@@ -82,6 +82,9 @@ def proposal_creation(request, requested_item_id, offered_item_id):
     else:
         return JsonResponse(selected_dates.errors, safe=False)
 
+def detail_proposal(request, proposal_id):
+    context = {}
+    return render(request, 'trades/detail_proposal.html', context)
 
 def accept_proposal(request, proposal_id, settled_date):
     proposal = get_object_or_404(Proposal, id=proposal_id)

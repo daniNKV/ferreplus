@@ -1,0 +1,104 @@
+{% extends 'trades/base.html' %}
+{% load static %}
+{% block content %}
+  <section 
+    class="flex flex-col items-center lg:place-content-center min-h-screen bg-neutral bg-cover"
+    style="background-image: url({% static 'img/background.png' %})">
+
+    <div class="hero bg-neutral max-w-screen-xl">
+      
+      <div class="hero-content flex flex-col-reverse w-full max-w-screen-xl gap-6 px-4 py-20">
+        <div id="ctas" class="text-center max-w-screen-sm lg:text-left">
+          <ul class="join join-horizontal w-full md:gap-0 py-4">
+            <li>
+              <a href="" 
+                class="btn md:btn-lg px-14 join-item w-full bg-main text-neutral hover:bg-success hover:text-neutral">Aceptar</a>
+            </li>
+            <li>
+              <a href="" 
+                class="btn md:btn-lg px-14 join-item w-full bg-main text-neutral hover:bg-error hover:text-neutral">Rechazar</a>
+            </li>
+            <li>
+              <a href="" 
+                class="btn md:btn-lg px-14 join-item w-full bg-main text-neutral hover:bg-warning hover:text-neutral">Contraofertar</a>
+            </li>
+          </ul> 
+        </div>
+
+        <div id="offer" class="card shrink-0 grow w-full shadow-2xl">
+          <div class="card-body bg-[#F8F8F8] rounded-md border-2 border-dark text-dark">
+            
+            <div class="flex flex-col w-full lg:flex-row">
+              
+              <div id="offered" class="grid flex-grow card bg-neutral text-dark rounded-box place-items-center gap-2 p-4">
+                <p class="text-dark opacity-80">Tu</p>
+                <h3 class="text-xl font-semibold">Motosierra Dahl</h3>
+                <div class="w-24 mask mask-squircle object-center">
+                  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRaFrSSK879833DMBEL6p0_pN4g2lQcPs-I4g&s" alt="">
+                </div>
+              </div> 
+             
+              <div class="divider lg:divider-horizontal text-dark">POR</div> 
+              
+              <div id="desireed" class="grid flex-grow card text-dark bg-neutral rounded-box place-items-center p-4">
+                <div id="desireed-item" class="flex flex-col items-center gap-2">
+                  <h3 class="text-xl font-semibold">Taladro Bosch</h3>
+                  <div class="w-24 mask mask-squircle object-center">
+                    <img src="https://http2.mlstatic.com/D_NQ_NP_917518-MLA44737119055_012021-O.webp" alt="">
+                  </div>
+                </div>
+               
+                <div class="divider lg:divider-vertical divider-neutral">DE</div>
+               
+                <div id="desireed-item-owner" class="inline-flex items-center gap-2">
+                  <p class="text-xl font-semibold">Juana Lopez</p>
+                  <div class="avatar mx-auto">
+                    <div class="w-12 mt-1 mask mask-squircle object-center object-cover">
+                      <img class="" src="https://cdn-icons-png.flaticon.com/512/219/219969.png" alt="">                    
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="divider divider-vertical md:divider-horizontal text-dark">EN</div> 
+              <div class="grid flex-grow card bg-neutral p-4 rounded-box place-items-start items-center">
+                <p class="stat-value text-center place-self-center">Sucursal La Plata</p>
+                <p class="stat-title text-center place-self-center">Horarios posibles</p>
+                <ul class="flex flex-col mx-auto md:flex-row">
+                  <li>
+                    <p class="text-dark opacity-80">El miercoles</p>
+                    <div>
+                      <p class="text-xl font-semibold">10 de enero</p>
+                      <p class="text-xl font-semibold">15:00 - 17:00</p>
+                    </div>
+                  </li>
+                  <div class="divider lg:divider-horizontal divider-neutral">o</div>
+                  <li>
+                    <p class="text-dark opacity-80">El Sabado</p>
+                    <div>
+                      <p class="text-xl font-semibold">14 de enero</p>
+                      <p class="text-xl font-semibold">10:00 - 19:00</p>
+                    </div>
+                  </li>
+                  <div class="divider lg:divider-horizontal divider-neutral">o</div>
+                  <li>
+                    <p class="text-dark opacity-80">El martes</p>
+                    <div>
+                      <p class="text-xl font-semibold">17 de enero</p>
+                      <p class="text-xl font-semibold">16:00 - 18:00</p>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+
+            </div>
+
+
+          </div>
+        </div>
+        <h1 class="text-3xl text-center text-dark font-bold">¿Qué vas a hacer?</h1>
+      </div>
+
+    </div>
+
+  </section>
+{% endblock %}
