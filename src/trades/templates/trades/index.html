@@ -83,9 +83,9 @@
                 <div class="stat-title">en</div>
                 <div class="stat-value">Sucursal <br> {{trade.branch.name}} </div>
               </div>
-              <div class="stat">
-                <div class="stat-title">{{ date|date:"l" }}</div>
-                <div class="stat-value">{{ date|date:"j \d\e F" }} <br> {{ date|date:"H:i" }}</div>
+              <div class="stat gap-1">
+                <div class="stat-title">{{ trade.agreed_date|date:"l" }}</div>
+                <div class="stat-value">{{ trade.agreed_date|date:"j \d\e F" }} <br> {{ trade.agreed_date|date:"H:i" }}</div>
                 <button class="btn mt-6 btn-error">No puedo asistir</button>
               </div>
             </div>

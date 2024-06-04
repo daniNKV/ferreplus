@@ -20,6 +20,7 @@ urlpatterns = [
     ),
     path('date-confirmation/<int:proposal_id>', views.accept_proposal, name="confirm_date"),
     path('accept/<int:proposal_id>', views.accept_proposal, name="accept_proposal"),
+    path('decline/<int:proposal_id>', views.decline_proposal, name="decline_proposal"),
     path("detail/<int:proposal_id>", views.detail_proposal, name="detail_proposal"),
     path("history", views.show_history, name="show_history"),
 ]

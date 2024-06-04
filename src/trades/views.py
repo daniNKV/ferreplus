@@ -138,12 +138,11 @@ def accept_proposal(request, proposal_id):
                     branch=proposal.possible_branch,
                 )
                 trade.save()
-                fsm.accept(settled_date=settled_date)
+                fsm.accept()
                 messages.success(request, message="Propuesta aceptada!")
             return redirect("trades_home")
         else:
-            return HttpResponse(form.errors)
-
+            return render(request, 'trades/date_confirmation.html', {'form': form})
     else:
         form = ConfirmDateForm(proposal=proposal)
         context = {
@@ -181,14 +180,19 @@ def counteroffer_proposal(request, proposal_id, selected_item_id):
     return HttpResponse(f"Proposal {proposal_id} could not be counteroffered.")
 
 
-# def decline_proposal(request, proposal_id):
-#     proposal = get_object_or_404(Proposal, id=proposal_id)
-#     fsm = ProposalState(proposal)
-
-#     if proposal.state in [ProposalState.states.PENDING, ProposalState.states.COUNTEROFFERED]:
-#         fsm.decline()
-#         return HttpResponse(f"Proposal {proposal_id} declined.")
-#     return HttpResponse(f"Proposal {proposal_id} could not be declined.")
+def decline_proposal(request, proposal_id):
+    proposal = get_object_or_404(Proposal, id=proposal_id)
+    fsm = ProposalState(proposal)
+    if proposal.requested_user.get_id() != request.user.id:
+        return HttpResponseForbidden(f"Proposal {proposal_id} it's not for you")
+    if proposal.is_expired():
+        return HttpResponseForbidden(f"Proposal {proposal_id} it's expired")
+    
+    if proposal.state in [ProposalState.State.PENDING, ProposalState.State.COUNTEROFFERED]:
+        fsm.decline()
+        messages.success(request, f"Solicitud rechazada! Le avisaremos a {proposal.offering_user.first_name}")
+        return redirect('trades_home')
+    return HttpResponse(f"Proposal {proposal_id} could not be declined.")
 
 
 # def expire_proposal(request, proposal_id):
