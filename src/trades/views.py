@@ -147,27 +147,50 @@ def accept_proposal(request, proposal_id):
         return render(request, "trades/date_confirmation.html", context)
 
 
+@login_required
 def detail_proposal(request, proposal_id):
     proposal = get_object_or_404(Proposal, id=proposal_id)
     if proposal.requested_user.id != request.user.id:
         return HttpResponseForbidden(f"Proposal {proposal_id} it's not for you")
     if proposal.all_dates_expired():
         return HttpResponseForbidden(f"Proposal {proposal_id} it's expired")
-    context = {"proposal": proposal}
+    has_items = (
+        Item.objects.filter(
+            user=proposal.offering_user, category=proposal.offered_item.category
+        )
+        .exclude(id=proposal.offered_item.id)
+        .exists()
+    )
+    is_counteroffer = proposal.counteroffer_to != None
+    context = {
+        "proposal": proposal,
+        "can_counteroffer": has_items and not is_counteroffer,
+    }
     return render(request, "trades/detail_proposal.html", context)
 
 
-def counteroffer_proposal(request, proposal_id, selected_item_id):
+@login_required
+def counteroffer_proposal(request, proposal_id):
     proposal = get_object_or_404(Proposal, id=proposal_id)
-    counter_item = get_object_or_404(Item, id=selected_item_id)
-    fsm = ProposalState(proposal)
-
-    # TODO: Validar que el usuario haciendo la contraoferta sea el usuario que la recibio inicialmente
-    if fsm.is_pending():
-        # TODO: Definir si al contra ofertar se vuelve a seleccionar las fechas
-        fsm.counteroffer(item=counter_item)
-        return HttpResponse(f"Proposal {proposal_id} counteroffered.")
-    return HttpResponse(f"Proposal {proposal_id} could not be counteroffered.")
+    if proposal.requested_user.id != request.user.id:
+        return HttpResponseForbidden(f"Proposal {proposal_id} it's not for you")
+    if proposal.all_dates_expired():
+        return HttpResponseForbidden(f"Proposal {proposal_id} it's expired")
+    if request.method == "POST":
+        proposal = get_object_or_404(Proposal, id=proposal_id)
+        fsm = ProposalState(proposal)
+        if fsm.state == fsm.State.PENDING:
+            fsm.counteroffer()
+        return redirect("trades_home")
+    else:
+        items = Item.objects.filter(
+            user=proposal.offering_user, category=proposal.offered_item.category
+        ).exclude(id=proposal.offered_item.id)
+        context = {
+            "proposal": proposal,
+            "items_to_choose": items,
+        }
+        return render(request, "trades/counteroffer_proposal.html", context)
 
 
 def decline_proposal(request, proposal_id):

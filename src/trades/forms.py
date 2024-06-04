@@ -139,3 +139,6 @@ class ConfirmDateForm(forms.Form):
     def field_pairs(self):
         fields = iter(self)
         return zip(fields, fields)
+
+class CounterofferForm(forms.Form):
+    pass

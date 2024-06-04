@@ -75,10 +75,12 @@
               <a href="{% url 'decline_proposal' proposal.id %}" 
                 class="btn md:btn-lg px-14 join-item w-full bg-main text-neutral hover:bg-error hover:text-neutral">Rechazar</a>
             </li>
+            {% if can_counteroffer %}
             <li>
-              <a href="" 
+              <a href="{% url 'counteroffer_proposal' proposal.id %}" 
                 class="btn md:btn-lg px-14 join-item w-full bg-main text-neutral hover:bg-warning hover:text-neutral">Contraofertar</a>
             </li>
+            {% endif %}
           </ul> 
         </div>
         <h1 class="text-3xl text-center text-dark font-bold">¿Qué vas a hacer?</h1>
