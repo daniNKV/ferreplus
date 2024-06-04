@@ -49,14 +49,16 @@
                 <p class="stat-title text-center place-self-center">Horarios posibles</p>
                 <ul class="flex flex-col mx-auto md:flex-row">
                   {% for option in proposal.possible_dates.all %}
-                  <li class="line-through">
-                      <p class="text-dark opacity-80">{{ option.date|date:"l" }}</p>
-                      <div>
-                          <p class="text-xl font-semibold">{{ option.date|date:"j \d\e F" }}</p>
-                          <p class="text-xl font-semibold">{{ option.start_time|date:"H:i" }} - {{ option.end_time|date:"H:i" }}</p>
-                      </div>
+                  <li class="">
+                    <p class="text-dark opacity-80">{{ option.date|date:"l" }}</p>
+                    <div>
+                      <p class="text-xl font-semibold">{{ option.date|date:"j \d\e F" }}</p>
+                      <p class="text-xl font-semibold">{{ option.from_time|date:"H:i" }} - {{ option.to_time|date:"H:i" }}</p>
+                    </div>
                   </li>
-                  <div class="divider lg:divider-horizontal divider-neutral">o</div>
+                  {% if forloop.counter != proposal.possible_dates.all.count %}
+                    <div class="divider lg:divider-horizontal divider-neutral">o</div>
+                  {% endif %}
                 {% endfor %}
                 </ul>
               </div>
@@ -66,7 +68,7 @@
         <div id="ctas" class="text-center max-w-screen-sm lg:text-left">
           <ul class="join join-horizontal w-full md:gap-0 py-4">
             <li>
-              <a href="" 
+              <a href="{% url 'accept_proposal' proposal.id %}" 
                 class="btn md:btn-lg px-14 join-item w-full bg-main text-neutral hover:bg-success hover:text-neutral">Aceptar</a>
             </li>
             <li>
