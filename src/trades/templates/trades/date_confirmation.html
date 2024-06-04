@@ -3,7 +3,7 @@
 {% block content %}
 <section class="min-h-screen bg-neutral">
   <div class="flex flex-col mx-auto w-11/12 max-w-screen-lg gap-4 pt-20">
-    <h1 class="text-dark text-4xl font-bold text-center p-1">Confirmar fecha</h1>
+    {% comment %} <h1 class="text-dark text-4xl font-bold text-center p-1">Confirmar fecha</h1> {% endcomment %}
 
     <div class="stats mx-auto stats-vertical lg:stats-horizontal md:w-full max-w-screen-lg bg-[#F8F8F8] border-2 border-dark stats-vertical lg:stats-horizontal shadow-xl">
       <div class="stat gap-1 text-dark place-items-center">
@@ -76,7 +76,7 @@
               </div>
             </div>
           {% endfor %}
-          <input type="submit" class="btn btn-outline border-2 btn-lg max-w-md mx-auto text-dark bg-[#F8F8F8] hover:text-white hover:bg-dark hover:border-white" value="Aceptar trueque">
+          <input type="submit" class="btn btn-outline border-2 btn-lg max-w-md mx-auto text-neutral hover:text-dark bg-dark hover:bg-[#F8F8F8] hover:border-dark" value="Aceptar trueque">
       </form>
     </div>
   </div>

@@ -1,52 +1,18 @@
 {% extends 'trades/base.html' %}
 
 {% block content %}
-  <section class="min-h-screen bg-neutral">
-    <div class="pt-20">
-      <h1 class="text-dark text-5xl font-bold text-center">Tu historial</h1>
-      <table class="table text-dark max-w-screen-md mx-auto">
-        <thead class="text-dark">
-          <tr>
-            <th>Ofreciste</th>
-            <th>Te ofrecieron</th>
-            <th>Estado</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>
-              <div class="flex flex-col sm:flex-row items-center gap-3">
-                <div class="avatar">
-                  <a href="#" class="mask mask-squircle w-12 h-12">
-                    <img src="https://www.e-paimun.com.ar/wp-content/uploads/2021/03/Martillo-Galponero-1.jpg" />
-                  </a>
-                </div>
-                <div>
-                  <div class="font-bold">Stub Item Name</div>
-                </div>
-              </div>
-            </td>
-            <td>
-              <div class="flex flex-col sm:flex-row items-center gap-3">
-                <div class="avatar">
-                  <a href="#" class="mask mask-squircle w-12 h-12">
-                    <img src="https://www.e-paimun.com.ar/wp-content/uploads/2021/03/Martillo-Galponero-1.jpg" />
-                  </a>
-                </div>
-                <div>
-                  <div class="font-bold">Stub Item Name</div>
-                </div>
-              </div>
-            </td>
-            <td>
-              <label class="flex gap-2 text-dark focus:bg-transparent">
-                <span class="badge badge-ghost badge-sm p-5 sm:p-2 bg-dark text-white">Stub Branch</span>
-              </label>
-            </td>
-          </tr>
-        </tbody>
-        <!-- foot -->
-      </table>
+  <section class="flex flex-col items-center min-h-screen bg-neutral">
+    <div class="mx-auto max-w-screen-lg items-center pt-20">
+      <h1 class="text-dark text-5xl font-bold text-center p-5 ">Tu historial</h1>
+      <div class="join pt-2">
+        <button hx-get="{% url 'concreted_history' %}" hx-swap="innerHTML" hx-target="#results" class="btn btn-lg btn-outline join-item text-dark hover:bg-dark hover:text-neutral">Concretados</button>
+        <button hx-get="{% url 'canceled_history'  %}" hx-swap="innerHTML"  hx-target="#results" class="btn btn-lg btn-outline join-item text-dark hover:bg-dark hover:text-neutral">Cancelados</button>
+        <button hx-get="{% url 'declined_history' %}" hx-swap="innerHTML"  hx-target="#results" class="btn btn-lg btn-outline join-item text-dark hover:bg-dark hover:text-neutral">Rechazados</button>
+        <button hx-get="{% url 'expired_history' %}" hx-swap="innerHTML"  hx-target="#results" class="btn btn-lg btn-outline join-item text-dark hover:bg-dark hover:text-neutral">Expirados</button>
+      </div>
+    </div>
+    <div id="results" class="py-2">
+
     </div>
   </section>
 {% endblock %}

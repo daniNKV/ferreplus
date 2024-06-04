@@ -17,11 +17,11 @@
         {% if user.is_authenticated %}
                 <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
                     {% if user.profile.avatar %}
-                        <div class="w-24 rounded-full">
+                        <div class="w-20 rounded-full">
                             <img alt="Avatar del usuario" src="{{ user.profile.avatar.url }}" />
                         </div>
                     {% else %}
-                        <div class="w-24 rounded-full">
+                        <div class="w-20 rounded-full">
                             <img alt="Default avatar" src="{% static 'img/avatar-default.jpg' %}"/>
                         </div>
                     {% endif %}

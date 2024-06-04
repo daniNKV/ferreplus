@@ -3,9 +3,9 @@ from django.http import JsonResponse, HttpResponseForbidden, HttpResponse
 from django.views.decorators.http import require_GET, require_POST
 from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory
-from datetime import datetime
 from .forms import DatesSelectionForm, ConfirmDateForm
 from django.contrib import messages
+from django.db.models import Q
 from user.models import Employee
 from item.models import Item
 from .models import (
@@ -44,16 +44,10 @@ def index_trade(request):
 
 @login_required
 @require_GET
-def show_history(request):
-    return render(request, "trades/event_history.html", {})
-
-
-@login_required
-@require_GET
 def select_item_to_offer(request, requested_item_id):
-    if Proposal.objects.any(
+    if Proposal.objects.filter(
         requested_item=requested_item_id, offering_user=request.user.id
-    ):
+    ).exists():
         messages.error(request, "Ya enviaste una solicitud")
         return redirect("trades_home")
 
@@ -142,7 +136,7 @@ def accept_proposal(request, proposal_id):
                 messages.success(request, message="Propuesta aceptada!")
             return redirect("trades_home")
         else:
-            return render(request, 'trades/date_confirmation.html', {'form': form})
+            return render(request, "trades/date_confirmation.html", {"form": form})
     else:
         form = ConfirmDateForm(proposal=proposal)
         context = {
@@ -161,10 +155,6 @@ def detail_proposal(request, proposal_id):
         return HttpResponseForbidden(f"Proposal {proposal_id} it's expired")
     context = {"proposal": proposal}
     return render(request, "trades/detail_proposal.html", context)
-
-
-def confirm_date(request, proposal_id):
-    pass
 
 
 def counteroffer_proposal(request, proposal_id, selected_item_id):
@@ -187,26 +177,21 @@ def decline_proposal(request, proposal_id):
         return HttpResponseForbidden(f"Proposal {proposal_id} it's not for you")
     if proposal.is_expired():
         return HttpResponseForbidden(f"Proposal {proposal_id} it's expired")
-    
-    if proposal.state in [ProposalState.State.PENDING, ProposalState.State.COUNTEROFFERED]:
+
+    if proposal.state in [
+        ProposalState.State.PENDING,
+        ProposalState.State.COUNTEROFFERED,
+    ]:
         fsm.decline()
-        messages.success(request, f"Solicitud rechazada! Le avisaremos a {proposal.offering_user.first_name}")
-        return redirect('trades_home')
+        messages.success(
+            request,
+            f"Solicitud rechazada! Le avisaremos a {proposal.offering_user.first_name}",
+        )
+        return redirect("trades_home")
     return HttpResponse(f"Proposal {proposal_id} could not be declined.")
 
 
-# def expire_proposal(request, proposal_id):
-#     proposal = get_object_or_404(Proposal, id=proposal_id)
-
-#     fsm = ProposalState(proposal)
-
-#     if proposal.state in [ProposalState.states.PENDING, ProposalState.states.COUNTEROFFERED]:
-#         fsm.expire()
-#         return HttpResponse(f"Proposal {proposal_id} expired.")
-#     return HttpResponse(f"Proposal {proposal_id} could not be expired.")
-
-
-def confirm_trade(self, request, trade_id, employee_id):
+def confirm_trade(request, trade_id, employee_id):
     # TODO: Validar que los usuarios involucrados no sean el empleado que confirma
     trade = get_object_or_404(Trade, id=trade_id)
     employee = get_object_or_404(Employee, id=employee_id)
@@ -218,7 +203,7 @@ def confirm_trade(self, request, trade_id, employee_id):
     return HttpResponse(f"Trade {trade_id} could not be confirmed.", status=400)
 
 
-def cancel_trade(self, request, trade_id):
+def cancel_trade(request, trade_id):
     trade = get_object_or_404(Trade, id=trade_id)
     fsm = TradeState(trade)
 
@@ -228,11 +213,78 @@ def cancel_trade(self, request, trade_id):
     return HttpResponse(f"Trade {trade_id} could not be canceled.", status=400)
 
 
-# def expire_trade(request, trade_id):
-#     trade = get_object_or_404(Trade, id=trade_id)
-#     fsm = TradeState(trade)
+@login_required
+@require_GET
+def show_history(request):
+    return render(request, "trades/event_history.html", {})
 
-#     if trade.state == TradeState.states.PENDING:
-#         fsm.expire()
-#         return HttpResponse(f"Trade {trade_id} expired.")
-#     return HttpResponse(f"Trade {trade_id} could not be expired.")
+
+@login_required
+@require_GET
+def show_concreted_history(request):
+    trades = Trade.objects.filter(
+        Q(state=TradeState.State.CONFIRMED) & Q(proposal__requested_user=request.user)
+        | Q(proposal__offering_user=request.user)
+    )
+
+    return render(request, "trades/snippets/trade_history.html", {"trades": trades})
+
+
+@login_required
+@require_GET
+def show_canceled_history(request):
+    trades = Trade.objects.filter(
+        Q(state=TradeState.State.CANCELED)
+        & (
+            Q(proposal__requested_user=request.user)
+            | Q(proposal__offering_user=request.user)
+        )
+    )
+    proposals = Proposal.objects.filter(
+        Q(state=ProposalState.State.CANCELED)
+        & (Q(requested_user=request.user) | Q(offering_user=request.user))
+    )
+
+    return render(
+        request,
+        "trades/snippets/history_snippet.html",
+        {"proposals": proposals, "trades": trades},
+    )
+
+
+@login_required
+@require_GET
+def show_expired_history(request):
+    trades = Trade.objects.filter(
+        Q(state=TradeState.State.EXPIRED)
+        & (
+            Q(proposal__requested_user=request.user)
+            | Q(proposal__offering_user=request.user)
+        )
+    )
+    proposals = Proposal.objects.filter(
+        Q(state=ProposalState.State.EXPIRED)
+        & (Q(requested_user=request.user) | Q(offering_user=request.user))
+    )
+
+    return render(
+        request,
+        "trades/snippets/history_snippet.html",
+        {"proposals": proposals, "trades": trades},
+    )
+
+
+@login_required
+@require_GET
+def show_declined_history(request):
+    proposals = Proposal.objects.filter(
+        Q(state=ProposalState.State.DECLINED)
+        & (
+            Q(proposal__requested_user=request.user)
+            | Q(proposal__offering_user=request.user)
+        )
+    )
+
+    return render(
+        request, "trades/snippets/proposal_snippet.html", {"proposals": proposals}
+    )
