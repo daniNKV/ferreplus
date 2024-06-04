@@ -15,12 +15,17 @@
 
     <section class="min-h-screen flex items-center justify-center bg-neutral">
         <div class="card max-w-96 bg-base-100 shadow-xl">
-            <figure><img class="w-96" src="{% static 'img/construction.jpg' %}" alt="Construction warning"/></figure>
             <div class="card-body bg-slate-800 text-neutral">
-                <h2 class="card-title">¡Estamos trabajando en las funcionalidades para empleados!</h2>
-                <p>Vuelva prontos</p>
+                 <div class="flex flex-col sm:flex-row justify-center gap-2">
+                    <a href="{% url 'scheduled_trades' %}"> 
+                      <button class="btn btn-lg bg-main text-neutral hover:bg-neutral hover:text-dark">Trueques programados</button>
+                    </a>
+                    <a href="{% url 'confirmed_trades' %}"> 
+                      <button class="btn btn-lg bg-main text-neutral hover:bg-neutral hover:text-dark">Trueques confirmados</button>
+                    </a>
+                  </div>
                 <div class="card-actions justify-end">
-                <a href="{% url 'home' %}" class="btn btn-primary">Ir al inicio</a>
+                <a href="{% url 'home' %}" class="btn btn-primary" >Ir al inicio</a>
                 </div>
             </div>
         </div>

@@ -84,11 +84,11 @@ class ProposalStateMachine:
 class TradeStateMachine:
     class State(models.TextChoices):
         PENDING = "PENDING", _("Pending")
-        CONFIRMED = "ACCEPTED", _("Acepted")
+        CONFIRMED = "CONFIRMED", _("Confirmed")
         CANCELED = "CANCELED", _("Canceled")
         EXPIRED = "EXPIRED", _("Expired")
 
-    state = [state for state, _ in State.choices]
+    states = [state for state, _ in State.choices]
     trade_transitions = [
         {
             "trigger": "confirm",
@@ -121,8 +121,8 @@ class TradeStateMachine:
         )
 
     def save_state(self, event):
-        self.proposal.state = event.model.state
-        self.proposal.save()
+        self.trade.state = event.model.state
+        self.trade.save()
 
 
 class DateSelection(models.Model):

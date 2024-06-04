@@ -6,7 +6,6 @@ from django.forms import formset_factory
 from .forms import DatesSelectionForm, ConfirmDateForm
 from django.contrib import messages
 from django.db.models import Q
-from user.models import Employee
 from item.models import Item
 from .models import (
     Proposal,
@@ -212,19 +211,6 @@ def decline_proposal(request, proposal_id):
         )
         return redirect("trades_home")
     return HttpResponse(f"Proposal {proposal_id} could not be declined.")
-
-
-def confirm_trade(request, trade_id, employee_id):
-    # TODO: Validar que los usuarios involucrados no sean el empleado que confirma
-    trade = get_object_or_404(Trade, id=trade_id)
-    employee = get_object_or_404(Employee, id=employee_id)
-    fsm = TradeState(trade)
-
-    if trade.state == TradeState.PENDING:
-        fsm.confirm(employee=employee)
-        return HttpResponse(f"Trade {trade_id} confirmed.")
-    return HttpResponse(f"Trade {trade_id} could not be confirmed.", status=400)
-
 
 def cancel_trade(request, trade_id):
     trade = get_object_or_404(Trade, id=trade_id)
