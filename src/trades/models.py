@@ -16,14 +16,12 @@ class ProposalStateMachine:
         EXPIRED = "EXPIRED", _("Expired")
         CANCELED = "CANCELED", _("Canceled")
 
-
     states = [state for state, _ in State.choices]
     proposal_transitions = [
         {
             "trigger": "accept",
             "source": [State.PENDING, State.COUNTEROFFERED],
             "dest": State.ACCEPTED,
-            "before": "create_trade",
             "after": "save_state",
         },
         {
@@ -59,21 +57,13 @@ class ProposalStateMachine:
             model=self,
             states=ProposalStateMachine.states,
             transitions=self.proposal_transitions,
-            initial=self.states.PENDING,
+            initial=ProposalStateMachine.State.PENDING,
             send_event=True,
         )
 
     def save_state(self, event):
         self.proposal.state = event.model.state
         self.proposal.save()
-
-    def create_trade(self, event):
-        trade = Trade(
-            proposal=self.proposal,
-            agreed_date=event.kwargs.get("settled_date"),
-            branch=self.proposal.branch,
-        )
-        trade.save()
 
     def new_offer(self, event):
         counter_item = event.kwargs.get("item")
@@ -126,7 +116,7 @@ class TradeStateMachine:
             model=self,
             states=TradeStateMachine.states,
             transitions=self.trade_transitions,
-            initial="pending",
+            initial=TradeStateMachine.State.PENDING,
             send_event=True,
         )
 
@@ -141,12 +131,14 @@ class DateSelection(models.Model):
     to_time = models.TimeField()
 
     def __str__(self):
-        return str(self.date) + str(self.from_time)
+        return str(self.date) + str(" ") + str(self.from_time)
 
 
 class Proposal(models.Model):
     state = models.CharField(
-        max_length=20, choices=ProposalStateMachine.State.choices, default=ProposalStateMachine.State.PENDING
+        max_length=20,
+        choices=ProposalStateMachine.State.choices,
+        default=ProposalStateMachine.State.PENDING,
     )
 
     requested_user = models.ForeignKey(
@@ -190,11 +182,12 @@ class Proposal(models.Model):
     )
     replied_at = models.DateTimeField(default=None, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    
+    updated_at = models.DateTimeField(auto_now=True)
+
     def is_counteroffer(self):
         return self.counteroffer_to != None
-        
-    def is_expired(self):
+
+    def all_dates_expired(self):
         current_time = datetime.now()
         for date_selection in self.possible_dates.all():
             datetime_obj = datetime.combine(date_selection.date, date_selection.to_time)
@@ -202,9 +195,19 @@ class Proposal(models.Model):
                 return False
         return True
 
+    def is_expired(self):
+        if self.all_dates_expired():
+            fsm = ProposalStateMachine(self)
+            fsm.expire()
+            return True
+        return False
+
+
 class Trade(models.Model):
     state = models.CharField(
-        max_length=20, choices=TradeStateMachine.State.choices, default=TradeStateMachine.State.PENDING
+        max_length=20,
+        choices=TradeStateMachine.State.choices,
+        default=TradeStateMachine.State.PENDING,
     )
     proposal = models.OneToOneField(
         Proposal,
@@ -213,6 +216,9 @@ class Trade(models.Model):
     )
     agreed_date = models.DateTimeField(verbose_name="Fecha acordada")
     branch = models.ForeignKey(Branch, on_delete=models.PROTECT)
-    employee = models.ForeignKey(Employee, null=True, on_delete=models.PROTECT)
+    employee = models.ForeignKey(
+        Employee, null=True, blank=True, on_delete=models.PROTECT
+    )
     created_at = models.DateTimeField(auto_now_add=True)
-    confirmed_at = models.DateTimeField()
+    confirmed_at = models.DateTimeField(null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)

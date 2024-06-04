@@ -1,5 +1,16 @@
 {% extends 'trades/base.html' %}
 {% block content %}
+  {% if messages %}
+      <ul id="messages" class="messages flex flex-col">
+        {% for message in messages %}
+          <div class="toast">
+            <div class="alert alert-info">
+              <span>{{ message }}</span>
+            </div>
+          </div>
+        {% endfor %}
+    </ul>
+  {% endif %}
 
   <section id="recieved-proposals" 
     class="flex flex-col bg-neutral text-dark w-screen py-16 px-4">
@@ -38,7 +49,7 @@
           ¡No te olvides!
         </span>
       </h1>
-      <div class="flex-col flex gap-6">
+      <div class="flex-col flex gap-6 mt-6">
         {% if trades %}
           {% for trade in trades %}
             <div class="stats stats-vertical sm:stats-horizontal p-3 items-center bg-[#F8F8F8] border-2 border-dark text-dark  shadow-lg">
@@ -84,7 +95,7 @@
         <div class="flex flex-col">
           <h1 class="text-3xl font-bold text-center pt-5 pb-2">¡No hay trueques concretados!</h1>
         </div>          
-        <div class="stats items-center sm:stats-horizontal stats-vertical p-4 bg-[#F8F8F8] border-2 border-dark text-dark shadow-lg">
+        {% comment %} <div class="stats items-center sm:stats-horizontal stats-vertical p-4 bg-[#F8F8F8] border-2 border-dark text-dark shadow-lg">
           <div class="stat">
             <div class="stat-title">Con</div>
             <div class="stat-value">JUAN <br> LOPEZ</div>
@@ -120,7 +131,7 @@
             <div class="stat-value">10 de enero <br> 15:00</div>
             <button class="btn mt-5 btn-error">No puedo asistir</button>
           </div>
-        </div>
+        </div> {% endcomment %}
         {% endif %}
       </div>
     </div>
@@ -158,4 +169,18 @@
       {% endif %}
     </div>
   </section>
+
+
+
+{% block js %}
+<script>
+    window.setTimeout(function() {
+      let messages = document.getElementById('messages');
+      if (messages) {
+        messages.remove();
+      }
+  }, 4000);
+  
+</script>
+{% endblock %}
 {% endblock %}

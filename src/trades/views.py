@@ -1,9 +1,10 @@
-from django.shortcuts import render, HttpResponseRedirect, get_object_or_404
+from django.shortcuts import HttpResponseRedirect, render, redirect, get_object_or_404
 from django.http import JsonResponse, HttpResponseForbidden, HttpResponse
 from django.views.decorators.http import require_GET, require_POST
 from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory
-from .forms import DatesSelectionForm
+from datetime import datetime
+from .forms import DatesSelectionForm, ConfirmDateForm
 from django.contrib import messages
 from user.models import Employee
 from item.models import Item
@@ -27,12 +28,13 @@ def index_trade(request):
     pending_trades = Trade.objects.filter(
         proposal__requested_user=request.user.id, state=ProposalState.State.PENDING
     )
+
     non_expired_proposals = [
         proposal for proposal in pending_proposals if not proposal.is_expired()
     ]
     context = {
         "proposals": {
-            "pending": pending_proposals,
+            "pending": non_expired_proposals,
             "sent": sent_proposals,
         },
         "trades": pending_trades,
@@ -43,12 +45,18 @@ def index_trade(request):
 @login_required
 @require_GET
 def show_history(request):
-    return render(request, 'trades/event_history.html', {})
+    return render(request, "trades/event_history.html", {})
 
-# TODO:  Hay que verificar que el usuario no le haya hecho una propuesta aun
+
 @login_required
 @require_GET
-def item_selection(request, requested_item_id):
+def select_item_to_offer(request, requested_item_id):
+    if Proposal.objects.any(
+        requested_item=requested_item_id, offering_user=request.user.id
+    ):
+        messages.error(request, "Ya enviaste una solicitud")
+        return redirect("trades_home")
+
     requested_item = Item.objects.filter(id=requested_item_id).first()
     items_to_offer = Item.objects.filter(
         user_id=request.user.pk, category=requested_item.category
@@ -63,7 +71,7 @@ def item_selection(request, requested_item_id):
 # TODO: Hay que validar que las selecciones de rango no se superpongan ni sean inversas
 @login_required
 @require_POST
-def dates_selection(request, requested_item_id):
+def select_possible_dates(request, requested_item_id):
     requested_item = Item.objects.filter(id=requested_item_id).first()
     offered_item = Item.objects.get(id=request.POST.get("offered_item"))
     DateSelectionFormSet = formset_factory(DatesSelectionForm, extra=3)
@@ -77,7 +85,7 @@ def dates_selection(request, requested_item_id):
 
 @login_required
 @require_POST
-def proposal_creation(request, requested_item_id, offered_item_id):
+def make_proposal(request, requested_item_id, offered_item_id):
     DateSelectionFormSet = formset_factory(DatesSelectionForm, extra=3)
     selected_dates = DateSelectionFormSet(request.POST)
 
@@ -101,40 +109,63 @@ def proposal_creation(request, requested_item_id, offered_item_id):
         proposal.save()
 
         messages.success(request, "Solicitud enviada con exito!")
-        response = HttpResponseRedirect("/trades")
+        response = HttpResponseRedirect("/trades/#sent-proposals")
         response["HX-Redirect"] = "/trades"
-
-        return render(request, "trades/index.html", {})
+        return response
     else:
         return JsonResponse(selected_dates.errors, safe=True)
 
 
-def detail_proposal(request, proposal_id):
+@login_required
+def accept_proposal(request, proposal_id):
     proposal = get_object_or_404(Proposal, id=proposal_id)
     if proposal.requested_user.get_id() != request.user.id:
         return HttpResponseForbidden(f"Proposal {proposal_id} it's not for you")
-    if not (proposal.is_expired()):
+    if proposal.is_expired():
         return HttpResponseForbidden(f"Proposal {proposal_id} it's expired")
+    context = {"proposal": proposal}
+    if request.method == "POST":
+        form = ConfirmDateForm(proposal, request.POST)
+        if form.is_valid():
+            proposal = get_object_or_404(Proposal, id=proposal_id)
+            settled_date = form.cleaned_data
+            fsm = ProposalState(proposal)
+            if fsm.state == fsm.State.PENDING:
+                proposal.confirmed_date = settled_date
+                trade = Trade(
+                    proposal=proposal,
+                    agreed_date=settled_date,
+                    branch=proposal.possible_branch,
+                )
+                trade.save()
+                fsm.accept(settled_date=settled_date)
+                messages.success(request, message="Propuesta aceptada!")
+            return redirect("trades_home")
+        else:
+            return HttpResponse(form.errors)
 
+    else:
+        form = ConfirmDateForm(proposal=proposal)
+        context = {
+            "date_confirmation_form": form,
+            "proposal": proposal,
+            "possible_dates": proposal.possible_dates.all(),
+        }
+        return render(request, "trades/date_confirmation.html", context)
+
+
+def detail_proposal(request, proposal_id):
+    proposal = get_object_or_404(Proposal, id=proposal_id)
+    if proposal.requested_user.id != request.user.id:
+        return HttpResponseForbidden(f"Proposal {proposal_id} it's not for you")
+    if proposal.all_dates_expired():
+        return HttpResponseForbidden(f"Proposal {proposal_id} it's expired")
     context = {"proposal": proposal}
     return render(request, "trades/detail_proposal.html", context)
 
 
 def confirm_date(request, proposal_id):
     pass
-
-
-def accept_proposal(request, proposal_id, settled_date):
-    proposal = get_object_or_404(Proposal, id=proposal_id)
-    fsm = ProposalState(proposal)
-    if proposal.requested_user.get_id() == request.user.id:
-        return HttpResponseForbidden(f"Proposal {proposal_id} it's not for you")
-    if proposal.is_expired():
-        return HttpResponseForbidden(f"Proposal {proposal_id} it's expired")
-    if fsm.is_pending():
-        fsm.accept(settled_date=settled_date)
-        return HttpResponse(f"Proposal {proposal_id} has been accepted")
-    return HttpResponse(f"Proposal {proposal_id} could not be accepted.")
 
 
 def counteroffer_proposal(request, proposal_id, selected_item_id):
