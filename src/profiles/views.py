@@ -16,9 +16,10 @@ def profile_view(request, user_id):
     user_model = get_user_model()
     user = get_object_or_404(user_model, pk=user_id)
     if (request.user == user.id):
-        items = Item.objects.filter(user=user, was_traded=False)  
-    else: 
-        items=Item.objects.filter(user=user, was_traded=False, is_visible=True)
+        items = Item.objects.filter(user=user, was_traded=False, is_visible=True)  
+    # Mostrar al due;o tambien los articulos en un trueque confirmado. Hay que bloquear que se puedan editar
+    # else: 
+    #     items=Item.objects.filter(user=user, was_traded=False, is_visible=True)
     profile, created = Profile.objects.get_or_create(user=user)
     return render(request, "profiles/profile_detail.html", {"profile": profile, "items": items})
 

@@ -7,7 +7,6 @@ from django.forms import formset_factory
 from django.utils import timezone
 from django.contrib import messages
 from django.db.models import Q
-from .decorators import check_proposal
 from item.models import Item
 from .models import (
     Proposal,
@@ -310,8 +309,8 @@ def cancel_trade(request, trade_id):
         messages.success(
             request, message="Trueque cancelado! Le avisaremos del inconveniente"
         )
-        requested_item = get_object_or_404(Item, id=trade.proposal.requested_item)
-        offered_item = get_object_or_404(Item, id=trade.proposal.offered_item)
+        requested_item = get_object_or_404(Item, id=trade.proposal.requested_item.id)
+        offered_item = get_object_or_404(Item, id=trade.proposal.offered_item.id)
         requested_item.is_visible = True
         offered_item.is_visible = True
         requested_item.save()
