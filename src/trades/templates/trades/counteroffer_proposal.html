@@ -5,7 +5,7 @@
   <div class="flex flex-col mx-auto w-11/12 max-w-screen-lg gap-4 pt-20">
     {% comment %} <h1 class="text-dark text-4xl font-bold text-center p-1">Contraoferta</h1> {% endcomment %}
 
-    <div class="stats mx-auto stats-vertical lg:stats-horizontal md:w-full max-w-screen-lg bg-[#F8F8F8] border-2 border-dark stats-vertical lg:stats-horizontal shadow-xl">
+    <div id="proposal-info" class="stats mx-auto stats-vertical lg:stats-horizontal md:w-full max-w-screen-lg bg-[#F8F8F8] border-2 border-dark stats-vertical lg:stats-horizontal shadow-xl">
       <div class="stat gap-1 text-dark place-items-center">
         <div class="flex w-full">
           <div class="avatar grid flex-grow card rounded-box place-items-center">
@@ -48,29 +48,28 @@
         </p>
       </div>
     </div>
-    <div class="">
+    <div id="steps">
       <p class="text-dark text-xl font-thin text-center">{{proposal.offering_user}} tiene los siguientes productos en la categoria
         <span class="font-semibold">{{proposal.requested_item.category}}</span>
       </p>
       <p class="text-dark text-xl text-center">Por favor, selecciona otro producto que te interese</p>
 
-      <form method="post" hx-post="{% url 'counteroffer_proposal' proposal_id=proposal.id  %}"  hx-swap="outerHTML" class="overflow-x-auto flex flex-col gap-4">
+      <form method="post" hx-post="{% url 'confirm_date' proposal_id=proposal.id %}"  hx-swap="innerHTML" hx-target="#steps" class="overflow-x-auto flex flex-col gap-4">
         {% csrf_token %}
         <table class="table text-dark max-w-screen-md mx-auto">
           <thead class="text-dark">
             <tr>
               <th class="hidden sm:block"></th>
               <th>Articulo</th>
-              <th>Categoria</th>
-              <th class="hidden sm:block">Sucursal</th>
-              <th></th>
+              <th>Sucursal</th>
+              <th class="hidden sm:block"></th>
             </tr>
           </thead>
           <tbody>
             {% for item in items_to_choose %}
               <tr>
-                <th class="hidden sm:block">
-                  <a href="{% url 'item_detail' item_id=item.pk %}" class="btn btn-ghost btn-xs">Ver</a>
+                <th class="hidden sm:block ">
+                  <a href="{% url 'item_detail' item_id=item.pk %}" class="btn btn-ghost btn-xs  my-auto">Ver</a>
                 </th>
                 <td>
                   <div class="flex items-center gap-3">
@@ -85,13 +84,13 @@
                     </div>
                   </div>
                 </td>
-                <td class="hidden sm:block">
+                <td class="h-full">
                   <span class="badge badge-ghost badge-sm p-5 sm:p-2 bg-dark text-white">{{item.branch}}</span>
                 </td>
                 <th>
                   <label class="flex gap-2 text-dark focus:bg-transparent">
                     <span class="">Elegir</span>
-                    <input type="radio" name="offered_item" class="radio radio-md" value="{{item.id}}" required>
+                    <input type="radio" name="selected_item" class="radio radio-md" value="{{item.id}}" required>
                   </label>
                 </th>
                 <th>
@@ -101,11 +100,42 @@
           </tbody>
           <!-- foot -->
         </table>
-        <button 
+        <input 
           type="submit" 
-          class=" btn btn-outline border-2 btn-lg max-w-md mx-auto text-neutral hover:text-dark bg-dark hover:bg-[#F8F8F8] hover:border-dark tracking-wide">Enviar contraoferta</button>
-      </form>
+          class=" btn btn-outline border-2 btn-lg max-w-md mx-auto text-neutral hover:text-dark bg-dark hover:bg-[#F8F8F8] hover:border-dark tracking-wide" value="Elegir encuentro">
+ 
     </div>
   </div>
 </section>
+
+
 {% endblock %}
+
+{% block js %}
+<script>
+  document.addEventListener('htmx:afterSwap', function() {
+      const checkboxes = Array.from(document.querySelectorAll(`.checkbox`));
+      for (let i = 0; i < checkboxes.length; i++) {
+          checkboxes[i].addEventListener('change', function() {
+              const selectField = document.querySelector(`.select-${i}`);
+              if (this.checked) {
+                  selectField.style.display = 'block';
+                  // Disable other checkboxes
+                  checkboxes.forEach((checkbox, index) => {
+                      if (index !== i) {
+                          checkbox.disabled = true;
+                          document.querySelector(`.select-${index}`).style.display = 'none';
+                      }
+                  });
+              } else {
+                  selectField.style.display = 'none';
+                  // Enable other checkboxes
+                  checkboxes.forEach(checkbox => checkbox.disabled = false);
+              }
+          });
+      }
+  });
+</script>
+{% endblock %}
+
+

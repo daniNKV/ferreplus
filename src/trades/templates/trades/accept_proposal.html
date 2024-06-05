@@ -50,37 +50,51 @@
     </div>
 
     <div id="date-confirmation">
-      <p class="text-dark text-xl font-thin text-center">{{proposal.offering_user}} nos comentó que puede en los siguientes horarios</p>
-      <p class="text-dark text-xl text-center">Por favor, selecciona dia y hora para el encuentro</p>
-      <form method="post" class="flex flex-col max-w-screen-md items-center mx-auto gap-6 p-5">
-        {% csrf_token %}
-        {% if date_confirmation_form.errors %}
-          <div class="alert alert-danger">
-            <ul>
-              {% for field, errors in date_confirmation_form.errors.items %}
-                {% for error in errors %}
-                  <li>{{ field }}: {{ error }}</li>
+      {% if not is_confirmed %}
+        <p class="text-dark text-xl font-thin text-center">{{proposal.offering_user}} nos comentó que puede en los siguientes horarios</p>
+        <p class="text-dark text-xl text-center">Por favor, selecciona dia y hora para el encuentro</p>
+        <form method="post" class="flex flex-col max-w-screen-md items-center mx-auto gap-6 p-5">
+          {% csrf_token %}
+          {% if date_confirmation_form.errors %}
+            <div class="alert alert-danger">
+              <ul>
+                {% for field, errors in date_confirmation_form.errors.items %}
+                  {% for error in errors %}
+                    <li>{{ field }}: {{ error }}</li>
+                  {% endfor %}
                 {% endfor %}
-              {% endfor %}
-            </ul>
-          </div>
-        {% endif %}
-        {% for checkbox_field, select_field in date_confirmation_form.field_pairs %}
-          <div class="flex text-dark gap-4">
-            <div class="field flex flex-row-reverse gap-2 text-xl font-semibold items-center">
-                {{ checkbox_field.label_tag }}
-                {{ checkbox_field }}
+              </ul>
             </div>
-            <div class="flex items-center gap-4">
-                {{ select_field.label_tag }}
-                {{ select_field }}
+          {% endif %}
+          {% for checkbox_field, select_field in date_confirmation_form.field_pairs %}
+            <div class="flex text-dark gap-4">
+              <div class="field flex flex-row-reverse gap-2 text-xl font-semibold items-center">
+                  {{ checkbox_field.label_tag }}
+                  {{ checkbox_field }}
+              </div>
+              <div class="flex items-center gap-4">
+                  {{ select_field.label_tag }}
+                  {{ select_field }}
+              </div>
             </div>
-          </div>
-        {% endfor %}
-        <button type="submit" class="btn btn-outline border-2 btn-lg max-w-md mx-auto text-neutral hover:text-dark bg-dark hover:bg-[#F8F8F8] hover:border-dark" >
-          Aceptar trueque
-        </button>
-      </form>
+          {% endfor %}
+          <button type="submit" class="btn btn-outline border-2 btn-lg max-w-md mx-auto text-neutral hover:text-dark bg-dark hover:bg-[#F8F8F8] hover:border-dark" >
+            Aceptar trueque
+          </button>
+        </form>
+      {% else %}
+        <form method="post" class="flex flex-col items-center gap-4 mt-6">
+          {% csrf_token %}
+          <h1 class="text-3xl font-bold text-wrap text-dark text-center">
+            Aceptando trueque
+          </h1>
+          <p class="text-dark text-xl font-thin text-center">{{proposal.confirmed_date}} es la fecha acordada </p>
+          <button type="submit" class="btn btn-outline border-2 btn-lg max-w-md mx-auto text-neutral hover:text-dark bg-dark hover:bg-[#F8F8F8] hover:border-dark" >
+            Aceptar trueque
+          </button>
+        </form>
+
+      {% endif %}
     </div>
   </div>
 </section>

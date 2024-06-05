@@ -2,10 +2,12 @@ from django.shortcuts import HttpResponseRedirect, render, redirect, get_object_
 from django.http import JsonResponse, HttpResponseForbidden, HttpResponse
 from django.views.decorators.http import require_GET, require_POST
 from django.contrib.auth.decorators import login_required
-from django.forms import formset_factory
 from .forms import DatesSelectionForm, ConfirmDateForm
+from django.forms import formset_factory
+from django.utils import timezone
 from django.contrib import messages
 from django.db.models import Q
+from .decorators import check_proposal
 from item.models import Item
 from .models import (
     Proposal,
@@ -25,9 +27,8 @@ def index_trade(request):
         offering_user=request.user.id, state=ProposalState.State.PENDING
     )
     pending_trades = Trade.objects.filter(
-        proposal__requested_user=request.user.id, state=ProposalState.State.PENDING
+        proposal__requested_user=request.user.id, state=ProposalState.State.PENDING or ProposalState.State.COUNTEROFFERED
     )
-
     non_expired_proposals = [
         proposal for proposal in pending_proposals if not proposal.is_expired()
     ]
@@ -44,9 +45,12 @@ def index_trade(request):
 @login_required
 @require_GET
 def select_item_to_offer(request, requested_item_id):
-    if Proposal.objects.filter(
-        requested_item=requested_item_id, offering_user=request.user.id
-    ).exists():
+    has_proposal_pending = Proposal.objects.filter(
+        (Q(state=ProposalState.State.PENDING) |
+        Q(state=ProposalState.State.COUNTEROFFERED)) &
+        (Q(offering_user=request.user.id) & Q(requested_item=requested_item_id))     
+    ).exists()
+    if has_proposal_pending:
         messages.error(request, "Ya enviaste una solicitud")
         return redirect("trades_home")
 
@@ -94,7 +98,7 @@ def make_proposal(request, requested_item_id, offered_item_id):
             offering_user=offering_user,
             requested_item=requested_item,
             offered_item=offered_item,
-            possible_branch=branch,
+            possible_branch=branch,            
         )
         for date in dates:
             proposal.possible_dates.add(date)
@@ -107,6 +111,54 @@ def make_proposal(request, requested_item_id, offered_item_id):
         return response
     else:
         return JsonResponse(selected_dates.errors, safe=True)
+    
+    
+@require_POST
+def handle_post_accept_proposal(request, proposal):
+    if proposal.confirmed_date == None:
+        form = ConfirmDateForm(proposal, request.POST)
+        if form.is_valid():
+            proposal.confirmed_date = form.cleaned_data
+        else:
+            return render(request, "trades/accept_proposal.html", {"form": form})
+    fsm = ProposalState(proposal)
+    if fsm.state == fsm.State.PENDING:
+        trade = Trade(
+            proposal=proposal,
+            agreed_date=proposal.confirmed_date,
+            branch=proposal.possible_branch,
+        )
+        requested_item = proposal.requested_item
+        offered_item = proposal.offered_item
+        proposal.replied_at = timezone.now()
+        requested_item.is_visible = False
+        offered_item.is_visible = False
+        requested_item.save()
+        offered_item.save()
+        trade.save()
+        fsm.accept()
+        messages.success(request, message="Propuesta aceptada!")
+
+    return redirect("trades_home")
+
+
+@require_GET
+def handle_get_accept_proposal(request, proposal):
+    if (proposal.confirmed_date == None):
+        form = ConfirmDateForm(proposal=proposal)
+        context = {
+            "date_confirmation_form": form,
+            "proposal": proposal,
+            "possible_dates": proposal.possible_dates.all(),
+            "is_confirmed": False
+        }
+    else: 
+        context = { 
+            "proposal": proposal,
+            "is_confirmed": True,
+        }
+
+    return render(request, "trades/accept_proposal.html", context)
 
 
 @login_required
@@ -116,34 +168,11 @@ def accept_proposal(request, proposal_id):
         return HttpResponseForbidden(f"Proposal {proposal_id} it's not for you")
     if proposal.is_expired():
         return HttpResponseForbidden(f"Proposal {proposal_id} it's expired")
-    context = {"proposal": proposal}
+
     if request.method == "POST":
-        form = ConfirmDateForm(proposal, request.POST)
-        if form.is_valid():
-            proposal = get_object_or_404(Proposal, id=proposal_id)
-            settled_date = form.cleaned_data
-            fsm = ProposalState(proposal)
-            if fsm.state == fsm.State.PENDING:
-                proposal.confirmed_date = settled_date
-                trade = Trade(
-                    proposal=proposal,
-                    agreed_date=settled_date,
-                    branch=proposal.possible_branch,
-                )
-                trade.save()
-                fsm.accept()
-                messages.success(request, message="Propuesta aceptada!")
-            return redirect("trades_home")
-        else:
-            return render(request, "trades/date_confirmation.html", {"form": form})
+        return handle_post_accept_proposal(request, proposal)
     else:
-        form = ConfirmDateForm(proposal=proposal)
-        context = {
-            "date_confirmation_form": form,
-            "proposal": proposal,
-            "possible_dates": proposal.possible_dates.all(),
-        }
-        return render(request, "trades/date_confirmation.html", context)
+        return handle_get_accept_proposal(request, proposal)
 
 
 @login_required
@@ -169,27 +198,64 @@ def detail_proposal(request, proposal_id):
 
 
 @login_required
-def counteroffer_proposal(request, proposal_id):
+@require_GET
+def select_item_to_request(request, proposal_id):
     proposal = get_object_or_404(Proposal, id=proposal_id)
     if proposal.requested_user.id != request.user.id:
         return HttpResponseForbidden(f"Proposal {proposal_id} it's not for you")
     if proposal.all_dates_expired():
         return HttpResponseForbidden(f"Proposal {proposal_id} it's expired")
-    if request.method == "POST":
-        proposal = get_object_or_404(Proposal, id=proposal_id)
+    items = Item.objects.filter(
+        user=proposal.offering_user, category=proposal.offered_item.category
+    ).exclude(id=proposal.offered_item.id, is_visible=False)
+    context = {
+        "proposal": proposal,
+        "items_to_choose": items,
+    }
+    return render(request, "trades/counteroffer_proposal.html", context)
+
+@login_required
+@require_POST
+def confirm_date(request, proposal_id):
+    proposal = get_object_or_404(Proposal, id=proposal_id)
+    requested_item = Item.objects.get(id=request.POST.get("selected_item"))
+    form = ConfirmDateForm(proposal=proposal)
+    context = {
+        "date_confirmation_form": form,
+        "proposal": proposal,
+        "possible_dates": proposal.possible_dates.all(),
+        "selected_item": requested_item
+    }
+    return render(request, "trades/snippets/confirm_date_form.html", context)
+
+
+@login_required
+@require_POST
+def make_counteroffer(request, proposal_id, selected_item_id):
+    has_proposal_pending = Proposal.objects.filter(
+        (Q(state=ProposalState.State.PENDING) |
+        Q(state=ProposalState.State.COUNTEROFFERED)) &
+        (Q(offering_user=request.user.id) & Q(requested_item=selected_item_id))     
+    ).exists()
+    if has_proposal_pending:
+        messages.error(request, "Ya enviaste una solicitud")
+        return redirect("trades_home")
+
+    proposal = get_object_or_404(Proposal, id=proposal_id)
+    form = ConfirmDateForm(proposal, request.POST)
+    if form.is_valid():
+        item = get_object_or_404(Item, id=selected_item_id)
+        settled_date = form.cleaned_data
         fsm = ProposalState(proposal)
         if fsm.state == fsm.State.PENDING:
-            fsm.counteroffer()
-        return redirect("trades_home")
+            proposal.replied_at = timezone.now()
+            messages.success(request, message="Contraoferta enviada!")
+            fsm.counteroffer(item=item, date=settled_date)
+        response = HttpResponseRedirect("/trades")
+        response["HX-Redirect"] = "/trades"
+        return response
     else:
-        items = Item.objects.filter(
-            user=proposal.offering_user, category=proposal.offered_item.category
-        ).exclude(id=proposal.offered_item.id)
-        context = {
-            "proposal": proposal,
-            "items_to_choose": items,
-        }
-        return render(request, "trades/counteroffer_proposal.html", context)
+        return JsonResponse(form.errors, safe=True)
 
 
 def decline_proposal(request, proposal_id):
@@ -212,14 +278,13 @@ def decline_proposal(request, proposal_id):
         return redirect("trades_home")
     return HttpResponse(f"Proposal {proposal_id} could not be declined.")
 
-def cancel_trade(request, trade_id):
-    trade = get_object_or_404(Trade, id=trade_id)
-    fsm = TradeState(trade)
 
-    if trade.state == TradeState.PENDING:
-        fsm.cancel()
-        return HttpResponse(f"Trade {trade_id} canceled.")
-    return HttpResponse(f"Trade {trade_id} could not be canceled.", status=400)
+
+def cancel_trade(request, trade_id):
+    pass
+
+def cancel_proposal(request, proposal_id):
+    pass
 
 
 @login_required

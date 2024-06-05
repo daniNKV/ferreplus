@@ -77,7 +77,7 @@
             </li>
             {% if can_counteroffer %}
             <li>
-              <a href="{% url 'counteroffer_proposal' proposal.id %}" 
+              <a href="{% url 'initiate_counteroffer' proposal.id %}" 
                 class="btn md:btn-lg px-14 join-item w-full bg-main text-neutral hover:bg-warning hover:text-neutral">Contraofertar</a>
             </li>
             {% endif %}

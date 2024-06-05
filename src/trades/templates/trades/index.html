@@ -109,7 +109,7 @@
 
 
   <section id="sent-proposals" 
-    class="flex flex-col bg-neutral text-dark w-screen py-16 gap-6 px-4">
+    class="flex flex-col items-center bg-neutral text-dark w-screen py-16 gap-6 px-4">
     {% if proposals.sent %}
       <div class="flex flex-col">
         <h1 class="text-3xl font-bold text-center">Esperando respuesta <br>
@@ -117,14 +117,16 @@
             ¡Paciencia!
           </span>
         </h1>
-        <div class="flex flex-wrap gap-4 mx-auto max-w-screen-lg">
+        <div class="flex flex-wrap gap-4 mx-auto pt-5 max-w-screen-lg">
           {% for proposal in proposals.sent %}
             <div class="card sm:w-72 bg-base-[#F8F8F8] shadow-xl image-full">
               <figure><img src="{{proposal.requested_item.image.url}}" alt="" /></figure>
               <div class="card-body gap-4">
-                <h2 class="card-title font-bold text-3xl text-neutral">{{proposal.requested_item.name}}!</h2>
+                <h2 class="card-title font-bold text-3xl text-neutral flex flex-col">{{proposal.requested_item.name}}
+                  <span class="text-lg font-thin text-center">por tu <br> {{proposal.offered_item.name}}</span>
+                </h2>
                 <p class="text-neutral inline-flex items-center gap-3"><i class="fa-solid fa-map-pin text-3xl"></i>{{proposal.possible_branch}}</p>
-                <p class="text-neutral inline-flex items-center gap-3"><i class="fa-regular fa-user text-3xl"></i>{{proposal.offering_user.first_name}}</p>
+                <p class="text-neutral inline-flex items-center gap-3"><i class="fa-regular fa-user text-3xl"></i>{{proposal.requested_user}}</p>
                 <div class="card-actions justify-end text-neutral">
                   <a href="{% url 'detail_proposal' 1 %}" class="btn btn-outline border-2 btn-lg w-full mx-auto bg-[#F8F8F8] hover:bg-error text-dark hover:border-white"">Deseo cancelar</a>
                 </div>

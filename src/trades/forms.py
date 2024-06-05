@@ -1,8 +1,7 @@
 from django import forms
 from django.utils import timezone
-from datetime import datetime, date, timedelta, time
+from datetime import datetime, date, timedelta, time, timezone as dt_timezone
 from .models import Proposal, DateSelection
-
 
 def generate_time_choices():
     times = [
@@ -115,13 +114,15 @@ class ConfirmDateForm(forms.Form):
 
                 # Assuming settled_time is a string in the format 'HH:MM'
                 settled_hour, settled_minute = map(int, settled_time.split(":"))
-                settled_datetime = datetime(
+                naive_datetime = datetime(
                     settled_date.year,
                     settled_date.month,
                     settled_date.day,
                     settled_hour,
                     settled_minute,
                 )
+                arg_tz = dt_timezone(-timedelta(hours=3))
+                settled_datetime = timezone.make_aware(naive_datetime, arg_tz)
                 return settled_datetime
 
         raise forms.ValidationError("No date selected.")

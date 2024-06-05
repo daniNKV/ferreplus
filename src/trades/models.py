@@ -1,4 +1,5 @@
 from datetime import datetime
+from django.utils import timezone
 from django.db import models
 from transitions import Machine
 from django.utils.translation import gettext_lazy as _
@@ -22,6 +23,7 @@ class ProposalStateMachine:
             "trigger": "accept",
             "source": [State.PENDING, State.COUNTEROFFERED],
             "dest": State.ACCEPTED,
+            # "before": "create_trade",
             "after": "save_state",
         },
         {
@@ -67,19 +69,29 @@ class ProposalStateMachine:
 
     def new_offer(self, event):
         counter_item = event.kwargs.get("item")
+        settled_date = event.kwargs.get("date")
         last_offer = self.proposal
         counteroffer = Proposal(
-            replied_at=datetime.now,
             counteroffer_to=last_offer,
             requested_item=counter_item,
             requested_user=last_offer.offering_user,
             offering_user=last_offer.requested_user,
             offered_item=last_offer.requested_item,
             possible_branch=last_offer.possible_branch,
-            possible_dates=last_offer.possible_dates,
+            confirmed_date=settled_date
         )
         counteroffer.save()
-
+        counteroffer.possible_dates.set(last_offer.possible_dates.all())
+        
+    # def create_trade(self, event):
+    #     proposal = event.kwargs.get("proposal")
+    #     settled_date = event.kwargs.get("date")
+    #     trade = Trade(
+    #         proposal=proposal,
+    #         agreed_date=settled_date,
+    #         branch=proposal.possible_branch,
+    #     )
+    #     trade.save()
 
 class TradeStateMachine:
     class State(models.TextChoices):
@@ -173,7 +185,7 @@ class Proposal(models.Model):
     possible_branch = models.ForeignKey(
         Branch, verbose_name="Sucursal elegida", on_delete=models.PROTECT
     )
-    counteroffer_to = models.OneToOneField(
+    counteroffer_to = models.ForeignKey(
         "self",
         verbose_name="Propuesta previa",
         on_delete=models.PROTECT,
