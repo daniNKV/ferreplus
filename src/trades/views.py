@@ -281,11 +281,40 @@ def decline_proposal(request, proposal_id):
 
 
 def cancel_trade(request, trade_id):
-    pass
+    trade = get_object_or_404(Trade, id=trade_id)
+    user_involved = trade.proposal.requested_user.id == request.user.id or trade.proposal.offering_user.id == request.user.id
+    if not user_involved:
+        return HttpResponseForbidden(f"Proposal {trade_id} it's not for you")
+    if trade.state == TradeState.State.EXPIRED:
+        return HttpResponseForbidden(f"Proposal {trade_id} it's expired")
+    fsm = TradeState(trade)
+    if (trade.state == fsm.State.PENDING):
+        messages.success(request, message='Trueque cancelado! Le avisaremos del inconveniente')
+        requested_item = get_object_or_404(Item, id=trade.proposal.requested_item)
+        offered_item = get_object_or_404(Item, id=trade.proposal.offered_item)
+        requested_item.is_visible = True
+        offered_item.is_visible = True
+        requested_item.save()
+        offered_item.save()
+        fsm.cancel()
+    
+    return redirect('trades_home')
+
 
 def cancel_proposal(request, proposal_id):
-    pass
+    proposal = get_object_or_404(Proposal, id=proposal_id)
+    user_involved = proposal.requested_user.id == request.user.id or proposal.offering_user.id == request.user.id
+    if not user_involved:
+        return HttpResponseForbidden(f"Proposal {proposal_id} it's not yours'")
+    if proposal.is_expired():
+        return HttpResponseForbidden(f"Proposal {proposal_id} it's expired")
 
+    fsm = ProposalState(proposal)
+    if (proposal.state == fsm.State.PENDING):
+        messages.success(request, message='Hemos retirado tu propuesta!')
+        fsm.cancel()
+    
+    return redirect('trades_home')
 
 @login_required
 @require_GET

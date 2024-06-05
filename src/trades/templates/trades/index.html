@@ -90,9 +90,35 @@
               <div class="stat gap-1">
                 <div class="stat-title">{{ trade.agreed_date|date:"l" }}</div>
                 <div class="stat-value">{{ trade.agreed_date|date:"j \d\e F" }} <br> {{ trade.agreed_date|date:"H:i" }}</div>
-                <button class="btn mt-6 btn-error">No puedo asistir</button>
+                <button 
+                  id="openModalButton-trade-{{trade.pk}}"
+                  onclick="showModal('modal-trade-{{trade.pk}}')"
+                  class="btn mt-6 btn-error">
+                  No puedo asistir
+                </button>
               </div>
             </div>
+            <dialog id="modal-trade-{{ trade.pk }}" class="modal modal-trade z-20 bg-slate-800 backdrop-blur-lg">
+              <div class="modal-box bg-neutral text-dark">
+                <div class="flex flex-col items-center gap-3">
+                  <h3 class="font-bold text-xl">¿Está seguro que desea cancelar el encuentro?
+                    <span class="text-md grow font-thin text-center text-error">
+                      Esta acción impactará negativamente en tu perfil
+                    </span>
+                  </h3>
+                  <img width="200px" class="mt-" src="https://media.tenor.com/tJbuPWMkU8MAAAAM/seras-castigada.gif" alt="">
+                </div>
+                <div class="modal-action">
+                  <form method="dialog">
+                    <button class="btn btn-outline text-dark">Volver</button>
+                  </form>
+                  <form method="post" action="{% url 'cancel_trade' trade_id=trade.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn bg-error text-neutral">Cancelar</button>
+                  </form>
+                </div>
+              </div>
+            </dialog>
           {% endfor %}
   
         {% else %}
@@ -111,7 +137,7 @@
   {% if proposals.sent %}
     <div class="flex flex-col">
       <h1 class="text-3xl font-bold text-center">Esperando respuesta <br>
-        <span class="text-xl grow font-thin text-center"">
+        <span class="text-xl grow font-thin text-center">
           ¡Paciencia!
         </span>
       </h1>
@@ -124,10 +150,31 @@
               <p class="text-neutral inline-flex items-center gap-3"><i class="fa-solid fa-map-pin text-3xl"></i>{{proposal.possible_branch}}</p>
               <p class="text-neutral inline-flex items-center gap-3"><i class="fa-regular fa-user text-3xl"></i>{{proposal.offering_user.first_name}}</p>
               <div class="card-actions justify-end text-neutral">
-                <a href="{% url 'detail_proposal' 1 %}" class="btn btn-outline border-2 btn-lg w-full mx-auto bg-[#F8F8F8] hover:bg-error text-dark hover:border-white"">Deseo cancelar</a>
+                <button id="openModalButton-proposal-{{proposal.pk}}" 
+                  class="btn btn-outline border-2 btn-lg w-full mx-auto bg-[#F8F8F8] hover:bg-error text-dark hover:border-white"
+                  onclick="showModal('modal-proposal-{{proposal.pk}}')">
+                  <i class="fa-solid fa-trash text-2xl text-error text-center"></i>
+                  Deseo cancelar             
+                </button>
               </div>
             </div>
           </div>
+          <dialog id="modal-proposal-{{ proposal.pk }}" class="modal modal-proposal z-20 bg-slate-800 backdrop-blur-lg">
+            <div class="modal-box bg-neutral text-dark">
+              <div class="flex flex-col items-center gap-3">
+                <h3 class="font-bold text-xl">¿Está seguro que desea cancelar la propuesta?</h3>
+              </div>
+              <div class="modal-action">
+                <form method="dialog">
+                  <button class="btn btn-outline text-dark">Volver</button>
+                </form>
+                <form method="post" action="{% url 'cancel_proposal' proposal_id=proposal.pk %}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn bg-error text-neutral">Cancelar</button>
+                </form>
+              </div>
+            </div>
+          </dialog>
         {% endfor %}
       </div> <!-- This closing tag was moved here -->
     </div>
@@ -146,7 +193,10 @@
         messages.remove();
       }
   }, 4000);
-  
+  function showModal(modalId) {
+    let modal = document.getElementById(modalId);
+    modal.showModal();
+  }
 </script>
 {% endblock %}
 {% endblock %}

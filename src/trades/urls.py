@@ -34,6 +34,8 @@ urlpatterns = [
         views.make_counteroffer,
         name="create_counteroffer",
     ),
+    path('cancel/trade/<int:trade_id>', views.cancel_trade, name="cancel_trade"),
+    path('cancel/proposal/<int:proposal_id>', views.cancel_proposal, name="cancel_proposal"),
     path("decline/<int:proposal_id>", views.decline_proposal, name="decline_proposal"),
     path("detail/<int:proposal_id>", views.detail_proposal, name="detail_proposal"),
     path("history", views.show_history, name="show_history"),
