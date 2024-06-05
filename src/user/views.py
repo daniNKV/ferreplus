@@ -24,7 +24,7 @@ def scheduled_trades(request):
     employee = Employee.objects.filter(id=employee_id).first()
     trades_branch = Trade.objects.filter(branch=employee.branch)
     trades = trades_branch.filter(state="PENDING")
-    return render(request, "user/scheduled_trades.html", {"trades": trades})
+    return render(request, "user/scheduled_trades.html", {"trades": trades, "branch": employee.branch})
 
 
 @login_required
@@ -35,7 +35,7 @@ def confirmed_trades(request):
     employee_branch = employee.branch
     trades_branch = Trade.objects.filter(branch=employee_branch)
     trades = trades_branch.filter(state=TradeState.State.CONFIRMED)
-    return render(request, "user/confirmed_trades.html", {"trades": trades})
+    return render(request, "user/confirmed_trades.html", {"trades": trades, "branch": employee_branch})
 
 
 @login_required
@@ -56,10 +56,9 @@ def confirm_trade(request, trade_id):
         trade.proposal.requested_item.was_traded = True
         trade.proposal.offered_item.save()
         trade.proposal.requested_item.save()
-        messages.success('El trueque ha sido confirmado!')
-
         fsm.confirm(employee=employee)
-    return redirect("scheduled_trades")
+        messages.success(request, 'El trueque ha sido confirmado!')
+    return redirect("employee_panel")
 
 
 @login_required
@@ -72,6 +71,10 @@ def expire_trade(request, trade_id):
     if trade.state == TradeState.State.PENDING:
         trade.employee = employee
         trade.confirmed_at = timezone.now()
-        messages.success('El trueque ha expirado')
+        trade.proposal.offered_item.is_visible = True
+        trade.proposal.requested_item.is_visible = True
+        trade.proposal.offered_item.save()
+        trade.proposal.requested_item.save()
         fsm.expire()
-    return redirect("scheduled_trades")
+        messages.success(request, 'El trueque ha expirado')
+    return redirect("employee_panel")
