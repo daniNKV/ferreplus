@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from rolepermissions.decorators import has_role_decorator
 from django.http import HttpResponseNotAllowed
-from datetime import datetime
+from django.contrib import messages
+from django.utils import timezone
 from .models import Employee
 from trades.models import (
     Trade,
@@ -11,18 +12,17 @@ from trades.models import (
 
 
 @login_required
-@has_role_decorator("employee")
+@has_role_decorator('employee')
 def employee_panel(request):
     return render(request, "user/employee.html", {})
 
 
 @login_required
-@has_role_decorator("employee")
+@has_role_decorator('employee')
 def scheduled_trades(request):
-    employee_id = request.user.id
+    employee_id = request.user.employee.id
     employee = Employee.objects.filter(id=employee_id).first()
-    employee_branch = employee.branch
-    trades_branch = Trade.objects.filter(branch=employee_branch)
+    trades_branch = Trade.objects.filter(branch=employee.branch)
     trades = trades_branch.filter(state="PENDING")
     return render(request, "user/scheduled_trades.html", {"trades": trades})
 
@@ -30,7 +30,7 @@ def scheduled_trades(request):
 @login_required
 @has_role_decorator("employee")
 def confirmed_trades(request):
-    employee_id = request.user.id
+    employee_id = request.user.employee.id
     employee = Employee.objects.filter(id=employee_id).first()
     employee_branch = employee.branch
     trades_branch = Trade.objects.filter(branch=employee_branch)
@@ -41,7 +41,7 @@ def confirmed_trades(request):
 @login_required
 @has_role_decorator("employee")
 def confirm_trade(request, trade_id):
-    employee_id = request.user.id
+    employee_id = request.user.employee.id
     trade = get_object_or_404(Trade, id=trade_id)
     employee = get_object_or_404(Employee, id=employee_id)
     is_offering = employee.user.id == trade.proposal.offering_user.id
@@ -51,11 +51,13 @@ def confirm_trade(request, trade_id):
     fsm = TradeState(trade)
     if trade.state == TradeState.State.PENDING:
         trade.employee = employee
-        trade.confirmed_at = datetime.now
+        trade.confirmed_at = timezone.now()
         trade.proposal.offered_item.was_traded = True
         trade.proposal.requested_item.was_traded = True
         trade.proposal.offered_item.save()
         trade.proposal.requested_item.save()
+        messages.success('El trueque ha sido confirmado!')
+
         fsm.confirm(employee=employee)
     return redirect("scheduled_trades")
 
@@ -63,12 +65,13 @@ def confirm_trade(request, trade_id):
 @login_required
 @has_role_decorator("employee")
 def expire_trade(request, trade_id):
-    employee_id = request.user.id
+    employee_id = request.user.employee.id
     trade = get_object_or_404(Trade, id=trade_id)
     employee = get_object_or_404(Employee, id=employee_id)
     fsm = TradeState(trade)
     if trade.state == TradeState.State.PENDING:
         trade.employee = employee
-        trade.confirmed_at = datetime.now
+        trade.confirmed_at = timezone.now()
+        messages.success('El trueque ha expirado')
         fsm.expire()
     return redirect("scheduled_trades")
