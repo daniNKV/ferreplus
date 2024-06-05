@@ -27,11 +27,14 @@ def index_trade(request):
         offering_user=request.user.id, state=ProposalState.State.PENDING
     )
     pending_trades = Trade.objects.filter(
-        proposal__requested_user=request.user.id, state=ProposalState.State.PENDING or ProposalState.State.COUNTEROFFERED
+        Q(proposal__requested_user=request.user.id)
+        | Q(proposal__offering_user=request.user.id),
+        state=TradeState.State.PENDING,
     )
     non_expired_proposals = [
         proposal for proposal in pending_proposals if not proposal.is_expired()
     ]
+    non_expired_trades = [trade for trade in pending_trades if not trade.is_expired()]
     context = {
         "proposals": {
             "pending": non_expired_proposals,
@@ -46,9 +49,11 @@ def index_trade(request):
 @require_GET
 def select_item_to_offer(request, requested_item_id):
     has_proposal_pending = Proposal.objects.filter(
-        (Q(state=ProposalState.State.PENDING) |
-        Q(state=ProposalState.State.COUNTEROFFERED)) &
-        (Q(offering_user=request.user.id) & Q(requested_item=requested_item_id))     
+        (
+            Q(state=ProposalState.State.PENDING)
+            | Q(state=ProposalState.State.COUNTEROFFERED)
+        )
+        & (Q(offering_user=request.user.id) & Q(requested_item=requested_item_id))
     ).exists()
     if has_proposal_pending:
         messages.error(request, "Ya enviaste una solicitud")
@@ -56,7 +61,10 @@ def select_item_to_offer(request, requested_item_id):
 
     requested_item = Item.objects.filter(id=requested_item_id).first()
     items_to_offer = Item.objects.filter(
-        user_id=request.user.pk, category=requested_item.category
+        user_id=request.user.pk,
+        category=requested_item.category,
+        is_visible=True,
+        was_traded=False,
     )
     context = {
         "requested_item": requested_item,
@@ -98,7 +106,7 @@ def make_proposal(request, requested_item_id, offered_item_id):
             offering_user=offering_user,
             requested_item=requested_item,
             offered_item=offered_item,
-            possible_branch=branch,            
+            possible_branch=branch,
         )
         for date in dates:
             proposal.possible_dates.add(date)
@@ -111,8 +119,8 @@ def make_proposal(request, requested_item_id, offered_item_id):
         return response
     else:
         return JsonResponse(selected_dates.errors, safe=True)
-    
-    
+
+
 @require_POST
 def handle_post_accept_proposal(request, proposal):
     if proposal.confirmed_date == None:
@@ -144,16 +152,16 @@ def handle_post_accept_proposal(request, proposal):
 
 @require_GET
 def handle_get_accept_proposal(request, proposal):
-    if (proposal.confirmed_date == None):
+    if proposal.confirmed_date == None:
         form = ConfirmDateForm(proposal=proposal)
         context = {
             "date_confirmation_form": form,
             "proposal": proposal,
             "possible_dates": proposal.possible_dates.all(),
-            "is_confirmed": False
+            "is_confirmed": False,
         }
-    else: 
-        context = { 
+    else:
+        context = {
             "proposal": proposal,
             "is_confirmed": True,
         }
@@ -184,7 +192,10 @@ def detail_proposal(request, proposal_id):
         return HttpResponseForbidden(f"Proposal {proposal_id} it's expired")
     has_items = (
         Item.objects.filter(
-            user=proposal.offering_user, category=proposal.offered_item.category
+            user=proposal.offering_user,
+            category=proposal.offered_item.category,
+            is_visible=True,
+            was_traded=False,
         )
         .exclude(id=proposal.offered_item.id)
         .exists()
@@ -206,13 +217,16 @@ def select_item_to_request(request, proposal_id):
     if proposal.all_dates_expired():
         return HttpResponseForbidden(f"Proposal {proposal_id} it's expired")
     items = Item.objects.filter(
-        user=proposal.offering_user, category=proposal.offered_item.category
-    ).exclude(id=proposal.offered_item.id, is_visible=False)
+        user=proposal.offering_user,
+        category=proposal.offered_item.category,
+        is_visible=True,
+    ).exclude(id=proposal.offered_item.id)
     context = {
         "proposal": proposal,
         "items_to_choose": items,
     }
     return render(request, "trades/counteroffer_proposal.html", context)
+
 
 @login_required
 @require_POST
@@ -224,7 +238,7 @@ def confirm_date(request, proposal_id):
         "date_confirmation_form": form,
         "proposal": proposal,
         "possible_dates": proposal.possible_dates.all(),
-        "selected_item": requested_item
+        "selected_item": requested_item,
     }
     return render(request, "trades/snippets/confirm_date_form.html", context)
 
@@ -233,9 +247,11 @@ def confirm_date(request, proposal_id):
 @require_POST
 def make_counteroffer(request, proposal_id, selected_item_id):
     has_proposal_pending = Proposal.objects.filter(
-        (Q(state=ProposalState.State.PENDING) |
-        Q(state=ProposalState.State.COUNTEROFFERED)) &
-        (Q(offering_user=request.user.id) & Q(requested_item=selected_item_id))     
+        (
+            Q(state=ProposalState.State.PENDING)
+            | Q(state=ProposalState.State.COUNTEROFFERED)
+        )
+        & (Q(offering_user=request.user.id) & Q(requested_item=selected_item_id))
     ).exists()
     if has_proposal_pending:
         messages.error(request, "Ya enviaste una solicitud")
@@ -279,17 +295,21 @@ def decline_proposal(request, proposal_id):
     return HttpResponse(f"Proposal {proposal_id} could not be declined.")
 
 
-
 def cancel_trade(request, trade_id):
     trade = get_object_or_404(Trade, id=trade_id)
-    user_involved = trade.proposal.requested_user.id == request.user.id or trade.proposal.offering_user.id == request.user.id
+    user_involved = (
+        trade.proposal.requested_user.id == request.user.id
+        or trade.proposal.offering_user.id == request.user.id
+    )
     if not user_involved:
         return HttpResponseForbidden(f"Proposal {trade_id} it's not for you")
     if trade.state == TradeState.State.EXPIRED:
         return HttpResponseForbidden(f"Proposal {trade_id} it's expired")
     fsm = TradeState(trade)
-    if (trade.state == fsm.State.PENDING):
-        messages.success(request, message='Trueque cancelado! Le avisaremos del inconveniente')
+    if trade.state == fsm.State.PENDING:
+        messages.success(
+            request, message="Trueque cancelado! Le avisaremos del inconveniente"
+        )
         requested_item = get_object_or_404(Item, id=trade.proposal.requested_item)
         offered_item = get_object_or_404(Item, id=trade.proposal.offered_item)
         requested_item.is_visible = True
@@ -297,24 +317,28 @@ def cancel_trade(request, trade_id):
         requested_item.save()
         offered_item.save()
         fsm.cancel()
-    
-    return redirect('trades_home')
+
+    return redirect("trades_home")
 
 
 def cancel_proposal(request, proposal_id):
     proposal = get_object_or_404(Proposal, id=proposal_id)
-    user_involved = proposal.requested_user.id == request.user.id or proposal.offering_user.id == request.user.id
+    user_involved = (
+        proposal.requested_user.id == request.user.id
+        or proposal.offering_user.id == request.user.id
+    )
     if not user_involved:
         return HttpResponseForbidden(f"Proposal {proposal_id} it's not yours'")
     if proposal.is_expired():
         return HttpResponseForbidden(f"Proposal {proposal_id} it's expired")
 
     fsm = ProposalState(proposal)
-    if (proposal.state == fsm.State.PENDING):
-        messages.success(request, message='Hemos retirado tu propuesta!')
+    if proposal.state == fsm.State.PENDING:
+        messages.success(request, message="Hemos retirado tu propuesta!")
         fsm.cancel()
-    
-    return redirect('trades_home')
+
+    return redirect("trades_home")
+
 
 @login_required
 @require_GET

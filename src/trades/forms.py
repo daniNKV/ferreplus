@@ -67,6 +67,11 @@ class DatesSelectionForm(forms.ModelForm):
             if time_str:
                 hour, minute, second = map(int, time_str.split(":"))
                 cleaned_data[field] = time(hour, minute)
+        # Check if to_time is before from_time
+        if cleaned_data.get("to_time") and cleaned_data.get("from_time"):
+            if cleaned_data["to_time"] < cleaned_data["from_time"]:
+                # Swap from_time and to_time
+                cleaned_data["from_time"], cleaned_data["to_time"] = cleaned_data["to_time"], cleaned_data["from_time"]
         return cleaned_data
 
 
