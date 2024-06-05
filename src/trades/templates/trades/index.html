@@ -1,19 +1,18 @@
 {% extends 'trades/base.html' %}
 {% block content %}
   {% if messages %}
-      <ul id="messages" class="messages flex flex-col">
-        {% for message in messages %}
-          <div class="toast">
-            <div class="alert alert-info">
-              <span>{{ message }}</span>
-            </div>
+    <ul id="messages" class="messages flex flex-col">
+      {% for message in messages %}
+        <div class="toast">
+          <div class="alert alert-info">
+            <span>{{ message }}</span>
           </div>
-        {% endfor %}
+        </div>
+      {% endfor %}
     </ul>
   {% endif %}
-
-  <section id="recieved-proposals" 
-    class="flex flex-col bg-neutral text-dark w-screen py-16 px-4">
+  <div id="recieved-proposals"
+    class="flex flex-col bg-neutral text-dark w-screen py-20 px-4">
     <div class="flex flex-wrap place-content-center gap-4 mx-auto max-w-screen-lg">
       {% if proposals.pending %}
       <h1 class="text-3xl font-bold text-center p-5 grid w-full">¡Te ofrecieron nuevos trueques! <br>
@@ -44,12 +43,12 @@
           <h1 class="text-3xl font-bold text-center pt-5 pb-2">Nada que responder aun...</h1>
           <p class="text-xl grow font-thin text-center""> No desesperes, ¡ya llegará un trueque!</p>
           <a href="{% url 'item_create'%}" class="btn btn-ghost mt-5">Mientras tanto... publica un articulo!</a>
-        </div>  
+        </div>
       {% endif %}
     </div>
-  </section>
+  </div>
 
-  <section id="settled-proposals" class="flex flex-col items-center bg-neutral text-dark w-screen">
+  <div id="settled-proposals" class="flex flex-col items-center bg-neutral text-dark w-screen">
     <div class="max-w-screen-xl p-4 pb-16 mx-auto">
       <div class="flex-col flex gap-6 mt-6">
         {% if trades %}
@@ -71,7 +70,7 @@
                 <div class="flex flex-row mx-auto sm:flex-col border-opacity-50">
                   <div class="grid h-24 w-24 card rounded-box place-items-center">
                     <div class="w-24 mask mask-squircle object-center">
-                      <img src="{{trade.proposal.offered_item.image.url}}" alt=""> 
+                      <img src="{{trade.proposal.offered_item.image.url}}" alt="">
                     </div>
                   </div>
                   <div class="divider">por</div>
@@ -95,52 +94,48 @@
               </div>
             </div>
           {% endfor %}
-            
+  
         {% else %}
         <div class="flex flex-col">
           <h1 class="text-3xl font-bold text-center">
             ¡No concretaste ningún trueque todavia!
           </h1>
-        </div>   
+        </div>
         {% endif %}
       </div>
     </div>
-  </section>
-
-
-  <section id="sent-proposals" 
-    class="flex flex-col items-center bg-neutral text-dark w-screen py-16 gap-6 px-4">
-    {% if proposals.sent %}
-      <div class="flex flex-col">
-        <h1 class="text-3xl font-bold text-center">Esperando respuesta <br>
-          <span class="text-xl grow font-thin text-center"">
-            ¡Paciencia!
-          </span>
-        </h1>
-        <div class="flex flex-wrap gap-4 mx-auto pt-5 max-w-screen-lg">
-          {% for proposal in proposals.sent %}
-            <div class="card sm:w-72 bg-base-[#F8F8F8] shadow-xl image-full">
-              <figure><img src="{{proposal.requested_item.image.url}}" alt="" /></figure>
-              <div class="card-body gap-4">
-                <h2 class="card-title font-bold text-3xl text-neutral flex flex-col">{{proposal.requested_item.name}}
-                  <span class="text-lg font-thin text-center">por tu <br> {{proposal.offered_item.name}}</span>
-                </h2>
-                <p class="text-neutral inline-flex items-center gap-3"><i class="fa-solid fa-map-pin text-3xl"></i>{{proposal.possible_branch}}</p>
-                <p class="text-neutral inline-flex items-center gap-3"><i class="fa-regular fa-user text-3xl"></i>{{proposal.requested_user}}</p>
-                <div class="card-actions justify-end text-neutral">
-                  <a href="{% url 'detail_proposal' 1 %}" class="btn btn-outline border-2 btn-lg w-full mx-auto bg-[#F8F8F8] hover:bg-error text-dark hover:border-white"">Deseo cancelar</a>
-                </div>
+  </div>
+  
+  <div id="sent-proposals"
+  class="flex flex-col bg-neutral text-dark w-screen py-16 gap-6 px-4">
+  {% if proposals.sent %}
+    <div class="flex flex-col">
+      <h1 class="text-3xl font-bold text-center">Esperando respuesta <br>
+        <span class="text-xl grow font-thin text-center"">
+          ¡Paciencia!
+        </span>
+      </h1>
+      <div class="flex flex-wrap gap-4 mx-auto max-w-screen-lg">
+        {% for proposal in proposals.sent %}
+          <div class="card sm:w-72 bg-base-[#F8F8F8] shadow-xl image-full">
+            <figure><img src="{{proposal.requested_item.image.url}}" alt="" /></figure>
+            <div class="card-body gap-4">
+              <h2 class="card-title font-bold text-3xl text-neutral">{{proposal.requested_item.name}}!</h2>
+              <p class="text-neutral inline-flex items-center gap-3"><i class="fa-solid fa-map-pin text-3xl"></i>{{proposal.possible_branch}}</p>
+              <p class="text-neutral inline-flex items-center gap-3"><i class="fa-regular fa-user text-3xl"></i>{{proposal.offering_user.first_name}}</p>
+              <div class="card-actions justify-end text-neutral">
+                <a href="{% url 'detail_proposal' 1 %}" class="btn btn-outline border-2 btn-lg w-full mx-auto bg-[#F8F8F8] hover:bg-error text-dark hover:border-white"">Deseo cancelar</a>
               </div>
             </div>
-          {% endfor %}
-        {% else %}
-          <h1 class="text-3xl font-bold text-center pt-5">¡No has ofrecido ningún trueque!</h1>
-          <a href="{% url 'all_items'%}" class="btn btn-ghost mt-5">¿Por qué no buscas uno?</a>
-        </div>
-      </div>
-    {% endif %}
-  </section>
-
+          </div>
+        {% endfor %}
+      </div> <!-- This closing tag was moved here -->
+    </div>
+  {% else %}
+    <h1 class="text-3xl font-bold text-center pt-5">¡No has ofrecido ningún trueque!</h1>
+    <a href="{% url 'all_items'%}" class="btn btn-ghost mt-5">¿Por qué no buscas uno?</a>
+  {% endif %}
+  </div>
 
 
 {% block js %}
