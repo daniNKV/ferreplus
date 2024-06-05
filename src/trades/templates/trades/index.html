@@ -23,11 +23,18 @@
           <div class="card sm:w-72 bg-base-[#F8F8F8] shadow-xl image-full">
             <figure><img src="{{proposal.requested_item.image.url}}" alt="" /></figure>
             <div class="card-body gap-4">
-              <h2 class="card-title font-bold text-3xl text-neutral">{{proposal.requested_item.name}}!</h2>
-              <p class="text-neutral inline-flex items-center gap-3"><i class="fa-solid fa-map-pin text-3xl"></i>{{proposal.possible_branch}}</p>
-              <p class="text-neutral inline-flex items-center gap-3"><i class="fa-regular fa-user text-3xl"></i>{{proposal.offering_user.first_name}}</p>
-              <div class="card-actions justify-end text-neutral">
-                <a href="{% url 'detail_proposal' proposal.id %}" class="btn btn-outline border-2 btn-lg w-full mx-auto bg-[#F8F8F8] hover:bg-dark text-dark hover:text-neutral hover:border-white"">Decidir</a>
+              <h2 class="card-title font-bold text-3xl text-neutral">{{proposal.requested_item.name}}</h2>
+              <div class="flex flex-col gap-2">
+                <p class="text-neutral inline-flex items-center gap-3 font-semibold"><i class="fa-solid fa-map-pin text-2xl"></i>{{proposal.possible_branch}}</p>
+                <p class="text-neutral inline-flex items-center gap-3 font-semibold"><i class="fa-regular fa-user text-2xl"></i>{{proposal.offering_user}}</p>
+                {% if proposal.state == 'PENDING' %}
+                  <p class="badge badge-md badge-accent font-semibold mx-auto">{{proposal.state}}</p>
+                {% elif proposal.state == 'COUNTEROFFERED' %}
+                  <p class="badge badge-md badge-warning font-semibold mx-auto">{{proposal.state}}</p>
+                {% endif %}
+                </div>
+              <div class="card-actions justify-end text-neutral py-1">
+                <a href="{% url 'detail_proposal' proposal.id %}" class="btn btn-outline btn-lg w-full mx-auto bg-[#F8F8F8] hover:bg-dark text-dark hover:text-neutral hover:border-white"">Decidir</a>
               </div>
             </div>
           </div>
