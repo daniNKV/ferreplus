@@ -49,10 +49,12 @@
       </div>
     </div>
     <div class="">
-      <p class="text-dark text-xl font-thin text-center">{{proposal.offering_user}} nos comentó que puede en los siguientes horarios</p>
+      <p class="text-dark text-xl font-thin text-center">{{proposal.offering_user}} tiene los siguientes productos en la categoria
+        <span class="font-semibold">{{proposal.requested_item.category}}</span>
+      </p>
       <p class="text-dark text-xl text-center">Por favor, selecciona otro producto que te interese</p>
 
-      <form method="post" hx-post="{% url 'counteroffer_proposal' proposal_id=proposal.id %}"  hx-swap="outerHTML" class="overflow-x-auto flex flex-col gap-4">
+      <form method="post" hx-post="{% url 'counteroffer_proposal' proposal_id=proposal.id  %}"  hx-swap="outerHTML" class="overflow-x-auto flex flex-col gap-4">
         {% csrf_token %}
         <table class="table text-dark max-w-screen-md mx-auto">
           <thead class="text-dark">
@@ -101,7 +103,7 @@
         </table>
         <button 
           type="submit" 
-          class="btn btn-outline border-2 btn-lg max-w-md mx-auto text-dark bg-[#F8F8F8] hover:text-white hover:bg-dark hover:border-white">Continuar</button>
+          class=" btn btn-outline border-2 btn-lg max-w-md mx-auto text-neutral hover:text-dark bg-dark hover:bg-[#F8F8F8] hover:border-dark tracking-wide">Enviar contraoferta</button>
       </form>
     </div>
   </div>

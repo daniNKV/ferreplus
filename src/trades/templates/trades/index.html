@@ -43,14 +43,12 @@
   </section>
 
   <section id="settled-proposals" class="flex flex-col items-center bg-neutral text-dark w-screen">
-    <div class="max-w-screen-xl p-4 py-16 mx-auto">
-      <h1 class="text-3xl font-bold text-center">Trueques pactados <br> 
-        <span class="text-xl grow font-thin text-center"">
-          ¡No te olvides!
-        </span>
-      </h1>
+    <div class="max-w-screen-xl p-4 pb-16 mx-auto">
       <div class="flex-col flex gap-6 mt-6">
         {% if trades %}
+          <h1 class="text-3xl font-bold text-center">Trueques pactados <br>
+            <span class="text-xl grow font-thin text-center"">¡No te olvides!</span>
+          </h1>
           {% for trade in trades %}
             <div class="stats stats-vertical sm:stats-horizontal p-3 items-center bg-[#F8F8F8] border-2 border-dark text-dark  shadow-lg">
               <div class="stat">
@@ -93,45 +91,10 @@
             
         {% else %}
         <div class="flex flex-col">
-          <h1 class="text-3xl font-bold text-center pt-5 pb-2">¡No hay trueques concretados!</h1>
-        </div>          
-        {% comment %} <div class="stats items-center sm:stats-horizontal stats-vertical p-4 bg-[#F8F8F8] border-2 border-dark text-dark shadow-lg">
-          <div class="stat">
-            <div class="stat-title">Con</div>
-            <div class="stat-value">JUAN <br> LOPEZ</div>
-            <div class="avatar mx-auto">
-              <div class="w-24 mt-1 mask mask-squircle object-center">
-                <img class="" src="https://w7.pngwing.com/pngs/340/946/png-transparent-avatar-user-computer-icons-software-developer-avatar-child-face-heroes.png" alt="">
-              </div>
-            </div>
-          </div>
-          <div class="stat">
-            <div class="flex flex-row mx-auto sm:flex-col border-opacity-50">
-              <div class="grid h-24 w-24 card rounded-box place-items-center">
-                <div class="w-24 mask mask-squircle object-center">
-                  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRaFrSSK879833DMBEL6p0_pN4g2lQcPs-I4g&s" alt=""> 
-                </div>
-              </div>
-              <div class="divider">por</div>
-              <div class="grid h-24 w-24 card rounded-box place-items-center">
-                <div class="avatar">
-                  <div class="w-24 mask mask-squircle object-center">
-                    <img src="https://http2.mlstatic.com/D_NQ_NP_917518-MLA44737119055_012021-O.webp" alt="">
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="stat">
-            <div class="stat-title">en</div>
-            <div class="stat-value">Sucursal <br> La Plata</div>
-          </div>
-          <div class="stat">
-            <div class="stat-title">el miercoles</div>
-            <div class="stat-value">10 de enero <br> 15:00</div>
-            <button class="btn mt-5 btn-error">No puedo asistir</button>
-          </div>
-        </div> {% endcomment %}
+          <h1 class="text-3xl font-bold text-center">
+            ¡No concretaste ningún trueque todavia!
+          </h1>
+        </div>   
         {% endif %}
       </div>
     </div>
@@ -140,34 +103,33 @@
 
   <section id="sent-proposals" 
     class="flex flex-col bg-neutral text-dark w-screen py-16 gap-6 px-4">
-    <h1 class="text-3xl font-bold text-center">Esperando respuesta <br> 
-      <span class="text-xl grow font-thin text-center"">
-        ¡Paciencia!
-      </span>
-    </h1>
-    <h2 c></h2>
-    <div class="flex flex-wrap gap-4 mx-auto max-w-screen-lg">
-      {% if proposals %}
-        {% for proposal in proposals.sent %}
-          <div class="card sm:w-72 bg-base-[#F8F8F8] shadow-xl image-full">
-            <figure><img src="{{proposal.requested_item.image.url}}" alt="" /></figure>
-            <div class="card-body gap-4">
-              <h2 class="card-title font-bold text-3xl text-neutral">{{proposal.requested_item.name}}!</h2>
-              <p class="text-neutral inline-flex items-center gap-3"><i class="fa-solid fa-map-pin text-3xl"></i>{{proposal.possible_branch}}</p>
-              <p class="text-neutral inline-flex items-center gap-3"><i class="fa-regular fa-user text-3xl"></i>{{proposal.offering_user.first_name}}</p>
-              <div class="card-actions justify-end text-neutral">
-                <a href="{% url 'detail_proposal' 1 %}" class="btn btn-outline border-2 btn-lg w-full mx-auto bg-[#F8F8F8] hover:bg-error text-dark hover:border-white"">Deseo cancelar</a>
+    {% if proposals.sent %}
+      <div class="flex flex-col">
+        <h1 class="text-3xl font-bold text-center">Esperando respuesta <br>
+          <span class="text-xl grow font-thin text-center"">
+            ¡Paciencia!
+          </span>
+        </h1>
+        <div class="flex flex-wrap gap-4 mx-auto max-w-screen-lg">
+          {% for proposal in proposals.sent %}
+            <div class="card sm:w-72 bg-base-[#F8F8F8] shadow-xl image-full">
+              <figure><img src="{{proposal.requested_item.image.url}}" alt="" /></figure>
+              <div class="card-body gap-4">
+                <h2 class="card-title font-bold text-3xl text-neutral">{{proposal.requested_item.name}}!</h2>
+                <p class="text-neutral inline-flex items-center gap-3"><i class="fa-solid fa-map-pin text-3xl"></i>{{proposal.possible_branch}}</p>
+                <p class="text-neutral inline-flex items-center gap-3"><i class="fa-regular fa-user text-3xl"></i>{{proposal.offering_user.first_name}}</p>
+                <div class="card-actions justify-end text-neutral">
+                  <a href="{% url 'detail_proposal' 1 %}" class="btn btn-outline border-2 btn-lg w-full mx-auto bg-[#F8F8F8] hover:bg-error text-dark hover:border-white"">Deseo cancelar</a>
+                </div>
               </div>
             </div>
-          </div>
-        {% endfor %}
-      {% else %}
-        <div class="flex flex-col">
+          {% endfor %}
+        {% else %}
           <h1 class="text-3xl font-bold text-center pt-5">¡No has ofrecido ningún trueque!</h1>
           <a href="{% url 'all_items'%}" class="btn btn-ghost mt-5">¿Por qué no buscas uno?</a>
-        </div>      
-      {% endif %}
-    </div>
+        </div>
+      </div>
+    {% endif %}
   </section>
 
 
