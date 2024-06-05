@@ -2,8 +2,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
+from django.db.models import Q
 # from rolepermissions.decorators import has_role_decorator
 from item.models import Item, Category
+from trades.models import Trade, TradeStateMachine as TradeState
 from profiles.models import Profile
 from .forms import ItemForm
 
@@ -56,9 +58,16 @@ def edit_item(request, item_id):
 def delete_item(request, item_id):
     item = get_object_or_404(Item, pk=item_id)
     if item.user != request.user:
-        messages.success(request, "¡El articulo no es tuyo!")
+        messages.error(request, "¡El articulo no es tuyo!")
         return redirect("profile_view", user_id=request.user.id)
-    item.delete()
+    exists_trade = Trade.objects.filter(
+        Q(state=TradeState.State.PENDING) & (Q(proposal__offering_user=request.user.id) | Q(proposal__requested_user=request.user.id))
+    )
+    if exists_trade:
+        messages.error(request, "¡No podes eliminar un articulo de trueque, cancela el trueque primero!")
+        return redirect("profile_view", user_id=request.user.id) 
+    item.is_visible = False
+    item.save()
     messages.success(request, "¡Artículo eliminado exitosamente!")
     return redirect("profile_view", user_id=request.user.id)
 
