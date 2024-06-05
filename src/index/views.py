@@ -8,7 +8,7 @@ def branches(request):
 
 def home_view(request):
     items_shown = 10
-    items = Item.objects.filter(was_traded=False).order_by('?')[:items_shown]  # Get 10 random items
+    items = Item.objects.filter(was_traded=False, is_visible=True).order_by('?')[:items_shown]  # Get 10 random items
     return render(request, 'index.html', {'items': items})
 
 def all_items(request):

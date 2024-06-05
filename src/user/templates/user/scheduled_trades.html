@@ -34,10 +34,10 @@
                     </div>
                 </div>
                 <div class="flex flex-col sm:flex-row justify-center gap-2">
-                  <a href="{% url 'confirm_trade' trade_id=trade.id employee_id=request.user.id %}"> 
+                  <a href="{% url 'confirm_trade' trade_id=trade.id %}"> 
                     <button class="btn btn-lg bg-main text-neutral hover:bg-neutral hover:text-dark">Trueque realizado</button>
                   </a>
-                  <a href="{% url 'expire_trades' trade_id=trade.id employee_id=request.user.id %}"> 
+                  <a href="{% url 'expire_trade' trade_id=trade.id %}"> 
                     <button class="btn btn-lg bg-main text-neutral hover:bg-neutral hover:text-dark">Trueque no realizado</button>
                   </a>
                 </div>
