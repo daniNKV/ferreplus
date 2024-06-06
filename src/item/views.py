@@ -5,7 +5,7 @@ from django.views.decorators.http import require_POST
 from django.db.models import Q
 # from rolepermissions.decorators import has_role_decorator
 from item.models import Item, Category
-from trades.models import Trade, TradeStateMachine as TradeState
+from trades.models import Trade, TradeStateMachine as TradeState, Proposal, ProposalStateMachine as ProposalState
 from profiles.models import Profile
 from .forms import ItemForm
 
@@ -38,6 +38,13 @@ def create_item(request, category_id=None):
 @login_required
 def edit_item(request, item_id):
     item = get_object_or_404(Item, pk=item_id)
+    exists_trade = Trade.objects.filter(
+        Q(state=TradeState.State.PENDING) & (Q(proposal__offering_user=request.user.id) | Q(proposal__requested_user=request.user.id))
+        )
+    if exists_trade:
+        messages.error(request, "¡No podes un articulo de trueque, cancelalo primero!")
+        return redirect("profile_view", user_id=request.user.id)  
+
     if item.user != request.user:
         return redirect("profile_view", user_id=request.user.id)
     if request.method == "POST":
@@ -63,7 +70,12 @@ def delete_item(request, item_id):
     exists_trade = Trade.objects.filter(
         Q(state=TradeState.State.PENDING) & (Q(proposal__offering_user=request.user.id) | Q(proposal__requested_user=request.user.id))
     )
-    if exists_trade:
+    
+    exists_proposal = Proposal.objects.filter(
+        Q(state=ProposalState.State.PENDING) & (Q(proposal__offering_user=request.user.id) | Q(proposal__requested_user=request.user.id))
+    )
+
+    if exists_trade or exists_proposal:
         messages.error(request, "¡No podes eliminar un articulo de trueque, cancela el trueque primero!")
         return redirect("profile_view", user_id=request.user.id) 
     item.is_visible = False

@@ -54,6 +54,8 @@ def confirm_trade(request, trade_id):
         trade.confirmed_at = timezone.now()
         trade.proposal.offered_item.was_traded = True
         trade.proposal.requested_item.was_traded = True
+        trade.proposal.offered_item.is_visible = False
+        trade.proposal.requested_item.is_visible = False
         trade.proposal.offered_item.save()
         trade.proposal.requested_item.save()
         fsm.confirm(employee=employee)
