@@ -349,8 +349,11 @@ def show_history(request):
 @require_GET
 def show_concreted_history(request):
     trades = Trade.objects.filter(
-        Q(state=TradeState.State.CONFIRMED) & Q(proposal__requested_user=request.user)
-        | Q(proposal__offering_user=request.user)
+        Q(state=TradeState.State.CONFIRMED)
+        & (
+            Q(proposal__requested_user=request.user)
+            | Q(proposal__offering_user=request.user)
+        )
     )
 
     return render(request, "trades/snippets/trade_history.html", {"trades": trades})
