@@ -23,6 +23,7 @@ class Item(models.Model):
     category = models.ForeignKey(
         Category, on_delete=models.PROTECT, blank=True, null=True
     )
+    is_visible = models.BooleanField(default=True)
     user = models.ForeignKey(User, on_delete=models.PROTECT, blank=True, null=True)
     branch = models.ForeignKey(Branch, on_delete=models.PROTECT, blank=True, null=True)
 

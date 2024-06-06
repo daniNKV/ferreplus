@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+
+{% block head_title %}
+  Perfil de {{ profile.user.first_name }} {{ profile.user.last_name }}
+{% endblock %}
+
+{% block extra_head %}
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+{% endblock extra_head %}
+
+{% block body %}
+
+{% if messages %}
+    <ul id="messages" class="messages">
+      {% for message in messages %}
+        <div class="toast">
+          <div class="alert alert-success">
+            <span>{{ message }}</span>
+          </div>
+        </div>
+      {% endfor %}
+  </ul>
+{% endif %}
+
+{% include 'navbar.html' %}
+
+<section id="hero" class="hero pt-16 min-h-screen text-dark bg-cover" style="background-image: url({% static 'img/background.png' %})">
+  <div class="hero-content md:w-6/12 bg-neutral flex-col lg:gap-2">
+    <h2 class="text-5xl md:text-7xl text-center font-bold">{{ profile.user.first_name }} {{ profile.user.last_name }}</h1>
+
+    {% if user.profile.avatar %}
+        <img alt="Avatar de {{ profile.user.first_name }}" class="avatar max-w-72 w-h-72 rounded-lg shadow-2xl" src="{{ profile.avatar.url }}" />
+    {% else %}
+        <img alt="Default avatar" class="avatar max-w-72 w-h-72 rounded-lg shadow-2xl" src="{% static 'img/avatar-default.jpg' %}"/>
+    {% endif %}
+    <div class="join pt-2">
+      <a href="#items" class="btn btn-lg btn-outline join-item text-dark hover:bg-dark hover:text-neutral">Ver articulos</a>
+      {% if user.is_authenticated and user.pk == profile.user.pk %}
+        <a href="{% url 'item_create' %}" class="btn btn-lg btn-outline join-item text-dark hover:bg-dark hover:text-neutral">Publicar Artículo</a>
+        <a href="{% url 'profile_edit' user_id=profile.user.pk %}" class="btn btn-lg btn-outline join-item text-dark hover:bg-dark hover:text-neutral">Modificar perfil</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<div class="divider divider-neutral text-xl lg:text-3xl text-wrap sm:text-nowrap p-10 bg-neutral text-dark">Productos ofrecidos por {{ profile.user.first_name }} {{ profile.user.last_name }}</div>
+
+<section id="items" class="flex items-center place-content-center min-h-screen bg-neutral">
+  <div class="hero-content">
+    {% if items %}
+      <ul class="flex flex-col sm:flex-row flex-wrap md:justify-center max-w-screen-xl gap-4 ">
+        {% for item in items %}
+          <li id="item-{{ item.pk }}" class="card w-[95%] mx-auto sm:max-w-64 lg:max-w-72 relative shadow-xl hover:-translate-y-2 hover:shadow-2xl transition-transform">
+            <a href="{% url 'item_detail' item_id=item.pk %}" class="sm:h-2/4">
+              <figure class="rounded-none z-10 max-h-64">
+                <img src="{{ item.image.url }}"  alt="Martillo" />
+              </figure>
+            </a>
+            <div class="card-body items-center gap-5 text-center bg-main text-neutral">
+              <div class="badge bg-accent border-none font-semibold tracking-wide p-4 text-neutral">{{ item.category.name }}</div>
+              <h2 class="card-title text-3xl">
+                {{ item.name }}
+              </h2>
+              <p>{{ item.description|truncatechars:100 }}</p>
+              <div class="join join-horizontal ">
+                {% if user.is_authenticated and user.pk == profile.user.pk %}
+                  <a href="{% url 'item_edit' item_id=item.pk %}" class="btn join-item btn-outline text-neutral"><i class="fas fa-edit text-2xl text-center"></i>Editar</a>
+                  <button id="openModalButton-{{item.pk}}" class="modal-btn btn join-item btn-outline text-neutral hover:bg-error hover:text-neutral" onclick="modal.showModal()">
+                    <i class="fa-solid fa-trash text-2xl text-error text-center"></i>
+                    Eliminar
+                  </button>
+                  {% else %}
+                    <a href="{% url 'item_detail' item_id=item.pk %}" class="btn w-full btn-outline text-neutral">Ver más</a>
+                  {% endif %}
+              </div>
+            </div>
+          </li>
+
+          <dialog id="modal-{{ item.pk }}" class="modal z-20 bg-slate-800 backdrop-blur-lg">
+            <div class="modal-box bg-neutral text-dark">
+              <h3 class="font-bold text-lg">¿Está seguro que desea eliminar el item {{ item.name }}?</h3>
+              <div class="modal-action">
+                <form method="dialog">
+                  <button class="btn btn-outline text-dark">Cancelar</button>
+                </form>
+                <form method="post" action="{% url 'item_delete' item_id=item.pk %}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn bg-error text-neutral">Eliminar</button>
+                </form>
+              </div>
+            </div>
+          </dialog>
+        {% endfor %}
+      </ul>
+    {% else %}
+      {% if user.pk == profile.user.pk %}
+        <div class="flex flex-col gap-5 text-dark">
+          <h2 class="text-3xl text-center">Ooops. No has publicado todavía. <br> ¿Por qué no publicas algo?</h2>
+          <a href="{% url 'item_create' %}" class="btn btn-lg btn-outline bg-main text-neutral">Publicar</a>
+        </div>
+      {% else %}
+        <h2 class="text-3xl text-dark">Ooops. {{profile.user.first_name}} no ha publicado todavía! </h2>
+      {% endif %}
+    {% endif %}
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_body %}
+<script>
+  let buttons = document.querySelectorAll('.modal-btn');
+  buttons.forEach(function(button) {
+    button.addEventListener('click', function() {
+      // Get the item's primary key from the button's ID
+      let pk = this.id.split('-')[1];
+      // Get the corresponding modal and show it
+      let modal = document.getElementById('modal-' + pk);
+      modal.showModal();
+    });
+  });
+
+</script>
+{% endblock extra_body %}

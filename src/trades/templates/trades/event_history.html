@@ -1,0 +1,26 @@
+{% extends 'trades/base.html' %}
+
+{% block content %}
+  <section class="flex flex-col items-center min-h-screen bg-neutral">
+    <div class="mx-auto max-w-screen-lg items-center pt-20">
+      <h1 class="text-dark text-5xl font-bold text-center p-5 ">Tu historial</h1>
+      <div class="join pt-2">
+        <button id="btn-concreted" hx-get="{% url 'concreted_history' %}" hx-swap="innerHTML" hx-target="#results" class="btn btn-lg btn-outline join-item text-dark hover:bg-dark hover:text-neutral">Concretados</button>
+        <button id="btn-canceled" hx-get="{% url 'canceled_history'  %}" hx-swap="innerHTML"  hx-target="#results" class="btn btn-lg btn-outline join-item text-dark hover:bg-dark hover:text-neutral">Cancelados</button>
+        <button id="btn-declined" hx-get="{% url 'declined_history' %}" hx-swap="innerHTML"  hx-target="#results" class="btn btn-lg btn-outline join-item text-dark hover:bg-dark hover:text-neutral">Rechazados</button>
+        <button id="btn-expired" hx-get="{% url 'expired_history' %}" hx-swap="innerHTML"  hx-target="#results" class="btn btn-lg btn-outline join-item text-dark hover:bg-dark hover:text-neutral">Expirados</button>
+      </div>
+    </div>
+    <div id="results" class="py-2">
+
+    </div>
+  </section>
+
+  {% block js %}
+    <script>
+      window.onload = function() {
+        htmx.trigger(document.getElementById('btn-concreted'), 'click');
+      }
+    </script>
+  {% endblock %}
+{% endblock %}

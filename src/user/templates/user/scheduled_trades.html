@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+
+{% block head_title %}
+  Perfil de {{ profile.user.first_name }} {{ profile.user.last_name }}
+{% endblock %}
+
+{% block extra_head %}
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+{% endblock extra_head %}
+
+{% block body %}
+{% include "navbar.html" %}
+
+<div class="flex flex-col items-center">
+
+    <ul class="list-unstyled mt-10">
+        {% for trade in trades %}
+        <li id="trade-{{ trade.pk }}" class="trade-card card mb-4 text-dark">
+            <div class="card-body bg-white">
+                <h2 class="card-title text-center mb-4">
+                    <strong>Fecha acordada:</strong> {{ trade.agreed_date }}
+                </h2>
+                <div class="row">
+                    <div class="col-md-6">
+                        <strong>Usuario implicado:</strong> {{ trade.proposal.requested_user }}<br>
+                        <strong>Ítem:</strong> {{ trade.proposal.requested_item }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Usuario implicado:</strong> {{ trade.proposal.offering_user }}<br>
+                        <strong>Ítem:</strong> {{ trade.proposal.offered_item }}
+                    </div>
+                </div>
+                <div class="flex flex-col sm:flex-row justify-center gap-2">
+                  <a href="{% url 'confirm_trade' trade_id=trade.id %}"> 
+                    <button class="btn btn-lg bg-main text-neutral hover:bg-neutral hover:text-dark">Trueque realizado</button>
+                  </a>
+                  <a href="{% url 'expire_trade' trade_id=trade.id %}"> 
+                    <button class="btn btn-lg bg-main text-neutral hover:bg-neutral hover:text-dark">Trueque no realizado</button>
+                  </a>
+                </div>
+            </div>
+        </li>
+        {% empty %}
+        <p class="text-center" style="color: black; text-align: center; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;">No hay trueques pendientes para la sucursal: {{ branch }}.</p>
+        {% endfor %}
+    </ul>
+</div>
+
+{% endblock %}

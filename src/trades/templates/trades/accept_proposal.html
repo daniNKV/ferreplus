@@ -1,0 +1,129 @@
+{% extends 'trades/base.html' %}
+
+{% block content %}
+<section class="min-h-screen bg-neutral">
+  <div class="flex flex-col mx-auto w-11/12 max-w-screen-lg gap-4 pt-20">
+    {% comment %} <h1 class="text-dark text-4xl font-bold text-center p-1">Confirmar fecha</h1> {% endcomment %}
+
+    <div id="info" class="stats mx-auto stats-vertical lg:stats-horizontal md:w-full max-w-screen-lg bg-[#F8F8F8] border-2 border-dark stats-vertical lg:stats-horizontal shadow-xl">
+      <div class="stat gap-1 text-dark place-items-center">
+        <div class="flex w-full">
+          <div class="avatar grid flex-grow card rounded-box place-items-center">
+            <div class="w-16 rounded-full">
+              <img src={{proposal.offered_item.image.url}} />
+            </div>
+          </div>
+          <div class="divider divider-horizontal">POR</div>
+          <div class="avatar grid flex-grow card rounded-box place-items-center">
+            <div class="w-16 rounded-full">
+              <img src={{proposal.requested_item.image.url}} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat text-dark place-items-center">
+        <div class="hidden md:grid stat-figure text-secondary">
+          <div class="avatar">
+            <div class="w-16 rounded-full">
+              <img src={{proposal.requested_item.user.profile.avatar.url}} />
+            </div>
+          </div>
+        </div>
+        <h1 class="text-3xl font-bold text-wrap text-dark text-center">
+          Aceptando trueque
+        </h1>
+        <p class="stat-title text-wrap text-dark">
+          con
+        </p>
+        <span class="text-3xl font-bold text-wrap text-dark text-center">{{proposal.offered_item.user.first_name}} {{proposal.offered_item.user.last_name}} </span>
+      </div>
+
+      <div class="stat gap-1 text-dark place-items-center">
+        <h1 class="stat-title text-wrap text-dark">
+          A intercambiar en
+        </h1>
+        <p class="stat-value">
+          {{proposal.possible_branch}}
+        </p>
+      </div>
+    </div>
+
+    <div id="date-confirmation">
+      {% if not is_confirmed %}
+        <p class="text-dark text-xl font-thin text-center">{{proposal.offering_user}} nos comentó que puede en los siguientes horarios</p>
+        <p class="text-dark text-xl text-center">Por favor, selecciona dia y hora para el encuentro</p>
+        <form method="post" class="flex flex-col max-w-screen-md items-center mx-auto gap-6 p-5">
+          {% csrf_token %}
+          {% if date_confirmation_form.errors %}
+            <div class="alert alert-danger">
+              <ul>
+                {% for field, errors in date_confirmation_form.errors.items %}
+                  {% for error in errors %}
+                    <li>{{ field }}: {{ error }}</li>
+                  {% endfor %}
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+          {% for checkbox_field, select_field in date_confirmation_form.field_pairs %}
+            <div class="flex text-dark gap-4">
+              <div class="field flex flex-row-reverse gap-2 text-xl font-semibold items-center">
+                  {{ checkbox_field.label_tag }}
+                  {{ checkbox_field }}
+              </div>
+              <div class="flex items-center gap-4">
+                  {{ select_field.label_tag }}
+                  {{ select_field }}
+              </div>
+            </div>
+          {% endfor %}
+          <button type="submit" class="btn btn-outline border-2 btn-lg max-w-md mx-auto text-neutral hover:text-dark bg-dark hover:bg-[#F8F8F8] hover:border-dark" >
+            Aceptar trueque
+          </button>
+        </form>
+      {% else %}
+        <form method="post" class="flex flex-col items-center gap-4 mt-6">
+          {% csrf_token %}
+          <h1 class="text-3xl font-bold text-wrap text-dark text-center">
+            Aceptando trueque
+          </h1>
+          <p class="text-dark text-xl font-thin text-center">{{proposal.confirmed_date}} es la fecha acordada </p>
+          <button type="submit" class="btn btn-outline border-2 btn-lg max-w-md mx-auto text-neutral hover:text-dark bg-dark hover:bg-[#F8F8F8] hover:border-dark" >
+            Aceptar trueque
+          </button>
+        </form>
+
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% block js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      const checkboxes = Array.from(document.querySelectorAll(`.checkbox`));
+      for (let i = 0; i < checkboxes.length; i++) {
+          checkboxes[i].addEventListener('change', function() {
+              const selectField = document.querySelector(`.select-${i}`);
+              if (this.checked) {
+                  selectField.style.display = 'block';
+                  // Disable other checkboxes
+                  checkboxes.forEach((checkbox, index) => {
+                      if (index !== i) {
+                          checkbox.disabled = true;
+                          document.querySelector(`.select-${index}`).style.display = 'none';
+                      }
+                  });
+              } else {
+                  selectField.style.display = 'none';
+                  // Enable other checkboxes
+                  checkboxes.forEach(checkbox => checkbox.disabled = false);
+              }
+          });
+      }
+  });
+</script>
+{% endblock %}
+
+{% endblock %}

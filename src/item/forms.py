@@ -44,6 +44,12 @@ class ItemForm(forms.ModelForm):
         ),
     )
 
+    def clean(self):
+        cleaned_data = super().clean()
+        instance = getattr(self, 'instance', None)
+        if instance and instance.pk:
+            if cleaned_data.get('category') != instance.category:
+                self.add_error('category', 'No se puede cambiar la categoria de un item.')
     def clean_image(self):
         image = self.cleaned_data.get("image")
         if not image:

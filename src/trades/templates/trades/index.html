@@ -1,0 +1,202 @@
+{% extends 'trades/base.html' %}
+{% block content %}
+  {% if messages %}
+    <ul id="messages" class="messages flex flex-col">
+      {% for message in messages %}
+        <div class="toast">
+          <div class="alert alert-info">
+            <span>{{ message }}</span>
+          </div>
+        </div>
+      {% endfor %}
+    </ul>
+  {% endif %}
+  <div id="recieved-proposals"
+    class="flex flex-col bg-neutral text-dark w-screen py-20 px-4">
+    <div class="flex flex-wrap place-content-center gap-4 mx-auto max-w-screen-lg">
+      {% if proposals.pending %}
+      <h1 class="text-3xl font-bold text-center p-5 grid w-full">¡Te ofrecieron nuevos trueques! <br>
+        <span class="text-xl grow font-thin text-center"">Estan esperando tu respuesta</span>
+      </h1>
+      {% for proposal in proposals.pending %}
+          <div class="card sm:w-72 bg-base-[#F8F8F8] shadow-xl image-full">
+            <figure><img src="{{proposal.requested_item.image.url}}" alt="" /></figure>
+            <div class="card-body gap-4">
+              <h2 class="card-title font-bold text-3xl text-neutral">{{proposal.requested_item.name}}</h2>
+              <div class="flex flex-col gap-2">
+                <p class="text-neutral inline-flex items-center gap-3 font-semibold"><i class="fa-solid fa-map-pin text-2xl"></i>{{proposal.possible_branch}}</p>
+                <p class="text-neutral inline-flex items-center gap-3 font-semibold"><i class="fa-regular fa-user text-2xl"></i>{{proposal.offering_user}}</p>
+                {% if proposal.state == 'PENDING' %}
+                  <p class="badge badge-md badge-accent font-semibold mx-auto">{{proposal.state}}</p>
+                {% elif proposal.state == 'COUNTEROFFERED' %}
+                  <p class="badge badge-md badge-warning font-semibold mx-auto">{{proposal.state}}</p>
+                {% endif %}
+                </div>
+              <div class="card-actions justify-end text-neutral py-1">
+                <a href="{% url 'detail_proposal' proposal.id %}" class="btn btn-outline btn-lg w-full mx-auto bg-[#F8F8F8] hover:bg-dark text-dark hover:text-neutral hover:border-white"">Decidir</a>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="flex flex-col">
+          <h1 class="text-3xl font-bold text-center pt-5 pb-2">Nada que responder aun...</h1>
+          <p class="text-xl grow font-thin text-center""> No desesperes, ¡ya llegará un trueque!</p>
+          <a href="{% url 'item_create'%}" class="btn btn-ghost mt-5">Mientras tanto... publica un articulo!</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div id="settled-proposals" class="flex flex-col items-center bg-neutral text-dark w-screen">
+    <div class="max-w-screen-xl p-4 pb-16 mx-auto">
+      <div class="flex-col flex gap-6 mt-6">
+        {% if trades %}
+          <h1 class="text-3xl font-bold text-center">Trueques pactados <br>
+            <span class="text-xl grow font-thin text-center"">¡No te olvides!</span>
+          </h1>
+          {% for trade in trades %}
+            <div class="stats stats-vertical sm:stats-horizontal p-3 items-center bg-[#F8F8F8] border-2 border-dark text-dark  shadow-lg">
+              <div class="stat">
+                <div class="stat-title">Con</div>
+                <div class="stat-value">{{trade.proposal.offering_user.first_name}} <br> {{trade.proposal.offering_user.last_name}}</div>
+                <div class="avatar mx-auto">
+                  <div class="w-24 mt-1 mask mask-squircle object-center">
+                    <img class="" src="https://cdn-icons-png.flaticon.com/512/219/219969.png" alt="">
+                  </div>
+                </div>
+              </div>
+              <div class="stat">
+                <div class="flex flex-row mx-auto sm:flex-col border-opacity-50">
+                  <div class="grid h-24 w-24 card rounded-box place-items-center">
+                    <div class="w-24 mask mask-squircle object-center">
+                      <img src="{{trade.proposal.offered_item.image.url}}" alt="">
+                    </div>
+                  </div>
+                  <div class="divider">por</div>
+                  <div class="grid h-24 w-24 card rounded-box place-items-center">
+                    <div class="avatar">
+                      <div class="w-24 mask mask-squircle object-center">
+                        <img src="{{trade.proposal.requested_item.image.url}}" alt="">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="stat">
+                <div class="stat-title">en</div>
+                <div class="stat-value">Sucursal <br> {{trade.branch.name}} </div>
+              </div>
+              <div class="stat gap-1">
+                <div class="stat-title">{{ trade.agreed_date|date:"l" }}</div>
+                <div class="stat-value">{{ trade.agreed_date|date:"j \d\e F" }} <br> {{ trade.agreed_date|date:"H:i" }}</div>
+                <button 
+                  id="openModalButton-trade-{{trade.pk}}"
+                  onclick="showModal('modal-trade-{{trade.pk}}')"
+                  class="btn mt-6 btn-error">
+                  No puedo asistir
+                </button>
+              </div>
+            </div>
+            <dialog id="modal-trade-{{ trade.pk }}" class="modal modal-trade z-20 bg-slate-800 backdrop-blur-lg">
+              <div class="modal-box bg-neutral text-dark">
+                <div class="flex flex-col items-center gap-3">
+                  <h3 class="font-bold text-xl">¿Está seguro que desea cancelar el encuentro?
+                    <span class="text-md grow font-thin text-center text-error">
+                      Esta acción impactará negativamente en tu perfil
+                    </span>
+                  </h3>
+                  <img width="200px" class="mt-" src="https://media.tenor.com/tJbuPWMkU8MAAAAM/seras-castigada.gif" alt="">
+                </div>
+                <div class="modal-action">
+                  <form method="dialog">
+                    <button class="btn btn-outline text-dark">Volver</button>
+                  </form>
+                  <form method="post" action="{% url 'cancel_trade' trade_id=trade.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn bg-error text-neutral">Cancelar</button>
+                  </form>
+                </div>
+              </div>
+            </dialog>
+          {% endfor %}
+  
+        {% else %}
+        <div class="flex flex-col">
+          <h1 class="text-3xl font-bold text-center">
+            ¡No concretaste ningún trueque todavia!
+          </h1>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  
+  <div id="sent-proposals"
+  class="flex flex-col bg-neutral text-dark w-screen py-16 gap-6 px-4">
+  {% if proposals.sent %}
+    <div class="flex flex-col">
+      <h1 class="text-3xl font-bold text-center">Esperando respuesta <br>
+        <span class="text-xl grow font-thin text-center">
+          ¡Paciencia!
+        </span>
+      </h1>
+      <div class="flex flex-wrap gap-4 mx-auto max-w-screen-lg">
+        {% for proposal in proposals.sent %}
+          <div class="card sm:w-72 bg-base-[#F8F8F8] shadow-xl image-full">
+            <figure><img src="{{proposal.requested_item.image.url}}" alt="" /></figure>
+            <div class="card-body gap-4">
+              <h2 class="card-title font-bold text-3xl text-neutral">{{proposal.requested_item.name}}!</h2>
+              <p class="text-neutral inline-flex items-center gap-3"><i class="fa-solid fa-map-pin text-3xl"></i>{{proposal.possible_branch}}</p>
+              <p class="text-neutral inline-flex items-center gap-3"><i class="fa-regular fa-user text-3xl"></i>{{proposal.offering_user.first_name}}</p>
+              <div class="card-actions justify-end text-neutral">
+                <button id="openModalButton-proposal-{{proposal.pk}}" 
+                  class="btn btn-outline border-2 btn-lg w-full mx-auto bg-[#F8F8F8] hover:bg-error text-dark hover:border-white"
+                  onclick="showModal('modal-proposal-{{proposal.pk}}')">
+                  <i class="fa-solid fa-trash text-2xl text-error text-center"></i>
+                  Deseo cancelar             
+                </button>
+              </div>
+            </div>
+          </div>
+          <dialog id="modal-proposal-{{ proposal.pk }}" class="modal modal-proposal z-20 bg-slate-800 backdrop-blur-lg">
+            <div class="modal-box bg-neutral text-dark">
+              <div class="flex flex-col items-center gap-3">
+                <h3 class="font-bold text-xl">¿Está seguro que desea cancelar la propuesta?</h3>
+              </div>
+              <div class="modal-action">
+                <form method="dialog">
+                  <button class="btn btn-outline text-dark">Volver</button>
+                </form>
+                <form method="post" action="{% url 'cancel_proposal' proposal_id=proposal.pk %}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn bg-error text-neutral">Cancelar</button>
+                </form>
+              </div>
+            </div>
+          </dialog>
+        {% endfor %}
+      </div> <!-- This closing tag was moved here -->
+    </div>
+  {% else %}
+    <h1 class="text-3xl font-bold text-center pt-5">¡No has ofrecido ningún trueque!</h1>
+    <a href="{% url 'all_items'%}" class="btn btn-ghost mt-5">¿Por qué no buscas uno?</a>
+  {% endif %}
+  </div>
+
+
+{% block js %}
+<script>
+    window.setTimeout(function() {
+      let messages = document.getElementById('messages');
+      if (messages) {
+        messages.remove();
+      }
+  }, 4000);
+  function showModal(modalId) {
+    let modal = document.getElementById(modalId);
+    modal.showModal();
+  }
+</script>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block head_title %}
+  Ferreplus | Mis Trueques
+{% endblock %}
+
+{% block extra_head %}
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+{% endblock extra_head %}
+
+{% block body %}
+  {% if messages %}
+    <ul id="messages" class="messages flex flex-col">
+      {% for message in messages %}
+        <div class="toast">
+          <div class="alert alert-info">
+            <span>{{ message }}</span>
+          </div>
+        </div>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% include 'navbar.html' with trade_manage=True %}
+  <div class="drawer">
+    <input id="menu" type="checkbox" class="drawer-toggle" />
+    <div class="drawer-content bg-neutral">
+      <!-- Page content here -->
+      {% block content %}
+  
+      {% endblock %}
+    </div> 
+    <div class="drawer-side">
+      <label for="menu" aria-label="close sidebar" class="drawer-overlay"></label>
+      <ul class="menu p-4 pt-20 w-80 min-h-full bg-slate-800 text-neutral">
+        <!-- Sidebar content here -->
+        <li><a href="{% url 'show_history' %}">Historial</a></li>
+        <li><a href="{% url 'trades_home' %}">Activos</a></li>
+        <li class="pl-6"><a href="{% url  'trades_home' %}#recieved_proposals" class="pl-4">Recibidos</a></li>
+        <li class="pl-6"><a href="{% url 'trades_home' %}#settled-proposals">Pactados</a></li>
+        <li class="pl-6"><a href="{% url 'trades_home' %}#sent-proposals">Enviados</a></li>
+        
+      </ul>
+    </div>
+  </div>
+{% endblock %}
+
+
+{% block extra_body %}
+<script>
+  window.setTimeout(function() {
+    let messages = document.getElementById('messages');
+    if (messages) {
+      messages.remove();
+    }
+}, 4000);
+
+
+</script>
+{% block js %}
+{% endblock %}
+{% endblock %}

@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
+
 import os
 from pathlib import Path
 from dotenv import dotenv_values
@@ -57,6 +58,8 @@ INSTALLED_APPS = [
     "debug_toolbar",
     "owners",
     "item",
+    "trades",
+    "transitions"
 ]
 
 MIDDLEWARE = [
@@ -144,8 +147,8 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # STATIC_ROOT = BASE_DIR.parent / "local-cdn" / "static"
@@ -181,7 +184,7 @@ ACCOUNT_FORMS = {
 
 ACCOUNT_ADAPTER = "user.adapter.UsersAdapter"
 
-ROLEPERMISSIONS_MODULE = 'user.roles'
+ROLEPERMISSIONS_MODULE = "user.roles"
 
-MEDIA_URL = '/media/'
+MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
