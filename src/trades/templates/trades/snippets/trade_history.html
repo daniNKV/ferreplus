@@ -15,8 +15,8 @@
         <td>
           <div class="flex flex-col sm:flex-row items-center gap-3">
             <div class="avatar">
-              <a href="{{trade.proposal.offered_item.image.url}}" class="mask mask-squircle w-12 h-12">
-                <img src="" />
+              <a href="{% url 'item_detail' item_id=trade.proposal.offered_item.id %}" class="mask mask-squircle w-12 h-12">
+                <img src="{{trade.proposal.offered_item.image.url}}" />
               </a>
             </div>
             <div>
@@ -27,7 +27,7 @@
         <td>
           <div class="flex flex-col sm:flex-row items-center gap-3">
             <div class="avatar">
-              <a href="#" class="mask mask-squircle w-12 h-12">
+              <a href="{% url 'item_detail' item_id=trade.proposal.requested_item.id %}" class="mask mask-squircle w-12 h-12">
                 <img src="{{trade.proposal.requested_item.image.url}}" />
               </a>
             </div>
