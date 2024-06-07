@@ -47,12 +47,11 @@ def index_trade(request):
 @login_required
 @require_GET
 def select_item_to_offer(request, requested_item_id):
+    states = ProposalState.State
     has_proposal_pending = Proposal.objects.filter(
-        (
-            Q(state=ProposalState.State.PENDING)
-            | Q(state=ProposalState.State.COUNTEROFFERED)
-        )
-        & (Q(offering_user=request.user.id) & Q(requested_item=requested_item_id))
+        (Q(state=states.PENDING))
+        & (Q(offering_user=request.user.id) & Q(requested_item=requested_item_id)) 
+        | (Q(requested_user=request.user.id) & Q(offered_item=requested_item_id))
     ).exists()
     if has_proposal_pending:
         messages.error(request, "Ya enviaste una solicitud")
