@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block head_title %}
+    Empleados Ferreplus
+{% endblock head_title %}
+
+{% block extra_head %}
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+{% endblock extra_head %}
+
+{% block body %}
+   {% include 'navbar.html' %} 
+
+    <section class="min-h-screen flex items-center justify-center bg-neutral">
+        <div class="card max-w-96 bg-base-100 shadow-xl">
+            <div class="card-body bg-slate-800 text-neutral">
+                 <div class="flex flex-col sm:flex-row justify-center gap-2">
+                    <a href="{% url 'historical_states_trades' %}"> 
+                      <button class="btn btn-lg bg-main text-neutral hover:bg-neutral hover:text-dark">Estados de trueques historico</button>
+                    </a>
+                    <a href="{% url 'weekly_states_trades' %}"> 
+                      <button class="btn btn-lg bg-main text-neutral hover:bg-neutral hover:text-dark">Estados de trueques semanal</button>
+                    </a>
+                    <a href="{% url 'category_trades' %}"> 
+                      <button class="btn btn-lg bg-main text-neutral hover:bg-neutral hover:text-dark">Trueques por categoria</button>
+                    </a>
+                    <a href="{% url 'users_ages' %}"> 
+                        <button class="btn btn-lg bg-main text-neutral hover:bg-neutral hover:text-dark">Edad usuarios</button>
+                      </a>
+                  </div>
+                <div class="card-actions justify-end">
+                <a href="{% url 'home' %}" class="btn btn-primary" >Ir al inicio</a>
+                </div>
+            </div>
+        </div>
+
+   </section>
+
+{% endblock %}
