@@ -3,11 +3,12 @@ from django.http import JsonResponse, HttpResponseForbidden, HttpResponse
 from django.views.decorators.http import require_GET, require_POST
 from django.contrib.auth.decorators import login_required
 from .forms import DatesSelectionForm, ConfirmDateForm
+from django.db.models import Q, Exists, OuterRef
 from django.forms import formset_factory
 from django.utils import timezone
 from django.contrib import messages
-from django.db.models import Q
 from item.models import Item
+from profiles.models import Profile, Valoration
 from .models import (
     Proposal,
     Trade,
@@ -34,12 +35,26 @@ def index_trade(request):
         proposal for proposal in pending_proposals if not proposal.is_expired()
     ]
     non_expired_trades = [trade for trade in pending_trades if not trade.is_expired()]
+    pending_valorations = Trade.objects.filter(
+        Q(state=TradeState.State.CONFIRMED)
+        & (
+            Q(proposal__requested_user=request.user.id)
+            | Q(proposal__offering_user=request.user.id)
+        )
+        & ~Exists(
+            Valoration.objects.filter(
+                Q(trade_id=OuterRef("pk")) & Q(from_user=request.user.id)
+            )
+        )
+    )
+
     context = {
         "proposals": {
             "pending": non_expired_proposals,
             "sent": sent_proposals,
         },
         "trades": pending_trades,
+        "valorations": pending_valorations,
     }
     return render(request, "trades/index.html", context)
 
@@ -50,7 +65,7 @@ def select_item_to_offer(request, requested_item_id):
     states = ProposalState.State
     has_proposal_pending = Proposal.objects.filter(
         (Q(state=states.PENDING))
-        & (Q(offering_user=request.user.id) & Q(requested_item=requested_item_id)) 
+        & (Q(offering_user=request.user.id) & Q(requested_item=requested_item_id))
         | (Q(requested_user=request.user.id) & Q(offered_item=requested_item_id))
     ).exists()
     if has_proposal_pending:
@@ -336,6 +351,33 @@ def cancel_proposal(request, proposal_id):
         fsm.cancel()
 
     return redirect("trades_home")
+
+
+@login_required
+@require_POST
+def valorate_user(request, trade_id):
+    been_rated = Valoration.objects.filter(
+        trade_id=trade_id, from_user_id=request.user.id
+    ).exists()
+
+    if not been_rated:
+        trade = Trade.objects.get(id=trade_id)
+        proposal = trade.proposal
+        if proposal.offering_user == request.user:
+            user_rated = proposal.requested_user
+        else:
+            user_rated = proposal.offering_user
+        profile = Profile.objects.get(user=user_rated)
+        rating = request.POST.get("rating", None)
+        print(rating)
+        valoration = Valoration(
+            trade_id=trade.id, from_user=request.user, to_user=user_rated, rating=rating
+        )
+        valoration.save()
+        profile.update_rating()
+        return HttpResponse("<div>Valoracion exitosa!</div>")
+    else:
+        return HttpResponseForbidden("Ya has valorado este trueque")
 
 
 @login_required

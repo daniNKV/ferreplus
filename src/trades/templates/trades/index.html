@@ -176,7 +176,7 @@
             </div>
           </dialog>
         {% endfor %}
-      </div> <!-- This closing tag was moved here -->
+      </div> 
     </div>
   {% else %}
     <h1 class="text-3xl font-bold text-center pt-5">¡No has ofrecido ningún trueque!</h1>
@@ -184,6 +184,63 @@
   {% endif %}
   </div>
 
+  <div id="pending_valorations" class="max-w-screen-xl p-4 pb-16 mx-auto">>
+    {% if valorations %}
+      <h1 class="text-3xl font-bold text-center text-dark p-5 grid w-full">
+        ¡Tienes valoraciones pendientes!
+        <span class="text-xl grow font-thin text-center">¡No te olvides de calificar!</span>
+      </h1>
+    {% else %}
+      <h1 class="text-3xl font-bold text-center text-dark p-5 grid w-full">
+        ¡No tienes valoraciones pendientes!
+        <span class="text-xl grow font-thin text-center">¡Buen trabajo!</span>
+      </h1>
+    {% endif %}
+
+    <div class="flex gap-6 mt-6 justify-center">
+      {% for trade_rated in valorations %}
+      <div class="stats bg-white text-dark">
+        <div class="stat">
+          <div class="stat-title">Trueque con</div>
+          {% if request.user == trade_rated.proposal.offering_user %}
+            <div class="stat-value">{{trade_rated.proposal.requested_user.first_name}}</div>
+            <div class="stat-title">Conseguiste</div>
+            <div class="w-24 mt-1 mask mask-squircle object-center">
+              <img class="" src="{{trade_rated.proposal.requested_item.image.url}}" alt="">
+            </div>
+          {% else %}
+            <div class="stat-value">{{trade_rated.proposal.offering_user.first_name}}</div>
+            <div class="stat-title">Conseguiste</div>
+            <div class="w-24 mt-1 mask mask-squircle object-center">
+              <img class="" src="{{trade_rated.proposal.offered_item.image.url}}" alt="">
+            </div>
+          {% endif %}
+        </div>
+      
+        <form hx-post="{% url 'rate_trade' trade_id=trade_rated.pk %}" hx-swap="outerHTML" id="ratingForm">
+          {% csrf_token %}
+          <div class="stat">
+            <div>¿Cómo calificarías tu experiencia?</div> 
+            <div class="stat-value flex-col flex gap-1 p-4">
+              <div class="flex gap-1">
+                <i class="fa-solid fa-star text-slate-400 cursor-pointer" data-rating="1"></i>
+                <i class="fa-solid fa-star text-slate-400 cursor-pointer" data-rating="2"></i>
+                <i class="fa-solid fa-star text-slate-400 cursor-pointer" data-rating="3"></i>
+                <i class="fa-solid fa-star text-slate-400 cursor-pointer" data-rating="4"></i>
+                <i class="fa-solid fa-star text-slate-400 cursor-pointer" data-rating="5"></i>
+              </div>
+              <div class="btn btn-md btn-ghost no-selection" data-rating="-1">No valorar</div>
+            </div>
+          </div>
+          <div class="stat-actions px-4 pb-4">
+            <input type="hidden" name="rating" id="ratingInput">
+            <button type="submit" class="btn btn-md bg-success w-full text-white">Confirmar</button>
+          </div>
+        </form>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
 
 {% block js %}
 <script>
@@ -197,6 +254,46 @@
     let modal = document.getElementById(modalId);
     modal.showModal();
   }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const stars = document.querySelectorAll('.fa-star');
+    const pass = document.querySelector('.no-selection');
+    const ratingInput = document.getElementById('ratingInput');
+
+    if (stars.length > 0 && ratingInput) { // Check if stars and ratingInput exist
+      let selectedRating = 0;
+
+      pass.addEventListener('click', function() {
+        ratingInput.value = -1;
+        highlightStars(-1, true);
+      });
+
+      stars.forEach(star => {
+        star.addEventListener('click', function() {
+          selectedRating = this.dataset.rating;
+          ratingInput.value = selectedRating;
+          highlightStars(selectedRating, true);
+        });
+      });
+
+      function highlightStars(rating, persist = false) {
+        stars.forEach(star => {
+          star.classList.remove('text-dark');
+          star.classList.add('text-slate-400');
+          if (star.dataset.rating <= rating) {
+            star.classList.remove('text-slate-400');
+            star.classList.add('text-dark');
+          } else if (!persist) {
+            star.classList.remove('text-dark');
+            star.classList.add('text-slate-400');
+
+          }
+        });
+      }
+    } else {
+      console.log('Stars or rating input not found.');
+    }
+  });
 </script>
 {% endblock %}
 {% endblock %}
