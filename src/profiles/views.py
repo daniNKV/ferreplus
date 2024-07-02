@@ -20,7 +20,11 @@ def profile_view(request, user_id):
     else: 
         items=Item.objects.filter(user=user, was_traded=False, is_visible=True)
     profile, created = Profile.objects.get_or_create(user=user)
-    return render(request, "profiles/profile_detail.html", {"profile": profile, "items": items})
+    return render(request, "profiles/profile_detail.html", {
+        "profile": profile, 
+        "items": items,
+        'valoration_range': range(profile.valoration),
+    })
 
 
 @login_required

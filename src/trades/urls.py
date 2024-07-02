@@ -38,6 +38,7 @@ urlpatterns = [
     path('cancel/proposal/<int:proposal_id>', views.cancel_proposal, name="cancel_proposal"),
     path("decline/<int:proposal_id>", views.decline_proposal, name="decline_proposal"),
     path("detail/<int:proposal_id>", views.detail_proposal, name="detail_proposal"),
+    path("rate/<int:trade_id>", views.valorate_user, name="rate_trade"),
     path("history", views.show_history, name="show_history"),
     path("history/concreted", views.show_concreted_history, name="concreted_history"),
     path("history/canceled", views.show_canceled_history, name="canceled_history"),

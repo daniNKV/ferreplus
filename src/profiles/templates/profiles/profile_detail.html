@@ -29,6 +29,11 @@
 
 <section id="hero" class="hero pt-16 min-h-screen text-dark bg-cover" style="background-image: url({% static 'img/background.png' %})">
   <div class="hero-content md:w-6/12 bg-neutral flex-col lg:gap-2">
+    <div class="flex gap-1">
+      {% for _ in valoration_range %}
+        <i class="fa-solid fa-star text-yellow-500 text-4xl"></i>
+      {% endfor %}
+      </div>
     <h2 class="text-5xl md:text-7xl text-center font-bold">{{ profile.user.first_name }} {{ profile.user.last_name }}</h1>
 
     {% if user.profile.avatar %}
