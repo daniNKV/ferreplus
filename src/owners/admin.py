@@ -2,6 +2,7 @@ from django.contrib import admin
 from django import forms
 from user.models import Employee
 from .models import Branch
+from .models import Product
 
 admin.site.site_header = "Panel de Administración de Ferreplus"
 admin.site.site_title = "Admin"
@@ -40,3 +41,24 @@ class BranchAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Branch, BranchAdmin)
+
+class ProductAdminForm(forms.ModelForm):
+    class Meta:
+        model = Product
+        fields = ["title", "image"]
+
+    def clean_(self):
+        cleaned_data = super().clean()
+        if not cleaned_data.name:
+            raise forms.ValidationError("This field is required.")
+
+class ProductAdmin(admin.ModelAdmin):
+    form = ProductAdminForm
+    list_display = ["title", "image"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.model._meta.verbose_name = "Producto"
+        self.model._meta.verbose_name_plural = "Productos"
+
+admin.site.register(Product, ProductAdmin)
