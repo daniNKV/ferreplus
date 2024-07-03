@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+
+{% block head_title %}
+  Perfil de {{ profile.user.first_name }} {{ profile.user.last_name }}
+{% endblock %}
+
+{% block extra_head %}
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+{% endblock extra_head %}
+
+{% block body %}
+{% include "navbar.html" %}
+
+{% block form %}
+
+<form method="POST" class="form-control gap-5" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{form.as_p}}
+    <a href="{% url 'upload_sale' %}"> 
+      <button class="btn btn-lg bg-main text-neutral hover:bg-neutral hover:text-dark">Cargar Venta</button>
+    </a>
+</form>
+
+{% endblock %}
+
+{% endblock %}

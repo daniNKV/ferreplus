@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+
+{% block head_title %}
+  Cargar Venta
+{% endblock %}
+
+{% block extra_head %}
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+{% endblock extra_head %}
+
+{% block body %}
+{% include "navbar.html" %}
+
+<div class="flex flex-col items-center">
+
+    <ul class="list-unstyled mt-10">
+        <li id="trade-{{ trade.pk }}" class="trade-card card mb-4 text-dark">
+            <div class="card-body bg-white">
+                <h2 class="card-title text-center mb-4">
+                    <strong>¿Quiere agregar una compra que se realizó durante el intercambio?</strong>
+                </h2>
+                <div class="flex flex-col sm:flex-row justify-center gap-2">
+                  <a href="{% url 'upload_sale' %}"> 
+                    <button class="btn btn-lg bg-main text-neutral hover:bg-neutral hover:text-dark">Agregar compra</button>
+                  </a>
+                  <a href="{% url 'employee_panel' %}"> 
+                    <button class="btn btn-lg bg-main text-neutral hover:bg-neutral hover:text-dark">NO Agregar compra</button>
+                  </a>
+                </div>
+            </div>
+        </li>
+        <p class="text-center" style="color: black; text-align: center; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;">No hay trueques pendientes para la sucursal: {{ branch }}.</p>
+    </ul>
+</div>
+
+{% endblock %}

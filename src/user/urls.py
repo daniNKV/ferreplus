@@ -14,4 +14,6 @@ urlpatterns = [
     path("employee/category-trades", views.category_trades, name="category_trades"),
     path("employee/users-ages", views.users_ages, name="users_ages"),
     path("employee/sold-products", views.sold_products, name="sold_products"),
+    path("employee/upload_sale", views.upload_sale, name="upload_sale"),
+    path("employee/ask_to_upload-sale", views.ask_to_upload_sale, name="ask_to_upload_sale"),
 ]

@@ -19,6 +19,7 @@ from django.utils.timezone import now, timedelta, datetime
 from django.http import HttpResponse 
 from item.models import Category
 from owners.models import Product
+from .forms import SaleForm
 
 @login_required
 @has_role_decorator('employee')
@@ -297,3 +298,25 @@ def sold_products(request):
     graphic = graphic.decode('utf-8')
     
     return render(request, 'user/sold_products.html', {'graphic': graphic})
+
+def upload_sale(request, product_id=None):
+    if request.method == "POST":
+        form = SaleForm(request.POST)
+        if form.is_valid():
+            print(product_id)
+            product_id = form.id
+            print(id)
+            product = get_object_or_404(Product, pk=product_id)
+            product.sold += request.sold
+            product.save()
+            messages.success(request, "¡Venta cargada exitosamente!")
+            return redirect("user/ask_to_upload_sale.html")
+    else:
+        product_id = None
+        if (product_id):
+            product = Product.objects.get(id=product_id)
+        form = SaleForm()
+    return render(request, "user/upload_sale.html", {"form": form})
+
+def ask_to_upload_sale(request):
+    return render(request, "user/ask_to_upload_sale.html", {})
