@@ -220,13 +220,13 @@ def users_ages(request):
     users = User.objects.all().values()
     users_df = pd.DataFrame(users)
 
+    # Convertir fechas de nacimiento a datetime y filtrar fechas inválidas
+    users_df['birth_date'] = pd.to_datetime(users_df['birth_date'], errors='coerce')
+    users_df = users_df[users_df['birth_date'].notna() & (users_df['birth_date'].dt.year >= 1677)]
+
     # Calcular las edades a partir de las fechas de nacimiento
     current_date = datetime.now()
-    users_df['birth_date'] = pd.to_datetime(users_df['birth_date'])
-    users_df['age'] = current_date.year - users_df['birth_date'].dt.year - \
-                      (current_date.month < users_df['birth_date'].dt.month) - \
-                      ((current_date.month == users_df['birth_date'].dt.month) & \
-                       (current_date.day < users_df['birth_date'].dt.day))
+    users_df['age'] = users_df['birth_date'].apply(lambda x: current_date.year - x.year - ((current_date.month, current_date.day) < (x.month, x.day)))
 
     # Calcular los bordes de los bins
     min_age = users_df['age'].min()
@@ -240,7 +240,7 @@ def users_ages(request):
     plt.xlabel('Edad')
     plt.ylabel('Cantidad de Usuarios')
 
-    plt.yticks(range(int(users_df.count().max()) + 1))
+    plt.yticks(range(int(users_df['age'].value_counts().max()) + 1))
 
     # Establecer los límites del eje X para comenzar desde la edad mínima
     plt.xlim(min_age, max_age + 1)
