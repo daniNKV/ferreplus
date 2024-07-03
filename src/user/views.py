@@ -99,11 +99,11 @@ def show_statistics(request):
 def historical_states_trades(request):
     trades = Trade.objects.all().values()  
     trades_df = pd.DataFrame(trades) 
-
-    trades_for_state = trades_df['state'].value_counts()
     
     if trades_df.empty:
         return HttpResponse("No se realizaron trueques.", content_type='text/plain')
+    
+    trades_for_state = trades_df['state'].value_counts()
     
     # Crear el gráfico
     plt.figure(figsize=(8, 8))
@@ -138,7 +138,7 @@ def weekly_states_trades(request):
     trades_df = pd.DataFrame(trades)
     
     if trades_df.empty:
-        return HttpResponse("No hay trueques en la última semana.", content_type='text/plain')
+        return HttpResponse("No hay trueques en la ultima semana.", content_type='text/plain')
     
     # Crear el gráfico
     plt.figure(figsize=(8, 8))
@@ -166,12 +166,15 @@ def category_trades(request):
     proposals_data = Proposal.objects.all().values()
     items_data = Item.objects.all().values()
     categories_data = Category.objects.all().values()
-
+    
     # Crear DataFrames de Pandas con los datos obtenidos
     trades_df = pd.DataFrame(trade_data)
     proposals_df = pd.DataFrame(proposals_data)
     items_df = pd.DataFrame(items_data)
     categories_df = pd.DataFrame(categories_data)
+
+    if trades_df.empty:
+        return HttpResponse("No hubo trueques.", content_type='text/plain')
 
     # Fusionar los DataFrames
     merged_df = pd.merge(trades_df, proposals_df, left_on='proposal_id', right_on='id', suffixes=('_trades', '_proposals'))
