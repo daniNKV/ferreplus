@@ -80,7 +80,7 @@ class SaleForm(forms.ModelForm):
 
     sold = forms.IntegerField(
         label="Cantidad vendida",
-        widget=forms.TextInput(
+        widget=forms.NumberInput(
             attrs={"class": "textarea textarea-bordered w-full bg-neutral border-dark"}
         ),
     )
