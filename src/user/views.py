@@ -18,6 +18,7 @@ import base64
 from django.utils.timezone import now, timedelta, datetime
 from django.http import HttpResponse 
 from item.models import Category
+from owners.models import Product
 
 @login_required
 @has_role_decorator('employee')
@@ -99,11 +100,11 @@ def show_statistics(request):
 def historical_states_trades(request):
     trades = Trade.objects.all().values()  
     trades_df = pd.DataFrame(trades) 
-
-    trades_for_state = trades_df['state'].value_counts()
     
     if trades_df.empty:
         return HttpResponse("No se realizaron trueques.", content_type='text/plain')
+    
+    trades_for_state = trades_df['state'].value_counts()
     
     # Crear el gráfico
     plt.figure(figsize=(8, 8))
@@ -138,7 +139,7 @@ def weekly_states_trades(request):
     trades_df = pd.DataFrame(trades)
     
     if trades_df.empty:
-        return HttpResponse("No hay trueques en la última semana.", content_type='text/plain')
+        return HttpResponse("No hay trueques en la ultima semana.", content_type='text/plain')
     
     # Crear el gráfico
     plt.figure(figsize=(8, 8))
@@ -257,3 +258,42 @@ def users_ages(request):
     graphic = graphic.decode('utf-8')
 
     return render(request, 'user/users_ages.html', {'graphic': graphic})
+
+
+def sold_products(request):
+    # Obtener los datos de las tablas
+    products_data = Product.objects.all().values()
+    products_df = pd.DataFrame(products_data)
+    
+     # Realizar el conteo de valores en la columna sold
+    products_counts = products_df.groupby('title')['sold'].sum()
+
+     # Obtener todos los productos posibles
+    all_products = products_df['title'].tolist()
+
+    # Crear un DataFrame con todos los productos y establecer el conteo en cero para aquellas que no estén presentes
+    all_products_counts = pd.Series({product: products_counts.get(product, 0) for product in all_products})
+
+    # Crear el gráfico de barras
+    plt.figure(figsize=(15, 10))
+    all_products_counts.plot(kind='bar')
+    plt.title('Productos vendidos en los trueques')
+    plt.xlabel('Productos')
+    plt.ylabel('Cantidad vendidos')
+
+    plt.yticks(range(int(all_products_counts.max()) + 1))
+
+    plt.xticks(rotation=25, ha='right')
+
+    # Guardar el gráfico en un buffer
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    image_png = buffer.getvalue()
+    buffer.close()
+    
+    # Convertir la imagen a base64 para pasarla a la plantilla
+    graphic = base64.b64encode(image_png)
+    graphic = graphic.decode('utf-8')
+    
+    return render(request, 'user/sold_products.html', {'graphic': graphic})

@@ -22,6 +22,7 @@ class Product(models.Model):
     image = models.ImageField(
         upload_to=UploadToPathAndRename("product/images/"), null=False, blank=False
     )
+    sold = models.IntegerField(default=0)
 
     def __str__(self):
         return str(self.title)
