@@ -76,7 +76,7 @@ class SaleForm(forms.ModelForm):
 
     class Meta:
         model = Product
-        fields = ["titulo", "sold", "id"]
+        fields = ["titulo", "sold"]
 
     sold = forms.IntegerField(
         label="Cantidad vendida",
@@ -92,5 +92,3 @@ class SaleForm(forms.ModelForm):
             attrs={"class": "select select-bordered w-full bg-neutral border-dark"}
         ),
     )
-
-    id = forms.IntegerField(widget=forms.HiddenInput())

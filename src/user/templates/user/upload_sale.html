@@ -4,7 +4,7 @@
 
 
 {% block head_title %}
-  Perfil de {{ profile.user.first_name }} {{ profile.user.last_name }}
+  Cargando una compra
 {% endblock %}
 
 {% block extra_head %}
@@ -15,14 +15,23 @@
 {% include "navbar.html" %}
 
 {% block form %}
+<br><br><br><br><br><br>
+<div class="flex flex-col items-center">
 
-<form method="POST" class="form-control gap-5" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{form.as_p}}
-    <a href="{% url 'upload_sale' %}"> 
-      <button class="btn btn-lg bg-main text-neutral hover:bg-neutral hover:text-dark">Cargar Venta</button>
-    </a>
-</form>
+  <ul class="list-unstyled mt-10">
+      <li id="trade-{{ trade.pk }}" class="trade-card card mb-4 text-dark">
+        <div class="card-body bg-white">
+          <form method="POST" class="form-control gap-5" enctype="multipart/form-data">
+              {% csrf_token %}
+              {{form.as_p}}
+              <a href="{% url 'upload_sale' %}"> 
+                <button class="btn btn-lg bg-main text-neutral hover:bg-neutral hover:text-dark">Cargar Venta</button>
+              </a>
+          </form>
+        </div>
+      </li>
+    </ul>
+  </div>
 
 {% endblock %}
 

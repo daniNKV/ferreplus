@@ -70,7 +70,7 @@ def confirm_trade(request, trade_id):
         trade.proposal.requested_item.save()
         fsm.confirm(employee=employee)
         messages.success(request, 'El trueque ha sido confirmado!')
-    return redirect("employee_panel")
+    return redirect("ask_to_upload_sale")
 
 
 @login_required
@@ -299,24 +299,18 @@ def sold_products(request):
     
     return render(request, 'user/sold_products.html', {'graphic': graphic})
 
-def upload_sale(request, product_id=None):
-    if request.method == "POST":
+
+def upload_sale(request):
+    if request.method == 'POST':
         form = SaleForm(request.POST)
         if form.is_valid():
-            print(product_id)
-            product_id = form.id
-            print(id)
-            product = get_object_or_404(Product, pk=product_id)
-            product.sold += request.sold
-            product.save()
-            messages.success(request, "¡Venta cargada exitosamente!")
-            return redirect("user/ask_to_upload_sale.html")
+            selected_product = form.cleaned_data['titulo']
+            selected_product.sold += int(request.POST['sold'])
+            selected_product.save()
+            return redirect('ask_to_upload_sale')
     else:
-        product_id = None
-        if (product_id):
-            product = Product.objects.get(id=product_id)
         form = SaleForm()
-    return render(request, "user/upload_sale.html", {"form": form})
+    return render(request, 'user/upload_sale.html', {'form': form})
 
 def ask_to_upload_sale(request):
-    return render(request, "user/ask_to_upload_sale.html", {})
+    return render(request, 'user/ask_to_upload_sale.html', {})
