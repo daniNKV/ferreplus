@@ -127,41 +127,6 @@ def historical_states_trades(request):
     return render(request, 'user/historical_states_trades.html', {'graphic': graphic})
 
 
-def weekly_states_trades(request):
-    # Obtener la fecha y hora actuales
-    current_time = now()
-    # Calcular la fecha y hora hace una semana
-    one_week_ago = current_time - timedelta(days=7)
-    
-    # Filtrar los trades de la última semana
-    trades = Trade.objects.filter(agreed_date__gte=one_week_ago).values()
-    
-    # Convertir el QuerySet a un DataFrame de Pandas
-    trades_df = pd.DataFrame(trades)
-    
-    if trades_df.empty:
-        return HttpResponse("No hay trueques en la ultima semana.", content_type='text/plain')
-    
-    # Crear el gráfico
-    plt.figure(figsize=(8, 8))
-    trades_df.plot(kind='pie', autopct='%1.1f%%', subplots=True)
-    plt.title('Distribución semanal de trueques por estado')
-    plt.ylabel('')  # Ocultar la etiqueta del eje Y
-
-    # Guardar el gráfico en un buffer
-    buffer = io.BytesIO()
-    plt.savefig(buffer, format='png')
-    buffer.seek(0)
-    image_png = buffer.getvalue()
-    buffer.close()
-    
-    # Convertir la imagen a base64 para pasarla a la plantilla
-    graphic = base64.b64encode(image_png)
-    graphic = graphic.decode('utf-8')
-    
-    return render(request, 'user/weekly_states_trades.html', {'graphic': graphic})
-
-
 def category_trades(request):
     # Obtener los datos de las tablas
     trade_data = Trade.objects.all().values()
@@ -262,3 +227,58 @@ def users_ages(request):
     graphic = graphic.decode('utf-8')
 
     return render(request, 'user/users_ages.html', {'graphic': graphic})
+
+
+def sold_products(request):
+    # Obtener los datos de las tablas
+    products_data = Product.objects.all().values()
+    products_df = pd.DataFrame(products_data)
+    
+     # Realizar el conteo de valores en la columna sold
+    products_counts = products_df.groupby('title')['sold'].sum()
+
+     # Obtener todos los productos posibles
+    all_products = products_df['title'].tolist()
+
+    # Crear un DataFrame con todos los productos y establecer el conteo en cero para aquellas que no estén presentes
+    all_products_counts = pd.Series({product: products_counts.get(product, 0) for product in all_products})
+
+    # Crear el gráfico de barras
+    plt.figure(figsize=(15, 10))
+    all_products_counts.plot(kind='bar')
+    plt.title('Productos vendidos en los trueques')
+    plt.xlabel('Productos')
+    plt.ylabel('Cantidad vendidos')
+
+    plt.yticks(range(int(all_products_counts.max()) + 1))
+
+    plt.xticks(rotation=25, ha='right')
+
+    # Guardar el gráfico en un buffer
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    image_png = buffer.getvalue()
+    buffer.close()
+    
+    # Convertir la imagen a base64 para pasarla a la plantilla
+    graphic = base64.b64encode(image_png)
+    graphic = graphic.decode('utf-8')
+    
+    return render(request, 'user/sold_products.html', {'graphic': graphic})
+
+
+def upload_sale(request):
+    if request.method == 'POST':
+        form = SaleForm(request.POST)
+        if form.is_valid():
+            selected_product = form.cleaned_data['titulo']
+            selected_product.sold += int(request.POST['sold'])
+            selected_product.save()
+            return redirect('ask_to_upload_sale')
+    else:
+        form = SaleForm()
+    return render(request, 'user/upload_sale.html', {'form': form})
+
+def ask_to_upload_sale(request):
+    return render(request, 'user/ask_to_upload_sale.html', {})
