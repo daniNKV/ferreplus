@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from item.models import Item, Category
-from owners.models import Branch
+from owners.models import Branch, Product
 
 def branches(request):
     branches = Branch.objects.all()
@@ -9,7 +9,8 @@ def branches(request):
 def home_view(request):
     items_shown = 10
     items = Item.objects.filter(was_traded=False, is_visible=True).order_by('?')[:items_shown]  # Get 10 random items
-    return render(request, 'index.html', {'items': items})
+    products = Product.objects.all()[:items_shown]
+    return render(request, 'index.html', {'items': items, 'products': products})
 
 def all_items(request):
     text = request.GET.get('text')
@@ -30,4 +31,6 @@ def all_items(request):
     categories = Category.objects.all()
     return render(request, 'index/all_items.html', {'resultados': resultados, 'branches': branches, 'categories': categories})
 
-    
+def all_products(request):
+    products = Product.objects.all()
+    return render(request, 'index/all_products.html', {'products': products})

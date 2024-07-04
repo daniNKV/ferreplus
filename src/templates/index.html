@@ -114,15 +114,33 @@
     {% endif %}
 </section>
 
-
 <section id="shop-products" class="min-w-screen bg-neutral text-dark">
-  <div class="flex justify-between items-center p-5 bg-main">
-    <h2 class="text-xl md:text-4xl text-neutral">Articulos ofrecidos por nosotros</h2>
-    <!-- <a href="" class="btn btn-lg btn-outline text-neutral">Ver todo</a> -->
-  </div>
-  <div class="flex justify-center items-center w-full h-96">
-    <h2 class="text-2xl text-dark text-center">Oops. No hay artículos disponibles aún.</h2>
-  </div>
+  <!--<div class="flex justify-between items-center p-5 bg-main">
+    <h2 class="text-xl md:text-4xl text-neutral">Articulos ofrecidos por otros usuarios</h2>
+    <a href="" class="btn btn-lg btn-outline text-neutral">Ver todo</a> 
+  </div>-->
+  <div class="navbar flex justify-between items-center p-5 gap-2 bg-main">
+      <h2 class="sm:text-xl  lg:text-4xl text-neutral">Productos que ofrecemos</h2>
+      <a href="{% url 'all_products' %}" class="btn btn-outline bg-neutral text-dark">Ver todos</a>
+    </div>
+
+  <div class="carousel w-full carousel-center py-20 px-10 space-x-10 bg-neutral">
+    {% if products %}
+      {% for product in products %}
+        <div class="carousel-item rounded-xl card w-[95%] sm:w-96 shadow-xl hover:-translate-y-2 hover:shadow-2xl transition-transform">
+            <figure class="max-h-64">
+              <img class="object-fit" src="{{ product.image.url }}" alt="{{ product.title }}" />
+            </figure>
+          <div class="card-body gap-5 items-center text-center bg-main text-neutral">
+            <h2 class="card-title text-2xl">{{ product.title }}</h2>
+          </div>
+        </div>
+      {% endfor %}
+    {% else  %}
+      <div class="flex justify-center items-center w-full h-96">
+        <h2 class="text-2xl text-dark">No hay productos disponibles aún</h2>
+      </div>
+    {% endif %}
 </section>
 
 {% include 'footer.html' %}
