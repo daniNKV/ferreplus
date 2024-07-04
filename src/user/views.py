@@ -168,12 +168,15 @@ def category_trades(request):
     proposals_data = Proposal.objects.all().values()
     items_data = Item.objects.all().values()
     categories_data = Category.objects.all().values()
-
+    
     # Crear DataFrames de Pandas con los datos obtenidos
     trades_df = pd.DataFrame(trade_data)
     proposals_df = pd.DataFrame(proposals_data)
     items_df = pd.DataFrame(items_data)
     categories_df = pd.DataFrame(categories_data)
+
+    if trades_df.empty:
+        return HttpResponse("No hubo trueques.", content_type='text/plain')
 
     # Fusionar los DataFrames
     merged_df = pd.merge(trades_df, proposals_df, left_on='proposal_id', right_on='id', suffixes=('_trades', '_proposals'))
@@ -219,13 +222,13 @@ def users_ages(request):
     users = User.objects.all().values()
     users_df = pd.DataFrame(users)
 
+    # Convertir fechas de nacimiento a datetime y filtrar fechas inválidas
+    users_df['birth_date'] = pd.to_datetime(users_df['birth_date'], errors='coerce')
+    users_df = users_df[users_df['birth_date'].notna() & (users_df['birth_date'].dt.year >= 1677)]
+
     # Calcular las edades a partir de las fechas de nacimiento
     current_date = datetime.now()
-    users_df['birth_date'] = pd.to_datetime(users_df['birth_date'])
-    users_df['age'] = current_date.year - users_df['birth_date'].dt.year - \
-                      (current_date.month < users_df['birth_date'].dt.month) - \
-                      ((current_date.month == users_df['birth_date'].dt.month) & \
-                       (current_date.day < users_df['birth_date'].dt.day))
+    users_df['age'] = users_df['birth_date'].apply(lambda x: current_date.year - x.year - ((current_date.month, current_date.day) < (x.month, x.day)))
 
     # Calcular los bordes de los bins
     min_age = users_df['age'].min()
@@ -239,7 +242,7 @@ def users_ages(request):
     plt.xlabel('Edad')
     plt.ylabel('Cantidad de Usuarios')
 
-    plt.yticks(range(int(users_df.count().max()) + 1))
+    plt.yticks(range(int(users_df['age'].value_counts().max()) + 1))
 
     # Establecer los límites del eje X para comenzar desde la edad mínima
     plt.xlim(min_age, max_age + 1)
@@ -259,58 +262,3 @@ def users_ages(request):
     graphic = graphic.decode('utf-8')
 
     return render(request, 'user/users_ages.html', {'graphic': graphic})
-
-
-def sold_products(request):
-    # Obtener los datos de las tablas
-    products_data = Product.objects.all().values()
-    products_df = pd.DataFrame(products_data)
-    
-     # Realizar el conteo de valores en la columna sold
-    products_counts = products_df.groupby('title')['sold'].sum()
-
-     # Obtener todos los productos posibles
-    all_products = products_df['title'].tolist()
-
-    # Crear un DataFrame con todos los productos y establecer el conteo en cero para aquellas que no estén presentes
-    all_products_counts = pd.Series({product: products_counts.get(product, 0) for product in all_products})
-
-    # Crear el gráfico de barras
-    plt.figure(figsize=(15, 10))
-    all_products_counts.plot(kind='bar')
-    plt.title('Productos vendidos en los trueques')
-    plt.xlabel('Productos')
-    plt.ylabel('Cantidad vendidos')
-
-    plt.yticks(range(int(all_products_counts.max()) + 1))
-
-    plt.xticks(rotation=25, ha='right')
-
-    # Guardar el gráfico en un buffer
-    buffer = io.BytesIO()
-    plt.savefig(buffer, format='png')
-    buffer.seek(0)
-    image_png = buffer.getvalue()
-    buffer.close()
-    
-    # Convertir la imagen a base64 para pasarla a la plantilla
-    graphic = base64.b64encode(image_png)
-    graphic = graphic.decode('utf-8')
-    
-    return render(request, 'user/sold_products.html', {'graphic': graphic})
-
-
-def upload_sale(request):
-    if request.method == 'POST':
-        form = SaleForm(request.POST)
-        if form.is_valid():
-            selected_product = form.cleaned_data['titulo']
-            selected_product.sold += int(request.POST['sold'])
-            selected_product.save()
-            return redirect('ask_to_upload_sale')
-    else:
-        form = SaleForm()
-    return render(request, 'user/upload_sale.html', {'form': form})
-
-def ask_to_upload_sale(request):
-    return render(request, 'user/ask_to_upload_sale.html', {})
