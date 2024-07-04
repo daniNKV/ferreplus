@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+
+{% block head_title %}
+  Cargando una compra
+{% endblock %}
+
+{% block extra_head %}
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+{% endblock extra_head %}
+
+{% block body %}
+{% include "navbar.html" %}
+
+{% block form %}
+<br><br><br><br><br><br>
+<div class="flex flex-col items-center">
+
+  <ul class="list-unstyled mt-10">
+      <li id="trade-{{ trade.pk }}" class="trade-card card mb-4 text-dark">
+        <div class="card-body bg-white">
+          <form method="POST" class="form-control gap-5" enctype="multipart/form-data">
+              {% csrf_token %}
+              {{form.as_p}}
+              <a href="{% url 'upload_sale' %}"> 
+                <button class="btn btn-lg bg-main text-neutral hover:bg-neutral hover:text-dark">Cargar Venta</button>
+              </a>
+          </form>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+{% endblock %}
+
+{% endblock %}

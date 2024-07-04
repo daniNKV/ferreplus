@@ -2,6 +2,7 @@ from datetime import datetime
 from allauth.account.forms import SignupForm
 from django import forms
 from . import models
+from owners.models import Product
 
 
 class UsersSignupForm(SignupForm):
@@ -70,3 +71,24 @@ class UserEditForm(forms.ModelForm):
             'first_name': forms.TextInput(attrs={'class': 'input input-bordered w-full'}),
             'last_name': forms.TextInput(attrs={'class': 'input input-bordered w-full'}),
         }
+
+class SaleForm(forms.ModelForm):
+
+    class Meta:
+        model = Product
+        fields = ["titulo", "sold"]
+
+    sold = forms.IntegerField(
+        label="Cantidad vendida",
+        widget=forms.NumberInput(
+            attrs={"class": "textarea textarea-bordered w-full bg-neutral border-dark"}
+        ),
+    )
+
+    titulo = forms.ModelChoiceField(
+        label="Nombre del producto",
+        queryset=Product.objects.all(),
+        widget=forms.Select(
+            attrs={"class": "select select-bordered w-full bg-neutral border-dark"}
+        ),
+    )

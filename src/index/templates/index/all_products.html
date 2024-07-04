@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block extra_head %}
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+{% endblock extra_head %}
+
+{% block body %}
+{% include "navbar.html" %}
+<br><br><br>
+<div class="flex flex-wrap justify-center gap-4 bg-neutral p-5">
+    {% for product in products %}
+    <div class="rounded-xl card w-80 sm:w-72 shadow-xl hover:-translate-y-2 hover:shadow-2xl transition-transform bg-main">
+        <figure class="h-48 overflow-hidden">
+          <img class="w-full h-full object-cover" src="{{ product.image.url }}" alt="{{ product.title }}" />
+        </figure>
+      </a>
+      <div class="card-body p-4 text-center bg-main text-neutral">
+        <h2 class="card-title text-xl mb-2">{{ product.title }}</h2>
+      </div>
+    </div>
+    {% empty %}
+    <p class="text-center w-full">No se encontraron resultados.</p>
+    {% endfor %}
+</div>
+
+{% endblock %}

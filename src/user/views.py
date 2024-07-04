@@ -18,6 +18,8 @@ import base64
 from django.utils.timezone import now, timedelta, datetime
 from django.http import HttpResponse 
 from item.models import Category
+from owners.models import Product
+from .forms import SaleForm
 
 @login_required
 @has_role_decorator('employee')
@@ -68,7 +70,7 @@ def confirm_trade(request, trade_id):
         trade.proposal.requested_item.save()
         fsm.confirm(employee=employee)
         messages.success(request, 'El trueque ha sido confirmado!')
-    return redirect("employee_panel")
+    return redirect("ask_to_upload_sale")
 
 
 @login_required

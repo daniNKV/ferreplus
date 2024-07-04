@@ -1,4 +1,5 @@
 from django.db import models
+from core.jobs import UploadToPathAndRename
 
 
 class Branch(models.Model):
@@ -12,3 +13,16 @@ class Branch(models.Model):
 
     def __str__(self):
         return str(self.name)
+
+class Product(models.Model):
+    class Meta:
+        verbose_name = "Producto"
+
+    title = models.CharField(verbose_name="titulo", max_length=100)
+    image = models.ImageField(
+        upload_to=UploadToPathAndRename("product/images/"), null=False, blank=False
+    )
+    sold = models.IntegerField(default=0)
+
+    def __str__(self):
+        return str(self.title)
